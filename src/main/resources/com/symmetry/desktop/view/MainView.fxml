@@ -2,9 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -15,7 +17,7 @@
             styleClass="raiz">
 
     <left>
-        <VBox styleClass="nav-lateral" prefWidth="250">
+        <VBox fx:id="menuLateral" styleClass="nav-lateral" prefWidth="250">
             <children>
                 <HBox styleClass="nav-marca" spacing="12" alignment="CENTER_LEFT">
                     <padding>
@@ -93,6 +95,19 @@
                         <Insets top="12" right="16" bottom="16" left="16"/>
                     </padding>
                     <children>
+                        <!-- Tarjeta de nivel RPG: se actualiza al ganar XP. -->
+                        <VBox fx:id="tarjetaNivelNav" styleClass="nav-nivel" spacing="6" onMouseClicked="#mostrarInicio">
+                            <children>
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label fx:id="etiquetaNivelNav" styleClass="nav-nivel-insignia"/>
+                                        <Label fx:id="etiquetaTituloNav" styleClass="nav-nivel-titulo" HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                </HBox>
+                                <ProgressBar fx:id="barraXpNav" styleClass="barra-xp" maxWidth="Infinity" progress="0"/>
+                                <Label fx:id="etiquetaXpNav" styleClass="nav-pie-texto"/>
+                            </children>
+                        </VBox>
                         <ToggleButton fx:id="botonTema" styleClass="nav-tema" text="Modo oscuro"
                                       maxWidth="Infinity" contentDisplay="LEFT" onAction="#alternarTema">
                             <graphic>
@@ -126,7 +141,24 @@
                 </HBox>
             </top>
             <center>
-                <StackPane fx:id="contenedorVistas" styleClass="contenedor-vistas"/>
+                <StackPane>
+                    <children>
+                        <StackPane fx:id="contenedorVistas" styleClass="contenedor-vistas"/>
+                        <!-- Capa superior para celebraciones: Level Up, confeti y avisos de XP. -->
+                        <StackPane fx:id="capaCelebracion" pickOnBounds="false">
+                            <children>
+                                <Pane fx:id="capaConfeti" mouseTransparent="true"/>
+                                <VBox fx:id="contenedorToasts" spacing="8" alignment="BOTTOM_RIGHT"
+                                      mouseTransparent="true" maxWidth="-Infinity" maxHeight="-Infinity"
+                                      StackPane.alignment="BOTTOM_RIGHT">
+                                    <padding>
+                                        <Insets top="0" right="22" bottom="22" left="0"/>
+                                    </padding>
+                                </VBox>
+                            </children>
+                        </StackPane>
+                    </children>
+                </StackPane>
             </center>
         </BorderPane>
     </center>

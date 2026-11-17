@@ -16,7 +16,7 @@ import java.util.Optional;
 public class BaseDatos {
 
     /** Version del formato de datos, para futuras migraciones. */
-    private int version = 2;
+    private int version = 3;
 
     private PerfilUsuario perfil = new PerfilUsuario();
     private ConfiguracionApp configuracion = new ConfiguracionApp();
@@ -26,6 +26,7 @@ public class BaseDatos {
     private List<MedicionCorporal> mediciones = new ArrayList<>();
     private List<FotoProgreso> fotos = new ArrayList<>();
     private List<PistaAudio> bibliotecaMusical = new ArrayList<>();
+    private ProgresoRpg progresoRpg = new ProgresoRpg();
 
     public BaseDatos() {
     }
@@ -162,5 +163,13 @@ public class BaseDatos {
 
     public void setBibliotecaMusical(List<PistaAudio> bibliotecaMusical) {
         this.bibliotecaMusical = bibliotecaMusical == null ? new ArrayList<>() : bibliotecaMusical;
+    }
+
+    public ProgresoRpg getProgresoRpg() {
+        return progresoRpg;
+    }
+
+    public void setProgresoRpg(ProgresoRpg progresoRpg) {
+        this.progresoRpg = progresoRpg == null ? new ProgresoRpg() : progresoRpg;
     }
 }

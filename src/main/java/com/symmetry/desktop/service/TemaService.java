@@ -34,6 +34,11 @@ public final class TemaService {
         aplicar(escena, temaActual);
     }
 
+    /** Deja de gestionar una escena (por ejemplo, al cerrar una ventana secundaria). */
+    public static void desregistrar(Scene escena) {
+        ESCENAS.remove(escena);
+    }
+
     /** Fija el tema activo y lo aplica a todas las escenas registradas. */
     public static void aplicarGlobal(TemaApp tema) {
         temaActual = tema == null ? TemaApp.CLARO : tema;

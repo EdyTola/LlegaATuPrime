@@ -2,16 +2,18 @@ package com.symmetry.desktop.controller;
 
 import com.symmetry.desktop.model.DiaSemana;
 import com.symmetry.desktop.model.Ejercicio;
+import com.symmetry.desktop.model.ModalidadEntrenamiento;
 import com.symmetry.desktop.model.NivelEjercicio;
 import com.symmetry.desktop.model.Rutina;
+import com.symmetry.desktop.service.AdaptadorEquipoService;
 import com.symmetry.desktop.service.ArchivoMultimediaService;
 import com.symmetry.desktop.service.GestorDatos;
 import com.symmetry.desktop.service.SugerenciasEjerciciosService;
 import com.symmetry.desktop.util.DiagramaAnatomico;
 import com.symmetry.desktop.util.Dialogos;
 import com.symmetry.desktop.util.FormularioDialogo;
-import com.symmetry.desktop.util.VisorMultimedia;
-import javafx.animation.TranslateTransition;
+import com.symmetry.desktop.util.GuiaTecnicaDialogo;
+import javafx.animation.FadeTransition;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -24,12 +26,18 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -41,7 +49,9 @@ import java.io.File;
 import java.net.URL;
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.ResourceBundle;
 
 /**
@@ -50,15 +60,12 @@ import java.util.ResourceBundle;
  *
  * <p>La tabla de ejercicios ocupa todo el ancho disponible y agrupa las acciones de cada
  * ejercicio (ver tecnica, adjuntar multimedia, editar y eliminar) en iconos dentro de la fila.
- * Las sugerencias por nivel se muestran en un panel lateral (drawer) que se abre bajo demanda.</p>
+ * La biblioteca de ejercicios se abre en un modal centrado con una cuadricula de tarjetas de 2 columnas.</p>
  */
 public class EntrenamientoController implements Initializable, VistaConRefresco {
 
     private static final String RUTA_FORMULARIO_RUTINA = "/com/symmetry/desktop/view/FormularioRutina.fxml";
     private static final String RUTA_FORMULARIO_EJERCICIO = "/com/symmetry/desktop/view/FormularioEjercicio.fxml";
-
-    /** Desplazamiento horizontal que deja el drawer fuera de la pantalla cuando esta cerrado. */
-    private static final double DESPLAZAMIENTO_DRAWER = 380;
 
     /** Tamano final (en px) de los iconos vectoriales de accion dentro de cada fila. */
     private static final double LADO_ICONO_ACCION = 17;
@@ -121,28 +128,37 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
     @FXML
     private Button botonIniciarEntrenamiento;
     @FXML
-    private Region scrimSugerencias;
-    @FXML
-    private VBox panelSugerencias;
+    private StackPane modalBiblioteca;
     @FXML
     private ComboBox<NivelEjercicio> comboNivelSugerencias;
     @FXML
     private Label etiquetaDescripcionNivel;
     @FXML
-    private ListView<Ejercicio> listaSugerencias;
+    private ScrollPane scrollSugerencias;
     @FXML
-    private Label detalleSugerencia;
+    private GridPane cuadriculaSugerencias;
     @FXML
-    private VBox contenedorAnatomia;
+    private Label etiquetaSeleccion;
     @FXML
     private Button botonAgregarSugerencia;
+    @FXML
+    private ToggleButton botonModalGimnasio;
+    @FXML
+    private ToggleButton botonModalCasa;
+    @FXML
+    private ToggleButton botonModoGimnasio;
+    @FXML
+    private ToggleButton botonModoCasa;
+    @FXML
+    private Label etiquetaModalidad;
 
-    /** Diagrama corporal que resalta el grupo muscular del ejercicio sugerido seleccionado. */
-    private final DiagramaAnatomico diagramaSugerencia = new DiagramaAnatomico();
+    /** Ejercicios de la biblioteca marcados por el usuario, en el orden en que los eligio. */
+    private final Set<Ejercicio> seleccionBiblioteca = new LinkedHashSet<>();
 
     @Override
     public void initialize(URL ubicacion, ResourceBundle recursos) {
         columnaNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
+        columnaNombre.setCellFactory(column -> celdaNombre());
         columnaGrupo.setCellValueFactory(new PropertyValueFactory<>("grupoMuscular"));
         columnaPrescripcion.setCellValueFactory(new PropertyValueFactory<>("prescripcion"));
         columnaRir.setCellValueFactory(new PropertyValueFactory<>("rirTexto"));
@@ -183,8 +199,127 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
         listaRutinas.getSelectionModel().selectedItemProperty()
                 .addListener((obs, anterior, actual) -> mostrarRutina(actual));
 
+        configurarModalidad();
         configurarSugerencias();
         refrescar();
+    }
+
+    // ------------------------------------------------------------------
+    // Modalidad: con equipo (Gym Mode) / sin equipo (Home Mode)
+    // ------------------------------------------------------------------
+
+    private void configurarModalidad() {
+        agruparSegmento(botonModoGimnasio, botonModoCasa);
+        agruparSegmento(botonModalGimnasio, botonModalCasa);
+        sincronizarModalidad();
+    }
+
+    /** Agrupa dos botones como segmento exclusivo: siempre queda uno activo. */
+    private static void agruparSegmento(ToggleButton primero, ToggleButton segundo) {
+        ToggleGroup grupo = new ToggleGroup();
+        primero.setToggleGroup(grupo);
+        segundo.setToggleGroup(grupo);
+        grupo.selectedToggleProperty().addListener((obs, anterior, actual) -> {
+            if (actual == null && anterior != null) {
+                anterior.setSelected(true);
+            }
+        });
+    }
+
+    @FXML
+    private void usarModoGimnasio() {
+        cambiarModalidad(ModalidadEntrenamiento.GIMNASIO);
+    }
+
+    @FXML
+    private void usarModoCasa() {
+        cambiarModalidad(ModalidadEntrenamiento.CASA);
+    }
+
+    private void cambiarModalidad(ModalidadEntrenamiento modalidad) {
+        if (gestor.getModalidad() == modalidad) {
+            sincronizarModalidad();
+            return;
+        }
+        gestor.setModalidad(modalidad);
+        sincronizarModalidad();
+        mostrarRutina(listaRutinas.getSelectionModel().getSelectedItem());
+        cargarSugerencias();
+        etiquetaEstado.setText(modalidad == ModalidadEntrenamiento.CASA
+                ? "Modo sin equipo: ejercicios adaptados a peso corporal."
+                : "Modo con equipo: rutina original del gimnasio.");
+    }
+
+    /** Refleja la modalidad guardada en el selector y en el mensaje explicativo. */
+    private void sincronizarModalidad() {
+        ModalidadEntrenamiento modalidad = gestor.getModalidad();
+        botonModoGimnasio.setSelected(modalidad == ModalidadEntrenamiento.GIMNASIO);
+        botonModoCasa.setSelected(modalidad == ModalidadEntrenamiento.CASA);
+        botonModalGimnasio.setSelected(modalidad == ModalidadEntrenamiento.GIMNASIO);
+        botonModalCasa.setSelected(modalidad == ModalidadEntrenamiento.CASA);
+        etiquetaModalidad.setText(modalidad.getDescripcion());
+    }
+
+    /** Ejercicios que se muestran y se entrenan: los originales o sus variantes sin equipo. */
+    private List<Ejercicio> ejerciciosVisibles(Rutina rutina) {
+        if (gestor.getModalidad() == ModalidadEntrenamiento.CASA) {
+            return AdaptadorEquipoService.adaptarRutina(rutina).getEjercicios();
+        }
+        return rutina.getEjercicios();
+    }
+
+    /** Ejercicio real de la rutina que corresponde a la fila visible (que puede ser una variante). */
+    private Ejercicio original(Ejercicio visible) {
+        Rutina rutina = listaRutinas.getSelectionModel().getSelectedItem();
+        if (rutina == null || visible == null) {
+            return visible;
+        }
+        return rutina.getEjercicios().stream()
+                .filter(e -> e.getId().equals(visible.getId()))
+                .findFirst()
+                .orElse(visible);
+    }
+
+    /** Las variantes son temporales: para modificarlas hay que volver al modo con equipo. */
+    private boolean bloqueadoPorVariante(Ejercicio visible) {
+        if (visible != null && visible.getAdaptadoDe() != null) {
+            Dialogos.info("Variante sin equipo",
+                    "\"" + visible.getNombre() + "\" es una variante automática de \""
+                            + visible.getAdaptadoDe() + "\".\nCambia a \"Con equipo\" para editar el ejercicio original.");
+            return true;
+        }
+        return false;
+    }
+
+    /** Celda del nombre: si es una variante sin equipo, muestra de que ejercicio proviene. */
+    private TableCell<Ejercicio, String> celdaNombre() {
+        return new TableCell<>() {
+            private final Label nombre = new Label();
+            private final Label origen = new Label();
+            private final VBox caja = new VBox(1, nombre, origen);
+
+            {
+                origen.getStyleClass().add("texto-variante");
+            }
+
+            @Override
+            protected void updateItem(String valor, boolean vacio) {
+                super.updateItem(valor, vacio);
+                int indice = getIndex();
+                List<Ejercicio> items = getTableView().getItems();
+                if (vacio || indice < 0 || indice >= items.size()) {
+                    setGraphic(null);
+                    return;
+                }
+                Ejercicio ejercicio = items.get(indice);
+                nombre.setText(valor);
+                boolean variante = ejercicio.getAdaptadoDe() != null;
+                origen.setText(variante ? "\u21BA Adaptado de: " + ejercicio.getAdaptadoDe() : "");
+                origen.setVisible(variante);
+                origen.setManaged(variante);
+                setGraphic(caja);
+            }
+        };
     }
 
     // ------------------------------------------------------------------
@@ -252,109 +387,136 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
     }
 
     // ------------------------------------------------------------------
-    // Panel lateral (drawer) de sugerencias
+    // Modal centrado: biblioteca de ejercicios (cuadricula de 2 columnas)
     // ------------------------------------------------------------------
 
-    /** Abre o cierra el panel de sugerencias con una transicion de deslizamiento. */
+    /** Abre la biblioteca como modal centrado sobre el contenido. */
     @FXML
     private void alternarSugerencias() {
-        if (panelSugerencias.isVisible()) {
+        if (modalBiblioteca.isVisible()) {
             cerrarSugerencias();
             return;
         }
-        panelSugerencias.setVisible(true);
-        scrimSugerencias.setVisible(true);
-        animarDrawer(DESPLAZAMIENTO_DRAWER, 0, null);
+        seleccionBiblioteca.clear();
+        cargarSugerencias();
+        scrollSugerencias.setVvalue(0);
+        modalBiblioteca.setManaged(true);
+        modalBiblioteca.setVisible(true);
+        modalBiblioteca.setOpacity(0);
+        FadeTransition aparicion = new FadeTransition(Duration.millis(160), modalBiblioteca);
+        aparicion.setToValue(1);
+        aparicion.play();
+        modalBiblioteca.requestFocus();
     }
 
     @FXML
     private void cerrarSugerencias() {
-        if (!panelSugerencias.isVisible()) {
+        if (!modalBiblioteca.isVisible()) {
             return;
         }
-        animarDrawer(panelSugerencias.getTranslateX(), DESPLAZAMIENTO_DRAWER, () -> {
-            panelSugerencias.setVisible(false);
-            scrimSugerencias.setVisible(false);
+        FadeTransition salida = new FadeTransition(Duration.millis(130), modalBiblioteca);
+        salida.setToValue(0);
+        salida.setOnFinished(evento -> {
+            modalBiblioteca.setVisible(false);
+            modalBiblioteca.setManaged(false);
         });
+        salida.play();
     }
 
-    private void animarDrawer(double desde, double hasta, Runnable alTerminar) {
-        panelSugerencias.setTranslateX(desde);
-        TranslateTransition transicion = new TranslateTransition(Duration.millis(180), panelSugerencias);
-        transicion.setFromX(desde);
-        transicion.setToX(hasta);
-        if (alTerminar != null) {
-            transicion.setOnFinished(evento -> alTerminar.run());
-        }
-        transicion.play();
-    }
-
-    /** Panel lateral de sugerencias de ejercicios filtradas por nivel. */
     private void configurarSugerencias() {
         comboNivelSugerencias.setItems(FXCollections.observableArrayList(NivelEjercicio.values()));
         comboNivelSugerencias.setValue(NivelEjercicio.PRINCIPIANTE);
-        comboNivelSugerencias.valueProperty().addListener((obs, anterior, actual) -> cargarSugerencias());
-
-        contenedorAnatomia.getChildren().add(diagramaSugerencia);
-        contenedorAnatomia.setVisible(false);
-        contenedorAnatomia.setManaged(false);
-
-        listaSugerencias.setCellFactory(lista -> new ListCell<>() {
-            @Override
-            protected void updateItem(Ejercicio ejercicio, boolean vacio) {
-                super.updateItem(ejercicio, vacio);
-                if (vacio || ejercicio == null) {
-                    setText(null);
-                    setGraphic(null);
-                    return;
-                }
-                // Cada sugerencia muestra el icono anatomico del grupo muscular que trabaja.
-                Node icono = DiagramaAnatomico.iconoMini(ejercicio.getGrupoMuscular());
-                Label nombre = new Label(ejercicio.getNombre());
-                nombre.getStyleClass().add("sugerencia-nombre");
-                Label detalle = new Label(ejercicio.getGrupoMuscular().getEtiqueta()
-                        + "  ·  " + ejercicio.getPrescripcion());
-                detalle.getStyleClass().add("sugerencia-detalle");
-                VBox textos = new VBox(2, nombre, detalle);
-                textos.setAlignment(Pos.CENTER_LEFT);
-                HBox fila = new HBox(10, icono, textos);
-                fila.setAlignment(Pos.CENTER_LEFT);
-                setText(null);
-                setGraphic(fila);
+        comboNivelSugerencias.valueProperty().addListener((obs, anterior, actual) -> {
+            seleccionBiblioteca.clear();
+            cargarSugerencias();
+        });
+        // Escape cierra el modal.
+        modalBiblioteca.setOnKeyPressed(evento -> {
+            if (evento.getCode() == KeyCode.ESCAPE) {
+                cerrarSugerencias();
             }
         });
-        listaSugerencias.getSelectionModel().selectedItemProperty()
-                .addListener((obs, anterior, actual) -> actualizarDetalleSugerencia(actual));
-        listaSugerencias.setPlaceholder(new Label("Sin sugerencias para este nivel."));
-
         cargarSugerencias();
     }
 
+    /** Reconstruye la cuadricula con los ejercicios del nivel y la modalidad activos. */
     private void cargarSugerencias() {
         NivelEjercicio nivel = comboNivelSugerencias.getValue();
-        etiquetaDescripcionNivel.setText(SugerenciasEjerciciosService.descripcion(nivel));
-        List<Ejercicio> sugeridas = SugerenciasEjerciciosService.paraNivel(nivel);
-        listaSugerencias.getItems().setAll(sugeridas);
-        listaSugerencias.getSelectionModel().clearSelection();
-        detalleSugerencia.setText("");
-        actualizarBotones();
+        etiquetaDescripcionNivel.setText(SugerenciasEjerciciosService.descripcion(nivel, gestor.getModalidad()));
+        seleccionBiblioteca.clear();
+        cuadriculaSugerencias.getChildren().clear();
+        List<Ejercicio> sugeridas = SugerenciasEjerciciosService.paraNivel(nivel, gestor.getModalidad());
+        for (int i = 0; i < sugeridas.size(); i++) {
+            cuadriculaSugerencias.add(crearTarjeta(sugeridas.get(i)), i % 2, i / 2);
+        }
+        actualizarSeleccion();
     }
 
-    private void actualizarDetalleSugerencia(Ejercicio ejercicio) {
-        if (ejercicio == null) {
-            detalleSugerencia.setText("");
-            diagramaSugerencia.limpiar();
-            contenedorAnatomia.setVisible(false);
-            contenedorAnatomia.setManaged(false);
-        } else {
-            detalleSugerencia.setText(ejercicio.getRirTexto() + " · descanso "
-                    + ejercicio.getDescansoSegundos() + " s");
-            diagramaSugerencia.resaltar(ejercicio.getGrupoMuscular(),
-                    ejercicio.getGrupoMuscular().getSecundarios());
-            contenedorAnatomia.setVisible(true);
-            contenedorAnatomia.setManaged(true);
-        }
-        actualizarBotones();
+    /** Tarjeta amplia: icono anatomico grande a la izquierda y datos del ejercicio a la derecha. */
+    private VBox crearTarjeta(Ejercicio ejercicio) {
+        Node icono = DiagramaAnatomico.iconoGrande(ejercicio.getGrupoMuscular());
+
+        Label nombre = new Label(ejercicio.getNombre());
+        nombre.getStyleClass().add("tarjeta-ejercicio-nombre");
+        nombre.setWrapText(true);
+
+        Label grupo = new Label(ejercicio.getGrupoMuscular().getEtiqueta());
+        grupo.getStyleClass().add("chip-grupo");
+        Label prescripcion = new Label(ejercicio.getPrescripcion() + " · " + ejercicio.getRirTexto());
+        prescripcion.getStyleClass().add("chip-prescripcion");
+        HBox etiquetas = new HBox(6, grupo, prescripcion);
+        etiquetas.setAlignment(Pos.CENTER_LEFT);
+
+        Label descripcion = new Label(SugerenciasEjerciciosService.descripcionTecnica(ejercicio));
+        descripcion.getStyleClass().add("tarjeta-ejercicio-descripcion");
+        descripcion.setWrapText(true);
+        descripcion.setMaxHeight(40);
+
+        Label marca = new Label("\u2713");
+        marca.getStyleClass().add("tarjeta-ejercicio-marca");
+        marca.setVisible(false);
+
+        VBox textos = new VBox(5, nombre, etiquetas, descripcion);
+        textos.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(textos, Priority.ALWAYS);
+
+        StackPane lateral = new StackPane(marca);
+        lateral.setAlignment(Pos.TOP_RIGHT);
+        lateral.setMinWidth(22);
+        lateral.setMaxWidth(22);
+
+        HBox contenido = new HBox(14, icono, textos, lateral);
+        contenido.setAlignment(Pos.CENTER_LEFT);
+
+        VBox tarjeta = new VBox(contenido);
+        tarjeta.getStyleClass().add("tarjeta-ejercicio");
+        tarjeta.setMinHeight(132);
+        tarjeta.setAlignment(Pos.CENTER_LEFT);
+        tarjeta.setOnMouseClicked(evento -> {
+            boolean marcada = seleccionBiblioteca.add(ejercicio);
+            if (!marcada) {
+                seleccionBiblioteca.remove(ejercicio);
+            }
+            tarjeta.getStyleClass().remove("tarjeta-ejercicio-seleccionada");
+            if (marcada) {
+                tarjeta.getStyleClass().add("tarjeta-ejercicio-seleccionada");
+            }
+            marca.setVisible(marcada);
+            actualizarSeleccion();
+        });
+        return tarjeta;
+    }
+
+    /** Actualiza el contador del pie del modal y el estado del boton de confirmar. */
+    private void actualizarSeleccion() {
+        Rutina rutina = listaRutinas.getSelectionModel().getSelectedItem();
+        int total = seleccionBiblioteca.size();
+        String destino = rutina == null ? "" : " a " + rutina.getTituloCompleto();
+        etiquetaSeleccion.setText(total == 0
+                ? "Toca las tarjetas para seleccionar uno o varios ejercicios."
+                : total + (total == 1 ? " ejercicio seleccionado" : " ejercicios seleccionados")
+                + " · se añadirán" + destino);
+        botonAgregarSugerencia.setDisable(rutina == null || total == 0);
     }
 
     /** Indicador corto del recurso visual: archivo local, YouTube u otro enlace. */
@@ -422,7 +584,7 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
         etiquetaDetalleRutina.setText(rutina.getEjercicios().size() + " ejercicios · "
                 + rutina.getSeriesTotales() + " series prescritas");
         etiquetaNotasRutina.setText(rutina.getNotas() == null ? "" : rutina.getNotas());
-        tablaEjercicios.getItems().setAll(rutina.getEjercicios());
+        tablaEjercicios.getItems().setAll(ejerciciosVisibles(rutina));
         marcarRutinaHoy(rutina.getDiaSemana() == DiaSemana.desdeFecha(LocalDate.now()));
         actualizarBotones();
     }
@@ -441,8 +603,7 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
         botonAgregarEjercicio.setDisable(rutina == null);
         botonAbrirSugerencias.setDisable(rutina == null);
         botonIniciarEntrenamiento.setDisable(rutina == null || rutina.getEjercicios().isEmpty());
-        botonAgregarSugerencia.setDisable(rutina == null
-                || listaSugerencias.getSelectionModel().getSelectedItem() == null);
+        actualizarSeleccion();
     }
 
     // ------------------------------------------------------------------
@@ -509,10 +670,11 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
         }
     }
 
-    private void editarEjercicio(Ejercicio ejercicio) {
-        if (ejercicio == null) {
+    private void editarEjercicio(Ejercicio visible) {
+        if (visible == null || bloqueadoPorVariante(visible)) {
             return;
         }
+        Ejercicio ejercicio = original(visible);
         if (abrirFormularioEjercicio(ejercicio, "Editar ejercicio", "Guardar")) {
             gestor.guardarCambiosEntrenamiento();
             mostrarRutina(listaRutinas.getSelectionModel().getSelectedItem());
@@ -520,11 +682,12 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
         }
     }
 
-    private void eliminarEjercicio(Ejercicio ejercicio) {
+    private void eliminarEjercicio(Ejercicio visible) {
         Rutina rutina = listaRutinas.getSelectionModel().getSelectedItem();
-        if (rutina == null || ejercicio == null) {
+        if (rutina == null || visible == null) {
             return;
         }
+        Ejercicio ejercicio = original(visible);
         boolean confirmado = Dialogos.confirmar("Eliminar ejercicio",
                 "¿Quitar \"" + ejercicio.getNombre() + "\" de " + rutina.getNombre() + "?", ventana());
         if (confirmado) {
@@ -535,21 +698,25 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
         }
     }
 
-    private void verTecnica(Ejercicio ejercicio) {
-        if (ejercicio == null) {
+    private void verTecnica(Ejercicio visible) {
+        if (visible == null) {
             return;
         }
-        VisorMultimedia.mostrar(ejercicio.getRutaMultimedia(), ejercicio.getEnlaceMultimedia(), ventana(), ruta -> {
+        Ejercicio ejercicio = visible.getAdaptadoDe() != null ? visible : original(visible);
+        // Las variantes sin equipo son temporales: no se les puede adjuntar multimedia.
+        boolean variante = ejercicio.getAdaptadoDe() != null;
+        GuiaTecnicaDialogo.mostrar(ejercicio, ejercicio.getNombre(), ventana(), variante ? null : ruta -> {
             ejercicio.setRutaMultimedia(ruta);
             gestor.guardarCambiosEntrenamiento();
             tablaEjercicios.refresh();
         });
     }
 
-    private void adjuntarMultimedia(Ejercicio ejercicio) {
-        if (ejercicio == null) {
+    private void adjuntarMultimedia(Ejercicio visible) {
+        if (visible == null || bloqueadoPorVariante(visible)) {
             return;
         }
+        Ejercicio ejercicio = original(visible);
         File archivo = ArchivoMultimediaService
                 .selectorMultimedia(gestor.getDatos().getConfiguracion().getUltimaCarpetaMultimedia())
                 .showOpenDialog(ventana());
@@ -563,24 +730,30 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
         etiquetaEstado.setText("Multimedia asociada a \"" + ejercicio.getNombre() + "\".");
     }
 
-    /** Anade el ejercicio sugerido seleccionado como copia editable en la rutina activa. */
+    /** Anade los ejercicios marcados en la biblioteca como copias editables de la rutina activa. */
     @FXML
     private void agregarSugerencia() {
         Rutina rutina = listaRutinas.getSelectionModel().getSelectedItem();
-        Ejercicio sugerido = listaSugerencias.getSelectionModel().getSelectedItem();
-        if (rutina == null || sugerido == null) {
+        if (rutina == null || seleccionBiblioteca.isEmpty()) {
             return;
         }
-        Ejercicio nuevo = new Ejercicio(sugerido.getNombre(), sugerido.getGrupoMuscular(),
-                sugerido.getSeries(), sugerido.getRepeticionesMin(), sugerido.getRepeticionesMax(),
-                sugerido.getRirObjetivo());
-        nuevo.setDescansoSegundos(sugerido.getDescansoSegundos());
-        nuevo.setPorTiempo(sugerido.isPorTiempo());
-        rutina.agregarEjercicio(nuevo);
+        int anadidos = 0;
+        for (Ejercicio sugerido : seleccionBiblioteca) {
+            Ejercicio nuevo = new Ejercicio(sugerido.getNombre(), sugerido.getGrupoMuscular(),
+                    sugerido.getSeries(), sugerido.getRepeticionesMin(), sugerido.getRepeticionesMax(),
+                    sugerido.getRirObjetivo());
+            nuevo.setDescansoSegundos(sugerido.getDescansoSegundos());
+            nuevo.setPorTiempo(sugerido.isPorTiempo());
+            nuevo.setNotas(SugerenciasEjerciciosService.descripcionTecnica(sugerido));
+            rutina.agregarEjercicio(nuevo);
+            anadidos++;
+        }
         gestor.guardarCambiosEntrenamiento();
         mostrarRutina(rutina);
-        etiquetaEstado.setText("Sugerencia \"" + nuevo.getNombre() + "\" añadida a "
+        etiquetaEstado.setText(anadidos + (anadidos == 1 ? " ejercicio añadido a " : " ejercicios añadidos a ")
                 + rutina.getNombre() + ".");
+        seleccionBiblioteca.clear();
+        cerrarSugerencias();
     }
 
     @FXML
@@ -590,7 +763,9 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
             Dialogos.info("Rutina vacía", "Añade al menos un ejercicio antes de iniciar el entrenamiento.");
             return;
         }
-        WorkoutPlayerController.abrir(rutina, ventana(), () -> recargarRutinas(false));
+        Rutina aEntrenar = gestor.getModalidad() == ModalidadEntrenamiento.CASA
+                ? AdaptadorEquipoService.adaptarRutina(rutina) : rutina;
+        WorkoutPlayerController.abrir(aEntrenar, ventana(), () -> recargarRutinas(false));
     }
 
     // ------------------------------------------------------------------

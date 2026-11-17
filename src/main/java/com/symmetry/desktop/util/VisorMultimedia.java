@@ -101,6 +101,103 @@ public final class VisorMultimedia {
         dialogo.showAndWait();
     }
 
+    /**
+     * Panel de multimedia personalizada para incrustar en otras ventanas (por ejemplo, la pestana
+     * del visor de tecnica): muestra el archivo o enlace del usuario y siempre ofrece el boton
+     * para adjuntar un video o una imagen.
+     */
+    public static final class PanelMultimedia {
+
+        private final Contexto contexto = new Contexto();
+        private final VBox raiz;
+
+        private PanelMultimedia(String rutaLocal, String enlace, Window propietario,
+                                Consumer<String> alAdjuntar) {
+            contexto.ruta = ArchivoMultimediaService.existe(rutaLocal) ? rutaLocal : null;
+            contexto.enlace = enlace != null && !enlace.isBlank() ? enlace.trim() : null;
+
+            Label etiquetaArchivo = new Label();
+            etiquetaArchivo.getStyleClass().add("texto-secundario");
+            StackPane contenedor = new StackPane();
+            contenedor.getStyleClass().add("visor-media");
+            contenedor.setMinSize(520, 320);
+            VBox.setVgrow(contenedor, Priority.ALWAYS);
+
+            Runnable redibujar = () -> {
+                construir(contexto, contenedor, etiquetaArchivo);
+                if (contenedor.getChildren().isEmpty()) {
+                    etiquetaArchivo.setText("Sin video ni imagen personalizada");
+                    contenedor.getChildren().add(vacio());
+                }
+            };
+
+            HBox acciones = new HBox(10);
+            acciones.setAlignment(Pos.CENTER_LEFT);
+            if (alAdjuntar != null) {
+                Button adjuntar = new Button("＋ Adjuntar video o imagen");
+                adjuntar.getStyleClass().add("boton-acento");
+                adjuntar.setOnAction(e -> {
+                    File archivo = ArchivoMultimediaService.selectorMultimedia(null).showOpenDialog(propietario);
+                    if (archivo != null) {
+                        contexto.ruta = archivo.getAbsolutePath();
+                        contexto.enlace = null;
+                        redibujar.run();
+                        alAdjuntar.accept(contexto.ruta);
+                    }
+                });
+                acciones.getChildren().add(adjuntar);
+            }
+            Region hueco = new Region();
+            HBox.setHgrow(hueco, Priority.ALWAYS);
+            Label ayuda = new Label("Archivos .png .jpg .gif .mp4 o enlaces web");
+            ayuda.getStyleClass().add("texto-secundario");
+            acciones.getChildren().addAll(hueco, ayuda);
+
+            raiz = new VBox(12, etiquetaArchivo, contenedor, acciones);
+            raiz.setPadding(new Insets(10, 4, 4, 4));
+            redibujar.run();
+        }
+
+        private static Node vacio() {
+            Label titulo = new Label("Aún no has adjuntado un video o una imagen");
+            titulo.getStyleClass().add("titulo-seccion");
+            Label detalle = new Label("Sube tu propia referencia (.mp4, .gif, .png, .jpg) con el botón "
+                    + "\"Adjuntar video o imagen\". Mientras tanto, el modelo 2D animado te sirve de guía.");
+            detalle.getStyleClass().add("texto-secundario");
+            detalle.setWrapText(true);
+            detalle.setMaxWidth(440);
+            VBox caja = new VBox(8, titulo, detalle);
+            caja.setAlignment(Pos.CENTER);
+            return caja;
+        }
+
+        public Node getNodo() {
+            return raiz;
+        }
+
+        /** Pausa el video si hay uno en reproduccion (al cambiar de pestana). */
+        public void pausar() {
+            if (contexto.reproductor != null) {
+                contexto.reproductor.pause();
+            }
+        }
+
+        public void reanudar() {
+            if (contexto.reproductor != null) {
+                contexto.reproductor.play();
+            }
+        }
+
+        public void liberar() {
+            contexto.liberar();
+        }
+    }
+
+    public static PanelMultimedia crearPanel(String rutaLocal, String enlace, Window propietario,
+                                             Consumer<String> alAdjuntar) {
+        return new PanelMultimedia(rutaLocal, enlace, propietario, alAdjuntar);
+    }
+
     private static void construir(Contexto contexto, StackPane contenedor, Label etiquetaArchivo) {
         contexto.liberar();
         contenedor.getChildren().clear();

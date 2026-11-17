@@ -9,7 +9,13 @@ import com.symmetry.desktop.service.ArchivoMultimediaService;
 import com.symmetry.desktop.service.GestorDatos;
 import com.symmetry.desktop.util.Dialogos;
 import com.symmetry.desktop.util.Formato;
-import com.symmetry.desktop.util.VisorMultimedia;
+import com.symmetry.desktop.service.SonidoService;
+import com.symmetry.desktop.service.SonidoService.Efecto;
+import com.symmetry.desktop.service.TemaService;
+import com.symmetry.desktop.util.AchievementVFX;
+import com.symmetry.desktop.util.GuiaTecnicaDialogo;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -69,6 +75,8 @@ public class WorkoutPlayerController {
     private Stage escenario;
     private Runnable alFinalizar;
     private Ejercicio ejercicioActual;
+    /** Capa transparente sobre el reproductor para los efectos de logro (texto flotante). */
+    private Pane capaEfectos;
 
     private Timeline relojGlobal;
     private Timeline relojDescanso;
@@ -121,7 +129,12 @@ public class WorkoutPlayerController {
                 escenario.initOwner(propietario);
                 escenario.initModality(Modality.WINDOW_MODAL);
             }
-            Scene escena = new Scene(raiz, 1140, 740);
+            Pane capaEfectos = new Pane();
+            capaEfectos.setMouseTransparent(true);
+            Scene escena = new Scene(new StackPane(raiz, capaEfectos), 1140, 740);
+            controlador.capaEfectos = capaEfectos;
+            TemaService.registrar(escena);
+            escenario.setOnHidden(evento -> TemaService.desregistrar(escena));
             URL css = WorkoutPlayerController.class.getResource(RUTA_CSS);
             if (css != null) {
                 escena.getStylesheets().add(css.toExternalForm());
@@ -267,6 +280,7 @@ public class WorkoutPlayerController {
                 fila.completadaProperty().addListener((obs, antes, ahora) -> {
                     if (ahora) {
                         iniciarDescanso();
+                        celebrarSerie(ejercicio, lista);
                     }
                     actualizarResumen();
                 });
@@ -276,6 +290,23 @@ public class WorkoutPlayerController {
             }
             return lista;
         });
+    }
+
+    /**
+     * Micro-interaccion al completar una serie: brillo sobre la tabla, texto flotante y sonido.
+     * Si era la ultima serie del ejercicio, la celebracion es mayor (lista de ejercicios).
+     */
+    private void celebrarSerie(Ejercicio ejercicio, List<FilaSerie> filas) {
+        boolean ejercicioCompleto = filas.stream().allMatch(FilaSerie::isCompletada);
+        if (capaEfectos != null && tablaSeries.getScene() != null) {
+            AchievementVFX.pulsoGlow(tablaSeries);
+            AchievementVFX.textoFlotante(tablaSeries, capaEfectos,
+                    ejercicioCompleto ? "¡Ejercicio completado!" : "¡Serie completada!");
+            if (ejercicioCompleto) {
+                AchievementVFX.pulsoGlow(listaEjercicios);
+            }
+        }
+        SonidoService.reproducir(ejercicioCompleto ? Efecto.EXITO : Efecto.SERIE);
     }
 
     private void mostrarEjercicio(Ejercicio ejercicio) {
@@ -396,11 +427,11 @@ public class WorkoutPlayerController {
         if (ejercicioActual == null) {
             return;
         }
-        VisorMultimedia.mostrar(ejercicioActual.getRutaMultimedia(), ejercicioActual.getEnlaceMultimedia(),
-                ventana(), ruta -> {
-                    ejercicioActual.setRutaMultimedia(ruta);
-                    gestor.guardarCambiosEntrenamiento();
-                });
+        // Guia tecnica: modelo 2D animado siempre disponible + multimedia personalizada del usuario.
+        GuiaTecnicaDialogo.mostrar(ejercicioActual, sustituciones.get(ejercicioActual.getId()), ventana(), ruta -> {
+            ejercicioActual.setRutaMultimedia(ruta);
+            gestor.guardarCambiosEntrenamiento();
+        });
     }
 
     @FXML

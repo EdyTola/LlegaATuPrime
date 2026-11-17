@@ -6,6 +6,7 @@ import com.symmetry.desktop.model.ObjetivosNutricionales;
 import com.symmetry.desktop.model.Recipiente;
 import com.symmetry.desktop.model.RegistroHidratacion;
 import com.symmetry.desktop.service.GestorDatos;
+import com.symmetry.desktop.util.AchievementVFX;
 import com.symmetry.desktop.util.Confeti;
 import com.symmetry.desktop.util.Dialogos;
 import com.symmetry.desktop.util.Formato;
@@ -279,47 +280,17 @@ public class NutricionController implements Initializable, VistaConRefresco {
         }
         for (MetaDiaria meta : nuevas) {
             meta.tarjeta().celebrar();
+            // Pulso de brillo + texto flotante + chime sobre la tarjeta de la meta.
+            AchievementVFX.celebrarMeta(meta.tarjeta(), capaConfeti, "¡Completado!");
         }
         Confeti.estallar(capaConfeti);
         mostrarInsignia(nuevas);
     }
 
-    /** Muestra un distintivo flotante de "meta alcanzada" que aparece y se desvanece. */
+    /** Toast compacto de "meta alcanzada" en la esquina superior derecha (nunca tapa la interfaz). */
     private void mostrarInsignia(List<MetaDiaria> metas) {
-        Label simbolo = new Label("\u2B50");
-        simbolo.getStyleClass().add("insignia-simbolo");
-        Label titulo = new Label("¡Meta diaria alcanzada!");
-        titulo.getStyleClass().add("insignia-titulo");
-        Label detalle = new Label(String.join(" · ", metas.stream().map(MetaDiaria::nombre).toList()));
-        detalle.getStyleClass().add("insignia-detalle");
-        VBox textos = new VBox(2, titulo, detalle);
-        textos.setAlignment(Pos.CENTER_LEFT);
-
-        HBox insignia = new HBox(10, simbolo, textos);
-        insignia.getStyleClass().add("insignia-victoria");
-        insignia.setAlignment(Pos.CENTER_LEFT);
-        insignia.setMouseTransparent(true);
-        StackPane.setAlignment(insignia, Pos.TOP_CENTER);
-
-        insignia.setTranslateY(70);
-        insignia.setOpacity(0);
-        raizNutricion.getChildren().add(insignia);
-
-        Timeline aparicion = new Timeline(
-                new KeyFrame(Duration.ZERO,
-                        new KeyValue(insignia.opacityProperty(), 0),
-                        new KeyValue(insignia.translateYProperty(), 70)),
-                new KeyFrame(Duration.millis(320),
-                        new KeyValue(insignia.opacityProperty(), 1, Interpolator.EASE_OUT),
-                        new KeyValue(insignia.translateYProperty(), 20, Interpolator.EASE_OUT)),
-                new KeyFrame(Duration.millis(2000),
-                        new KeyValue(insignia.opacityProperty(), 1),
-                        new KeyValue(insignia.translateYProperty(), 20)),
-                new KeyFrame(Duration.millis(2500),
-                        new KeyValue(insignia.opacityProperty(), 0, Interpolator.EASE_IN),
-                        new KeyValue(insignia.translateYProperty(), 0, Interpolator.EASE_IN)));
-        aparicion.setOnFinished(evento -> raizNutricion.getChildren().remove(insignia));
-        aparicion.play();
+        AchievementVFX.toastLogro(raizNutricion, "¡Meta diaria alcanzada!",
+                String.join(" · ", metas.stream().map(MetaDiaria::nombre).toList()));
     }
 
     /** Meta diaria evaluada en el resumen, con la tarjeta asociada para el destello. */

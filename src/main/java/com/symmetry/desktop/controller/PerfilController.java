@@ -5,6 +5,11 @@ import com.symmetry.desktop.model.PerfilUsuario;
 import com.symmetry.desktop.service.ArchivoMultimediaService;
 import com.symmetry.desktop.service.GestorDatos;
 import com.symmetry.desktop.service.PerfilService;
+import com.symmetry.desktop.service.QuoteService;
+import com.symmetry.desktop.service.SonidoService;
+import com.symmetry.desktop.model.ConfiguracionApp;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Slider;
 import com.symmetry.desktop.util.Dialogos;
 import com.symmetry.desktop.util.Formato;
 import com.symmetry.desktop.util.FormularioDialogo;
@@ -21,6 +26,7 @@ import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -62,6 +68,22 @@ public class PerfilController implements Initializable, VistaConRefresco {
     @FXML
     private TextField campoNombre;
     @FXML
+    private CheckBox checkSfx;
+    @FXML
+    private Slider sliderSfx;
+    @FXML
+    private Button botonProbarSfx;
+    /** Evita guardar mientras se cargan los valores iniciales en los controles de sonido. */
+    private boolean cargandoSfx;
+    @FXML
+    private TextField campoFrase;
+    @FXML
+    private Label vistaFraseTexto;
+    @FXML
+    private Label vistaFraseAutor;
+    @FXML
+    private Label contadorFrase;
+    @FXML
     private Spinner<Integer> spinnerEdad;
     @FXML
     private TextArea campoObjetivo;
@@ -101,6 +123,30 @@ public class PerfilController implements Initializable, VistaConRefresco {
     public void initialize(URL ubicacion, ResourceBundle recursos) {
         imagenAvatar.setClip(new Circle(RADIO_AVATAR, RADIO_AVATAR, RADIO_AVATAR));
 
+        // La frase personal se limita en longitud y la vista previa se actualiza al escribir.
+        campoFrase.setTextFormatter(new TextFormatter<>(cambio -> {
+            int exceso = cambio.getControlNewText().length() - QuoteService.LONGITUD_MAXIMA;
+            if (exceso <= 0) {
+                return cambio;
+            }
+            // Un texto pegado demasiado largo se recorta en lugar de rechazarse.
+            String texto = cambio.getText();
+            if (texto.length() <= exceso) {
+                return null;
+            }
+            cambio.setText(texto.substring(0, texto.length() - exceso));
+            return cambio;
+        }));
+        campoFrase.textProperty().addListener((obs, anterior, actual) -> actualizarVistaFrase());
+
+        // Los ajustes de sonido se guardan al momento, sin esperar a "Guardar cambios".
+        checkSfx.selectedProperty().addListener((obs, antes, ahora) -> {
+            sliderSfx.setDisable(!ahora);
+            botonProbarSfx.setDisable(!ahora);
+            guardarSfx();
+        });
+        sliderSfx.valueProperty().addListener((obs, antes, ahora) -> guardarSfx());
+
         spinnerEdad.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(10, 100, 25));
         spinnerProteina.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(0, 500, 145, 5));
         spinnerCalorias.setValueFactory(new SpinnerValueFactory.DoubleSpinnerValueFactory(1000, 6000, 2400, 50));
@@ -133,6 +179,16 @@ public class PerfilController implements Initializable, VistaConRefresco {
         campoNombre.setText(perfil.getNombre());
         spinnerEdad.getValueFactory().setValue(perfil.getEdad() == null ? 25 : perfil.getEdad());
         campoObjetivo.setText(perfil.getObjetivoGeneral() == null ? "" : perfil.getObjetivoGeneral());
+        campoFrase.setText(perfil.getCustomQuote() == null ? "" : perfil.getCustomQuote());
+        actualizarVistaFrase();
+
+        cargandoSfx = true;
+        ConfiguracionApp config = gestor.getDatos().getConfiguracion();
+        checkSfx.setSelected(config.isSfxActivados());
+        sliderSfx.setValue(config.getVolumenSfx());
+        sliderSfx.setDisable(!config.isSfxActivados());
+        botonProbarSfx.setDisable(!config.isSfxActivados());
+        cargandoSfx = false;
         etiquetaFechaRegistro.setText(perfil.getFechaRegistro() == null ? ""
                 : "Perfil creado el " + Formato.fechaCorta(perfil.getFechaRegistro()));
 
@@ -146,6 +202,32 @@ public class PerfilController implements Initializable, VistaConRefresco {
 
         etiquetaErrorPerfil.setText("");
         actualizarAvatar(perfil);
+    }
+
+    private void guardarSfx() {
+        if (cargandoSfx) {
+            return;
+        }
+        ConfiguracionApp config = gestor.getDatos().getConfiguracion();
+        config.setSfxActivados(checkSfx.isSelected());
+        config.setVolumenSfx(sliderSfx.getValue());
+        gestor.guardarAutomatico();
+    }
+
+    /** Reproduce el sonido de logro con el volumen elegido para que el usuario lo compruebe. */
+    @FXML
+    private void probarSfx() {
+        SonidoService.reproducir(SonidoService.Efecto.LOGRO, sliderSfx.getValue());
+    }
+
+    /** Vista previa de la frase personal tal como aparecera en el Inicio. */
+    private void actualizarVistaFrase() {
+        String texto = campoFrase.getText() == null ? "" : campoFrase.getText().trim();
+        boolean hayFrase = !texto.isEmpty();
+        vistaFraseTexto.setText(hayFrase ? "\u201C" + texto + "\u201D"
+                : "Escribe tu frase de poder: aparecerá en tu Inicio junto a las frases legendarias.");
+        vistaFraseAutor.setText(hayFrase ? QuoteService.AUTOR_PERSONAL : "");
+        contadorFrase.setText(texto.length() + " / " + QuoteService.LONGITUD_MAXIMA);
     }
 
     private void recargarPerfiles() {
@@ -207,6 +289,8 @@ public class PerfilController implements Initializable, VistaConRefresco {
         perfil.setEdad(spinnerEdad.getValue());
         String objetivo = campoObjetivo.getText() == null ? "" : campoObjetivo.getText().trim();
         perfil.setObjetivoGeneral(objetivo.isEmpty() ? null : objetivo);
+        String frase = campoFrase.getText() == null ? "" : campoFrase.getText().trim();
+        perfil.setCustomQuote(frase.isEmpty() ? null : frase);
 
         ObjetivosNutricionales metas = perfil.getObjetivos();
         metas.setProteinaGramos(spinnerProteina.getValue());
