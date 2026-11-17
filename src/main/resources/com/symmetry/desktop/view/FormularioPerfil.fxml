@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.symmetry.desktop.controller.FormularioPerfilController" spacing="12">
+    <padding>
+        <Insets top="8" right="14" bottom="8" left="14"/>
+    </padding>
+    <children>
+        <GridPane hgap="12" vgap="10">
+            <columnConstraints>
+                <ColumnConstraints minWidth="130" prefWidth="130"/>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="280"/>
+            </columnConstraints>
+            <children>
+                <Label text="Nombre del perfil" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <TextField fx:id="campoNombre" promptText="Ej. Yoel Fernando"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Edad" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <Spinner fx:id="spinnerEdad" editable="true" maxWidth="140"
+                         GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Objetivo general" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <TextArea fx:id="campoObjetivo" prefRowCount="3" wrapText="true"
+                          promptText="Objetivo principal del usuario (opcional)"
+                          GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+            </children>
+        </GridPane>
+        <Label text="El nuevo perfil se creará con las rutinas precargadas y sus propios datos aislados."
+               styleClass="texto-secundario" wrapText="true"/>
+        <Label fx:id="etiquetaError" styleClass="texto-error" wrapText="true"/>
+    </children>
+</VBox>

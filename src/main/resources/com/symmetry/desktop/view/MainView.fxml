@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.symmetry.desktop.controller.MainController"
+            styleClass="raiz">
+
+    <left>
+        <VBox styleClass="nav-lateral" prefWidth="250">
+            <children>
+                <HBox styleClass="nav-marca" spacing="12" alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets top="22" right="18" bottom="16" left="18"/>
+                    </padding>
+                    <children>
+                        <StackPane styleClass="nav-logo-marco" minWidth="44" minHeight="44"
+                                   maxWidth="44" maxHeight="44">
+                            <children>
+                                <SVGPath styleClass="nav-logo-barras"
+                                         content="M10,34 L15,34 L15,27 L10,27 Z M19,34 L24,34 L24,21 L19,21 Z M28,34 L33,34 L33,15 L28,15 Z"/>
+                                <SVGPath styleClass="nav-logo-pico"
+                                         content="M9,24 L16,17 L22,21 L35,11"/>
+                                <SVGPath styleClass="nav-logo-flecha"
+                                         content="M30,11 L36,11 L36,17"/>
+                            </children>
+                        </StackPane>
+                        <VBox spacing="2">
+                            <children>
+                                <Label text="Llega a tu Prime" styleClass="nav-marca-titulo"/>
+                                <Label text="Rendimiento · Salud" styleClass="nav-marca-subtitulo"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <VBox styleClass="nav-items" spacing="4" VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets top="4" right="12" bottom="12" left="12"/>
+                    </padding>
+                    <children>
+                        <ToggleButton fx:id="botonInicio" styleClass="nav-boton" text="Inicio"
+                                      maxWidth="Infinity" selected="true" contentDisplay="LEFT"
+                                      onAction="#mostrarInicio">
+                            <graphic>
+                                <Label text="&#8962;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="botonEntrenamiento" styleClass="nav-boton" text="Entrenamiento"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#mostrarEntrenamiento">
+                            <graphic>
+                                <Label text="&#9635;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="botonNutricion" styleClass="nav-boton" text="Nutricion e hidratacion"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#mostrarNutricion">
+                            <graphic>
+                                <Label text="&#9680;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="botonMusica" styleClass="nav-boton" text="Musica local"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#mostrarMusica">
+                            <graphic>
+                                <Label text="&#9834;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="botonProgreso" styleClass="nav-boton" text="Progreso y analiticas"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#mostrarProgreso">
+                            <graphic>
+                                <Label text="&#9650;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="botonPerfil" styleClass="nav-boton" text="Mi perfil"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#mostrarPerfil">
+                            <graphic>
+                                <SVGPath styleClass="nav-icono-svg"
+                                         content="M12,12 a4,4 0 1,0 0,-8 a4,4 0 1,0 0,8 Z M20,20 c0,-3.3 -3.6,-6 -8,-6 s-8,2.7 -8,6 Z"/>
+                            </graphic>
+                        </ToggleButton>
+                    </children>
+                </VBox>
+
+                <VBox styleClass="nav-pie" spacing="10">
+                    <padding>
+                        <Insets top="12" right="16" bottom="16" left="16"/>
+                    </padding>
+                    <children>
+                        <ToggleButton fx:id="botonTema" styleClass="nav-tema" text="Modo oscuro"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#alternarTema">
+                            <graphic>
+                                <Label fx:id="iconoTema" text="&#9789;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <VBox spacing="3">
+                            <children>
+                                <Label text="100% offline - datos locales" styleClass="nav-pie-texto"/>
+                                <Label fx:id="etiquetaRutaDatos" styleClass="nav-pie-texto" wrapText="true"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <BorderPane styleClass="area-contenido">
+            <top>
+                <HBox styleClass="cabecera" alignment="CENTER_LEFT" spacing="12">
+                    <padding>
+                        <Insets top="18" right="26" bottom="18" left="26"/>
+                    </padding>
+                    <children>
+                        <Label fx:id="etiquetaTituloSeccion" text="Inicio" styleClass="cabecera-titulo"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="etiquetaFechaCabecera" styleClass="cabecera-fecha"/>
+                    </children>
+                </HBox>
+            </top>
+            <center>
+                <StackPane fx:id="contenedorVistas" styleClass="contenedor-vistas"/>
+            </center>
+        </BorderPane>
+    </center>
+
+</BorderPane>

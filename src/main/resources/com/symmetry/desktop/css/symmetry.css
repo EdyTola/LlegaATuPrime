@@ -1,0 +1,1404 @@
+/* =====================================================================
+   Llega a tu Prime - Hoja de estilos principal
+   Estilo inspirado en Microsoft Fluent Design (Windows 11)
+   Los colores se definen como variables (looked-up colors) en .root y se
+   sobrescriben en .root.tema-oscuro, permitiendo alternar tema en caliente.
+   ===================================================================== */
+
+.root {
+    /* Variables del tema claro (por defecto) */
+    -color-fondo: #F3F3F3;
+    -color-superficie: #FFFFFF;
+    -color-superficie-alt: #FAFAFA;
+    -color-superficie-hover: #F5F4F3;
+    -color-tabla-cabecera: #FAF9F8;
+    -color-tabla-fila-hover: #F7F7F7;
+    -color-borde: #E1DFDD;
+    -color-borde-fuerte: #D2D0CE;
+    -color-separador: #F0EFEE;
+    -color-texto: #242424;
+    -color-texto-secundario: #605E5C;
+    -color-texto-deshabilitado: #9A9A9A;
+    -color-acento: #0078D4;
+    -color-acento-hover: #106EBE;
+    -color-acento-suave: #EFF6FC;
+    -color-acento-suave-hover: #DCEBF8;
+    -color-acento-borde: #CFE4F5;
+    -color-verde: #107C10;
+    -color-naranja: #CA5010;
+    -color-morado: #8764B8;
+    -color-teal: #038387;
+    -color-gris: #8A8886;
+    -color-rojo: #C42B1C;
+    -color-cian: #0A6EBD;
+    -color-menta: #0E8F6E;
+    -color-peligro-borde: #E8BFB9;
+    -color-peligro-suave: #FDF3F2;
+    -color-pista: #EDEBE9;
+    -color-grafico-fondo: #FCFCFC;
+    -color-grid: #EDEBE9;
+    -color-deshabilitado: #C7C7C7;
+    -color-sombra: rgba(0, 0, 0, 0.06);
+
+    /* Fuente geometrica de alta legibilidad (Inter / Segoe UI Variable en Windows 11) */
+    -fx-font-family: "Inter", "Segoe UI Variable Text", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: -color-fondo;
+    -fx-text-fill: -color-texto;
+}
+
+/* ---------------------------- Tema oscuro ---------------------------- */
+
+.root.tema-oscuro {
+    -color-fondo: #0F0F0F;
+    -color-superficie: #181818;
+    -color-superficie-alt: #141414;
+    -color-superficie-hover: #232323;
+    -color-tabla-cabecera: #242424;
+    -color-tabla-fila-hover: #262626;
+    -color-borde: #333333;
+    -color-borde-fuerte: #3D3D3D;
+    -color-separador: #2A2A2A;
+    -color-texto: #F0F0F0;
+    -color-texto-secundario: #A8A8A8;
+    -color-texto-deshabilitado: #6E6E6E;
+    -color-acento: #0078D4;
+    -color-acento-hover: #2B88D8;
+    -color-acento-suave: #11293D;
+    -color-acento-suave-hover: #16354E;
+    -color-acento-borde: #1E4A6E;
+    -color-verde: #4CC265;
+    -color-naranja: #E8A33D;
+    -color-morado: #B79CE8;
+    -color-teal: #2AA0A4;
+    -color-gris: #9A9A9A;
+    -color-rojo: #F1707B;
+    -color-cian: #38BDF8;
+    -color-menta: #5EE2A6;
+    -color-peligro-borde: #5A2A2A;
+    -color-peligro-suave: #2A1616;
+    -color-pista: #2A2A2A;
+    -color-grafico-fondo: #191919;
+    -color-grid: #2A2A2A;
+    -color-deshabilitado: #4A4A4A;
+    -color-sombra: rgba(0, 0, 0, 0.5);
+}
+
+.label {
+    -fx-text-fill: -color-texto;
+}
+
+/* ---------------------------- Navegacion lateral ---------------------------- */
+
+.raiz {
+    -fx-background-color: -color-fondo;
+}
+
+.nav-lateral {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: transparent -color-borde transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.nav-marca-titulo {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+}
+
+.nav-marca-subtitulo {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+/* Logotipo corporativo: marca vectorial (isotipo + tipografia) */
+.nav-logo-marco {
+    -fx-background-color: linear-gradient(to bottom right, -color-acento-suave, transparent);
+    -fx-background-radius: 12px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+/* Barras ascendentes: disciplina y constancia */
+.nav-logo-barras {
+    -fx-fill: -color-acento;
+}
+
+/* Linea de picos con flecha: evolucion y rendimiento */
+.nav-logo-pico,
+.nav-logo-flecha {
+    -fx-fill: transparent;
+    -fx-stroke: -color-menta;
+    -fx-stroke-width: 2.4px;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+}
+
+.nav-boton {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-width: 0 0 0 3;
+    -fx-border-color: transparent;
+    -fx-text-fill: -color-texto;
+    -fx-font-size: 14px;
+    -fx-padding: 10 12 10 12;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+}
+
+.nav-boton:hover {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.nav-boton:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: transparent transparent transparent -color-acento;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.nav-boton:selected .nav-icono {
+    -fx-text-fill: -color-acento;
+}
+
+.nav-icono {
+    -fx-text-fill: -color-texto-secundario;
+    -fx-font-size: 15px;
+    -fx-min-width: 22px;
+}
+
+.nav-pie {
+    -fx-background-color: -color-superficie-alt;
+    -fx-border-color: -color-borde transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.nav-pie-texto {
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.nav-tema {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-width: 1px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-padding: 8 12 8 12;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-font-size: 12px;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+}
+
+.nav-tema:hover {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.nav-tema:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.nav-tema:selected .nav-icono {
+    -fx-text-fill: -color-acento;
+}
+
+/* ---------------------------- Area de contenido ---------------------------- */
+
+.area-contenido {
+    -fx-background-color: -color-fondo;
+}
+
+.cabecera {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: transparent transparent -color-borde transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.cabecera-titulo {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.cabecera-fecha {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.contenedor-vistas {
+    -fx-background-color: -color-fondo;
+}
+
+.scroll-fondo,
+.scroll-fondo .viewport {
+    -fx-background-color: transparent;
+}
+
+.contenido-vista {
+    -fx-padding: 22 24 28 24;
+    -fx-background-color: transparent;
+}
+
+/* ---------------------------- Tarjetas ---------------------------- */
+
+.tarjeta {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 18px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
+}
+
+.tarjeta-compacta {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 14px;
+}
+
+.tarjeta-metrica {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
+}
+
+.tarjeta-acento {
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+}
+
+.panel-lista {
+    -fx-padding: 16px;
+}
+
+/* ---------------------------- Tipografia ---------------------------- */
+
+.titulo-principal {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.titulo-seccion {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.subtitulo {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.texto-secundario {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.etiqueta-metrica {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.valor-metrica {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.valor-acento {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+}
+
+.cronometro {
+    -fx-font-family: "Consolas", "Segoe UI", monospace;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+}
+
+.etiqueta-descanso {
+    -fx-font-family: "Consolas", "Segoe UI", monospace;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-naranja;
+}
+
+.texto-error {
+    -fx-text-fill: -color-rojo;
+}
+
+/* Confirmacion de accion completada (por ejemplo, cambios guardados) */
+.texto-exito {
+    -fx-text-fill: -color-verde;
+}
+
+/* Indicador de exceso: valor real con el sobrante por encima de la meta */
+.valor-exceso {
+    -fx-text-fill: -color-naranja;
+    -fx-font-weight: bold;
+}
+
+/* ---------------------------- Botones ---------------------------- */
+
+.button {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 5px;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+    -fx-text-fill: -color-texto;
+    -fx-padding: 7 16 7 16;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.button:focused {
+    -fx-border-color: -color-acento;
+}
+
+.button:disabled {
+    -fx-opacity: 0.45;
+}
+
+.boton-primario {
+    -fx-background-color: -color-acento;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.boton-primario:hover {
+    -fx-background-color: -color-acento-hover;
+    -fx-border-color: -color-acento-hover;
+}
+
+.boton-primario:disabled {
+    -fx-background-color: -color-deshabilitado;
+    -fx-border-color: -color-deshabilitado;
+}
+
+.boton-acento {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.boton-acento:hover {
+    -fx-background-color: -color-acento-suave-hover;
+}
+
+.boton-secundario {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-borde-fuerte;
+}
+
+.boton-secundario:hover {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.boton-peligro {
+    -fx-text-fill: -color-rojo;
+    -fx-border-color: -color-peligro-borde;
+    -fx-background-color: transparent;
+}
+
+.boton-peligro:hover {
+    -fx-background-color: -color-peligro-suave;
+}
+
+.boton-envase {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-font-size: 12px;
+    -fx-padding: 10 14 10 14;
+    -fx-text-alignment: center;
+}
+
+.boton-envase:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+}
+
+/* Chips compactos de registro rapido (por ejemplo, horas de sueno) */
+.boton-chip {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-padding: 4 14 4 14;
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-cursor: hand;
+}
+
+.boton-chip:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+}
+
+/* ---------------------------- Botones de icono (acciones de fila) ---------------------------- */
+
+.boton-icono {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-font-size: 12px;
+    -fx-min-width: 28px;
+    -fx-min-height: 24px;
+    -fx-padding: 1 6 1 6;
+    -fx-cursor: hand;
+}
+
+.boton-icono:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+}
+
+.boton-icono-peligro {
+    -fx-text-fill: -color-rojo;
+}
+
+.boton-icono-peligro:hover {
+    -fx-background-color: -color-peligro-suave;
+    -fx-text-fill: -color-rojo;
+}
+
+/* ---------------------------- Campos de entrada ---------------------------- */
+
+.text-field,
+.text-area,
+.password-field {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 5px;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+    -fx-padding: 7 10 7 10;
+    -fx-text-fill: -color-texto;
+    -fx-prompt-text-fill: -color-texto-deshabilitado;
+}
+
+.text-field:focused,
+.text-area:focused {
+    -fx-border-color: -color-acento;
+}
+
+.text-area .content {
+    -fx-background-color: -color-superficie;
+}
+
+.combo-box,
+.choice-box,
+.spinner {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 5px;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+}
+
+.combo-box:focused,
+.spinner:focused {
+    -fx-border-color: -color-acento;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 6 8 6 8;
+    -fx-text-fill: -color-texto;
+}
+
+.combo-box .list-view,
+.combo-box-popup .list-view {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde;
+}
+
+.spinner .text-field {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.date-picker .text-field {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup {
+    -fx-background-color: -color-superficie;
+}
+
+.date-picker-popup .month-year-pane {
+    -fx-background-color: -color-superficie;
+}
+
+.check-box {
+    -fx-text-fill: -color-texto;
+}
+
+.check-box .box {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 3px;
+}
+
+.check-box:selected .box {
+    -fx-background-color: -color-acento;
+    -fx-border-color: -color-acento;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+/* ---------------------------- Progreso ---------------------------- */
+
+.progress-bar {
+    -fx-pref-height: 8px;
+}
+
+.progress-bar > .track {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 4px;
+    -fx-background-insets: 0;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: -color-acento;
+    -fx-background-radius: 4px;
+    -fx-background-insets: 0;
+    -fx-padding: 4px;
+}
+
+.progreso-verde > .bar {
+    -fx-background-color: -color-verde;
+}
+
+.progreso-naranja > .bar {
+    -fx-background-color: -color-naranja;
+}
+
+.progreso-azul > .bar {
+    -fx-background-color: -color-acento;
+}
+
+.progreso-completo > .bar {
+    -fx-background-color: -color-verde;
+}
+
+/* Exceso: la barra se llena al 100 % en ambar y el texto muestra el sobrante real */
+.progreso-exceso > .bar {
+    -fx-background-color: -color-naranja;
+}
+
+.progreso-exceso > .track {
+    -fx-background-color: -color-pista;
+}
+
+/* ---------------------------- Resumen del dia (iconos de llenado) ---------------------------- */
+
+.tarjeta-indicador {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 14 10 12 10;
+}
+
+.tarjeta-indicador.indicador-cumplido {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+}
+
+.indicador-nombre {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.indicador-valor {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.indicador-meta {
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.indicador-meta-exceso {
+    -fx-text-fill: -color-naranja;
+    -fx-font-weight: bold;
+}
+
+/* Silueta (estado vacio) del icono y liquido de relleno */
+.icono-silueta {
+    -fx-fill: -color-pista;
+    -fx-stroke: -color-borde-fuerte;
+    -fx-stroke-width: 0.5;
+}
+
+.liquido-agua { -fx-fill: -color-acento; }
+.liquido-proteina { -fx-fill: -color-verde; }
+.liquido-calorias { -fx-fill: -color-naranja; }
+.liquido-creatina { -fx-fill: -color-acento; }
+.liquido-descanso { -fx-fill: -color-morado; }
+.liquido-exceso { -fx-fill: -color-naranja; }
+
+/* ---------------------------- Progreso: racha, galeria y volumen ---------------------------- */
+
+/* Racha de entrenamiento: borde ambar para destacar el indicador en el resumen */
+.tarjeta-racha {
+    -fx-border-color: -color-naranja;
+}
+
+.valor-racha {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-naranja;
+}
+
+/* Galeria de transformacion */
+.tarjeta-foto {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+}
+
+.marco-foto {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 6px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+}
+
+.foto-fecha {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.chip-pose {
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 2 10 2 10;
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-acento;
+}
+
+/* Grafico circular: colores Fluent para los grupos musculares y leyenda legible */
+.chart-legend-item {
+    -fx-text-fill: -color-texto;
+}
+
+.default-color0.chart-pie { -fx-pie-color: -color-acento; }
+.default-color1.chart-pie { -fx-pie-color: -color-verde; }
+.default-color2.chart-pie { -fx-pie-color: -color-naranja; }
+.default-color3.chart-pie { -fx-pie-color: -color-morado; }
+.default-color4.chart-pie { -fx-pie-color: -color-teal; }
+.default-color5.chart-pie { -fx-pie-color: -color-rojo; }
+.default-color6.chart-pie { -fx-pie-color: -color-gris; }
+
+/* ---------------------------- Tablas y listas ---------------------------- */
+
+.table-view,
+.list-view {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: -color-tabla-cabecera;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-border-color: transparent transparent -color-borde transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 36px;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-alignment: center-left;
+    -fx-padding: 0 8 0 8;
+}
+
+.table-row-cell {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: transparent transparent -color-separador transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cell-size: 34px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: -color-superficie;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: -color-tabla-fila-hover;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-texto;
+}
+
+.table-cell {
+    -fx-text-fill: -color-texto;
+    -fx-alignment: center-left;
+    -fx-padding: 0 8 0 8;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: -color-texto;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.tabla-series {
+    -fx-border-color: -color-borde;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 9 10 9 10;
+    -fx-text-fill: -color-texto;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: -color-tabla-fila-hover;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.list-view .placeholder .label {
+    -fx-text-fill: -color-texto-secundario;
+}
+
+/* ---------------------------- Graficos ---------------------------- */
+
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 8px;
+}
+
+.chart-plot-background {
+    -fx-background-color: -color-grafico-fondo;
+    -fx-border-color: -color-separador;
+}
+
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: -color-grid;
+}
+
+.chart-alternative-row-fill {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
+}
+
+.axis {
+    -fx-tick-label-fill: -color-texto-secundario;
+    -fx-font-size: 11px;
+}
+
+.axis-label {
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: -color-acento;
+    -fx-stroke-width: 2.5px;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: -color-acento, -color-superficie;
+    -fx-background-radius: 5px;
+    -fx-padding: 4px;
+}
+
+/* ---------------------------- Multimedia ---------------------------- */
+
+.visor-media {
+    -fx-background-color: #1B1B1B;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-padding: 12px;
+}
+
+.visor-media .label {
+    -fx-text-fill: #E8E8E8;
+}
+
+/* ---------------------------- Dialogos ---------------------------- */
+
+.dialogo-aplicacion {
+    -fx-background-color: -color-fondo;
+}
+
+.dialogo-aplicacion .header-panel {
+    -fx-background-color: -color-superficie;
+}
+
+.dialogo-aplicacion .header-panel .label {
+    -fx-text-fill: -color-texto;
+}
+
+.dialogo-aplicacion .content {
+    -fx-padding: 8px;
+}
+
+.dialogo-aplicacion .button {
+    -fx-min-width: 96px;
+}
+
+/* ---------------------------- Reproductor ---------------------------- */
+
+.reproductor-titulo {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.slider .track {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 3px;
+}
+
+.slider .thumb {
+    -fx-background-color: -color-acento;
+}
+
+.slider:disabled .thumb {
+    -fx-background-color: -color-deshabilitado;
+}
+
+.toolbar-vista {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 12px;
+}
+
+.separador-vertical {
+    -fx-background-color: -color-borde;
+    -fx-min-width: 1px;
+    -fx-max-width: 1px;
+}
+
+/* ---------------------------- Scroll ---------------------------- */
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -color-borde-fuerte;
+    -fx-background-radius: 6px;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: -color-texto-secundario;
+}
+
+/* ---------------------------- Modulo de entrenamiento (drawer de sugerencias) ---------------------------- */
+
+.drawer-scrim {
+    -fx-background-color: rgba(0, 0, 0, 0.30);
+    -fx-cursor: hand;
+}
+
+.panel-drawer {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: transparent transparent transparent -color-borde;
+    -fx-border-width: 0 0 0 1;
+    -fx-padding: 18px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 18, 0, -4, 0);
+}
+
+/* ---------------------------- Panel de inicio: tarjetas de consejos ---------------------------- */
+
+/* Cabecera de bienvenida con jerarquia tipografica solida */
+.dash-hero {
+    -fx-background-color: linear-gradient(to right, -color-acento-suave, transparent);
+    -fx-background-radius: 12px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-padding: 18 22 18 22;
+}
+
+.dash-hero-badge {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 6 12 6 12;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+}
+
+/* Tarjeta individual de consejo interactivo */
+.tarjeta-consejo {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+.tarjeta-consejo:hover {
+    -fx-border-color: -color-acento;
+    -fx-background-color: -color-superficie-hover;
+}
+
+.tarjeta-consejo.consejo-abierto {
+    -fx-border-color: -color-acento;
+    -fx-background-color: -color-acento-suave;
+}
+
+/* Marco del icono ilustrativo del consejo */
+.consejo-icono-marco {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 10px;
+    -fx-padding: 9px;
+}
+
+.consejo-titulo {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.consejo-texto {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.consejo-detalle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-padding: 6 0 0 0;
+    -fx-border-color: -color-borde transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+/* Color de cada icono segun la familia del consejo */
+.icono-consejo-cian { -fx-fill: -color-cian; }
+.icono-consejo-menta { -fx-fill: -color-menta; }
+.icono-consejo-morado { -fx-fill: -color-morado; }
+.icono-consejo-naranja { -fx-fill: -color-naranja; }
+.icono-consejo-teal { -fx-fill: -color-teal; }
+.icono-consejo-acento { -fx-fill: -color-acento; }
+
+/* Indicador de esfuerzo (RIR): arco y aguja animada */
+.icono-consejo-arco {
+    -fx-fill: transparent;
+    -fx-stroke: -color-borde-fuerte;
+    -fx-stroke-width: 4px;
+    -fx-stroke-line-cap: round;
+}
+
+.icono-consejo-aguja {
+    -fx-fill: transparent;
+    -fx-stroke: -color-naranja;
+    -fx-stroke-width: 4px;
+    -fx-stroke-line-cap: round;
+}
+
+/* ---------------------------- Iconos vectoriales de accion (fila de ejercicios) ---------------------------- */
+
+/* Relleno del glifo SVG segun el estado del boton que lo contiene */
+.icono-accion {
+    -fx-fill: -color-texto-secundario;
+}
+
+.boton-icono:hover .icono-accion {
+    -fx-fill: -color-acento;
+}
+
+.boton-icono-peligro .icono-accion {
+    -fx-fill: -color-rojo;
+}
+
+.boton-icono-peligro:hover .icono-accion {
+    -fx-fill: -color-rojo;
+}
+
+/* Icono vectorial del elemento "Mi perfil" en la navegacion lateral */
+.nav-icono-svg {
+    -fx-fill: -color-texto-secundario;
+}
+
+.nav-boton:selected .nav-icono-svg {
+    -fx-fill: -color-acento;
+}
+
+/* ---------------------------- Chips de estado ---------------------------- */
+
+.chip-hoy {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-width: 1px;
+    -fx-background-radius: 11px;
+    -fx-border-radius: 11px;
+    -fx-padding: 3 10 3 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.chip-activo {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-width: 1px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-padding: 2 9 2 9;
+    -fx-font-size: 10.5px;
+    -fx-font-weight: bold;
+}
+
+/* ---------------------------- Perfil de usuario: avatares ---------------------------- */
+
+.avatar-perfil {
+    -fx-background-color: linear-gradient(to bottom right, -color-acento-suave, -color-superficie);
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+}
+
+.avatar-iniciales {
+    -fx-text-fill: -color-acento;
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+}
+
+.avatar-mini {
+    -fx-min-width: 34px;
+    -fx-min-height: 34px;
+    -fx-pref-width: 34px;
+    -fx-pref-height: 34px;
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+}
+
+.avatar-iniciales-mini {
+    -fx-text-fill: -color-acento;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.perfil-nombre {
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+/* =====================================================================
+   Modulo de entrenamiento: diagrama anatomico y panel de sugerencias
+   ===================================================================== */
+
+/* Panel que aloja el diagrama del ejercicio seleccionado */
+.tarjeta-anatomia {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+}
+
+.diagrama-anatomico {
+    -fx-padding: 2 0 2 0;
+}
+
+.diagrama-vista {
+    -fx-font-size: 10.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+/* Silueta neutra del cuerpo humano */
+.cuerpo-silueta {
+    -fx-fill: -color-pista;
+    -fx-stroke: -color-borde-fuerte;
+    -fx-stroke-width: 0.5;
+}
+
+.cuerpo-miembro {
+    -fx-stroke: -color-pista;
+}
+
+/* Regiones musculares: base atenuada que se resalta segun el ejercicio */
+.musculo-region {
+    -fx-fill: -color-acento;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 0;
+}
+
+/* Grupo muscular principal: color de acento con halo luminoso */
+.musculo-principal {
+    -fx-fill: -color-acento;
+    -fx-stroke: -color-acento-hover;
+    -fx-stroke-width: 1;
+    -fx-effect: dropshadow(gaussian, -color-acento, 8, 0.45, 0, 0);
+}
+
+/* Grupos secundarios: color menta para diferenciarlos del principal */
+.musculo-secundario {
+    -fx-fill: -color-verde;
+    -fx-stroke: transparent;
+}
+
+/* Icono reducido del grupo muscular en cada fila de sugerencias */
+.icono-musculo {
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 7px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 7px;
+    -fx-border-width: 1px;
+    -fx-padding: 1px;
+}
+
+.sugerencia-nombre {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.sugerencia-detalle {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+/* =====================================================================
+   Modulo de nutricion: celebracion y gamificacion de metas diarias
+   ===================================================================== */
+
+/* Insignia de verificacion sobre la tarjeta resumen al cumplir su meta */
+.indicador-insignia {
+    -fx-text-fill: -color-verde;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-verde;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+    -fx-padding: 1 4 1 4;
+    -fx-effect: dropshadow(gaussian, -color-verde, 6, 0.35, 0, 0);
+}
+
+/* Distintivo flotante de "meta diaria alcanzada" (se retira al desvanecerse) */
+.insignia-victoria {
+    -fx-background-color: linear-gradient(to right, -color-acento-suave, -color-superficie);
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-acento;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+    -fx-padding: 10 20 10 16;
+    -fx-effect: dropshadow(gaussian, -color-acento, 22, 0.30, 0, 6);
+}
+
+.insignia-simbolo {
+    -fx-font-size: 24px;
+}
+
+.insignia-titulo {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.insignia-detalle {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+/* =====================================================================
+   Modulo 4 - Reproductor: experiencia interactiva de entrenamiento
+   ===================================================================== */
+
+.reproductor-tarjeta {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 12px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 14, 0.20, 0, 4);
+}
+
+/* Visualizador de audio tipo ecualizador */
+.espectro-audio {
+    -fx-padding: 4 0 4 0;
+}
+
+.espectro-barra {
+    -fx-fill: linear-gradient(to top, -color-acento, -color-cian);
+}
+
+/* Portada de la pista en reproduccion */
+.portada-reproductor {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 12px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+.portada-simbolo {
+    -fx-font-size: 30px;
+    -fx-text-fill: -color-texto-deshabilitado;
+}
+
+/* Miniatura de la columna de portada en la lista de reproduccion */
+.portada-miniatura {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 6px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+}
+
+/* Controles multimedia integrados */
+.boton-media {
+    -fx-background-color: transparent;
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-pref-width: 40px;
+    -fx-pref-height: 40px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.boton-media:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento-borde;
+}
+
+/* Modo aleatorio / repeticion activos */
+.boton-media-activo,
+.boton-media-activo:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+}
+
+.boton-media-principal {
+    -fx-background-color: -color-acento;
+    -fx-background-radius: 999px;
+    -fx-border-color: transparent;
+    -fx-min-width: 56px;
+    -fx-min-height: 56px;
+    -fx-pref-width: 56px;
+    -fx-pref-height: 56px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, -color-acento, 14, 0.40, 0, 3);
+}
+
+.boton-media-principal:hover {
+    -fx-background-color: -color-acento-hover;
+}
+
+/* Iconos vectoriales de los controles multimedia */
+.icono-media {
+    -fx-fill: -color-texto;
+}
+
+.boton-media:hover .icono-media,
+.boton-media-activo .icono-media {
+    -fx-fill: -color-acento;
+}
+
+.boton-media-principal .icono-media {
+    -fx-fill: white;
+}
+
+/* Filas de la lista durante el arrastre para reordenar la lista de reproduccion */
+.table-row-cell.fila-arrastrando {
+    -fx-background-color: -color-acento-suave;
+    -fx-opacity: 0.55;
+}
+
+.table-row-cell.fila-destino {
+    -fx-border-color: -color-acento transparent -color-separador transparent;
+    -fx-border-width: 2 0 1 0;
+}
+

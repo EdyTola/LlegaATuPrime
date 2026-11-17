@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<!--
+  Modulo 4 - Reproductor de musica.
+  La tarjeta inferior concentra la experiencia de entrenamiento: espectro de audio animado,
+  portada de la pista, controles multimedia con modo aleatorio y repeticion, progreso y volumen.
+  La lista superior admite arrastrar y soltar para reordenar la lista de reproduccion.
+-->
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.symmetry.desktop.controller.MusicaController"
+      styleClass="contenido-vista" spacing="16">
+
+    <HBox styleClass="toolbar-vista" spacing="10" alignment="CENTER_LEFT">
+        <children>
+            <Button text="Añadir archivos" styleClass="boton-primario" onAction="#agregarArchivos"/>
+            <Button text="Añadir carpeta" styleClass="boton-secundario" onAction="#agregarCarpeta"/>
+            <Button text="Añadir enlace" styleClass="boton-secundario" onAction="#agregarEnlace"/>
+            <Button fx:id="botonEliminarPista" text="Quitar de la lista" styleClass="boton-secundario"
+                    onAction="#eliminarPista"/>
+            <Button text="Vaciar biblioteca" styleClass="boton-peligro" onAction="#vaciarBiblioteca"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="etiquetaBiblioteca" styleClass="texto-secundario"/>
+        </children>
+    </HBox>
+
+    <Label text="Arrastra una fila para reordenar la lista de reproducción."
+           styleClass="texto-secundario"/>
+
+    <TableView fx:id="listaPistas" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="columnaPortada" text="" prefWidth="96"
+                         sortable="false" resizable="false"/>
+            <TableColumn fx:id="columnaTitulo" text="Título" prefWidth="330"/>
+            <TableColumn fx:id="columnaArtista" text="Artista" prefWidth="180"/>
+            <TableColumn fx:id="columnaOrigen" text="Origen" prefWidth="130"/>
+            <TableColumn fx:id="columnaDuracion" text="Duración" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <VBox styleClass="reproductor-tarjeta" spacing="12">
+        <children>
+
+            <!-- Espectro de audio: las barras se crean en el controlador. -->
+            <HBox fx:id="zonaEspectro" alignment="CENTER" minHeight="84"/>
+
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <children>
+                    <StackPane fx:id="marcoPortada" styleClass="portada-reproductor"
+                               minWidth="76" minHeight="76" prefWidth="76" prefHeight="76"
+                               maxWidth="76" maxHeight="76">
+                        <children>
+                            <Label fx:id="simboloPortada" text="&#9835;" styleClass="portada-simbolo"/>
+                            <ImageView fx:id="portadaActual" fitWidth="76" fitHeight="76"
+                                       preserveRatio="true" smooth="true"/>
+                        </children>
+                    </StackPane>
+                    <VBox spacing="3" HBox.hgrow="ALWAYS">
+                        <children>
+                            <Label fx:id="etiquetaTituloPista" text="Sin pista en reproducción"
+                                   styleClass="reproductor-titulo"/>
+                            <Label fx:id="etiquetaArtista" styleClass="texto-secundario"/>
+                        </children>
+                    </VBox>
+                </children>
+            </HBox>
+
+            <HBox spacing="12" alignment="CENTER">
+                <children>
+                    <Button fx:id="botonAleatorio" styleClass="boton-media" onAction="#alternarAleatorio"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="botonAnterior" styleClass="boton-media" onAction="#anterior"/>
+                    <Button fx:id="botonReproducir" styleClass="boton-media-principal"
+                            onAction="#alternarReproduccion"/>
+                    <Button fx:id="botonSiguiente" styleClass="boton-media" onAction="#siguiente"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="botonRepeticion" styleClass="boton-media" onAction="#cambiarRepeticion"/>
+                </children>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <children>
+                    <Label fx:id="etiquetaTiempoActual" text="00:00" styleClass="texto-secundario"
+                           minWidth="48"/>
+                    <Slider fx:id="sliderProgreso" min="0" max="100" value="0" HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="etiquetaTiempoTotal" text="00:00" styleClass="texto-secundario"
+                           minWidth="48"/>
+                </children>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <children>
+                    <Label text="Volumen" styleClass="texto-secundario"/>
+                    <Slider fx:id="sliderVolumen" min="0" max="1" value="0.8" prefWidth="220"/>
+                    <Label fx:id="etiquetaVolumen" styleClass="texto-secundario" minWidth="48"/>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+</VBox>

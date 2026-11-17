@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.symmetry.desktop.controller.DashboardController"
+      styleClass="contenido-vista" spacing="0">
+
+    <ScrollPane fitToWidth="true" styleClass="scroll-fondo" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="18">
+                <children>
+
+                    <HBox styleClass="dash-hero" alignment="CENTER_LEFT" spacing="16">
+                        <children>
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label fx:id="etiquetaSaludo" styleClass="titulo-principal"
+                                           text="Tu resumen de hoy"/>
+                                    <Label fx:id="etiquetaFecha" styleClass="subtitulo"/>
+                                </children>
+                            </VBox>
+                            <Label fx:id="etiquetaEstadoDia" styleClass="dash-hero-badge"/>
+                        </children>
+                    </HBox>
+
+                    <GridPane hgap="14" vgap="14">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="33.34" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <children>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <children>
+                                    <Label text="Rutina de hoy" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="valorRutina" styleClass="valor-acento" wrapText="true"/>
+                                    <Label fx:id="detalleRutina" styleClass="texto-secundario" wrapText="true"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                <children>
+                                    <Label text="Proteína" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="valorProteina" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="barraProteina" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="detalleProteina" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                <children>
+                                    <Label text="Calorías" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="valorCalorias" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="barraCalorias" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="detalleCalorias" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <children>
+                                    <Label text="Hidratación" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="valorHidratacion" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="barraHidratacion" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="detalleHidratacion" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <children>
+                                    <Label text="Creatina" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="valorCreatina" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="barraCreatina" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="detalleCreatina" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                <children>
+                                    <Label text="Descanso" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="valorSueno" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="barraSueno" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="detalleSueno" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                        </children>
+                    </GridPane>
+
+                    <VBox spacing="4">
+                        <children>
+                            <Label text="Recomendaciones basadas en evidencia" styleClass="titulo-seccion"/>
+                            <Label text="Consejos accionables sobre sobrecarga progresiva, descanso, hidratación y esfuerzo. Toca una tarjeta para ver el detalle."
+                                   styleClass="texto-secundario" wrapText="true"/>
+                        </children>
+                    </VBox>
+
+                    <FlowPane fx:id="rejillaConsejos" hgap="14" vgap="14" prefWrapLength="1000"/>
+
+                </children>
+            </VBox>
+        </content>
+    </ScrollPane>
+</VBox>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.symmetry.desktop.controller.FormularioMedicionController" spacing="12">
+    <padding>
+        <Insets top="8" right="14" bottom="8" left="14"/>
+    </padding>
+    <children>
+        <GridPane hgap="12" vgap="12">
+            <columnConstraints>
+                <ColumnConstraints minWidth="150" prefWidth="150"/>
+                <ColumnConstraints hgrow="ALWAYS" minWidth="280"/>
+            </columnConstraints>
+            <children>
+                <Label text="Fecha" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                <DatePicker fx:id="campoFecha" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                <Label text="Peso (kg)" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                <TextField fx:id="campoPeso" promptText="Ej. 78.5" maxWidth="140"
+                           GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                <Label text="Cintura (cm)" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                <TextField fx:id="campoCintura" promptText="Ej. 84" maxWidth="140"
+                           GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                <Label text="Grasa corporal (%)" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                <TextField fx:id="campoGrasa" promptText="Ej. 16.5" maxWidth="140"
+                           GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                <Label text="Masa muscular (kg)" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                <TextField fx:id="campoMasaMuscular" promptText="Ej. 62.0" maxWidth="140"
+                           GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+            </children>
+        </GridPane>
+        <Label text="Todos los campos son opcionales, pero introduce al menos el peso, la cintura, la grasa o la masa muscular."
+               styleClass="texto-secundario" wrapText="true"/>
+        <Label fx:id="etiquetaError" styleClass="texto-error" wrapText="true"/>
+    </children>
+</VBox>
