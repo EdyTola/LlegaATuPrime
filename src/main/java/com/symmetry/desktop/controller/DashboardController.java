@@ -1,10 +1,22 @@
 package com.symmetry.desktop.controller;
 
 import com.symmetry.desktop.model.DiaSalud;
+import com.symmetry.desktop.model.MetaXp;
 import com.symmetry.desktop.model.ObjetivosNutricionales;
 import com.symmetry.desktop.model.PerfilUsuario;
+import com.symmetry.desktop.model.RetoDiario;
 import com.symmetry.desktop.model.Rutina;
+import com.symmetry.desktop.service.GamificacionService;
+import com.symmetry.desktop.service.GamificacionService.EstadoMeta;
+import com.symmetry.desktop.service.GamificacionService.InfoNivel;
 import com.symmetry.desktop.service.GestorDatos;
+import com.symmetry.desktop.service.QuoteService;
+import com.symmetry.desktop.util.AchievementVFX;
+import javafx.application.Platform;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import com.symmetry.desktop.service.QuoteService.Frase;
 import com.symmetry.desktop.util.Formato;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
@@ -18,11 +30,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
@@ -31,9 +47,11 @@ import javafx.util.Duration;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -112,6 +130,37 @@ public class DashboardController implements Initializable, VistaConRefresco {
     private Label detalleSueno;
     @FXML
     private FlowPane rejillaConsejos;
+    @FXML
+    private Label etiquetaFrase;
+    @FXML
+    private Label etiquetaAutorFrase;
+    @FXML
+    private Label etiquetaNivelNumero;
+    @FXML
+    private Label etiquetaNivelTitulo;
+    @FXML
+    private ProgressBar barraXp;
+    @FXML
+    private Label etiquetaXp;
+    @FXML
+    private Label etiquetaXpResumen;
+    @FXML
+    private VBox listaMetas;
+    @FXML
+    private FlowPane rejillaRetos;
+    @FXML
+    private Label etiquetaRetosEstado;
+
+    /** Reevalua cada minuto para renovar retos vencidos y actualizar las cuentas atras. */
+    private Timeline relojRpg;
+
+    /** Filas y tarjetas visibles, para dispararles la micro-interaccion al cumplirse. */
+    private final Map<MetaXp, HBox> filasMeta = new EnumMap<>(MetaXp.class);
+    private final Map<String, VBox> tarjetasReto = new HashMap<>();
+    /** Logros ocurridos durante la ultima evaluacion (XP por meta / ids de retos). */
+    private final Map<MetaXp, Integer> metasNuevas = new EnumMap<>(MetaXp.class);
+    private final Map<String, Integer> retosNuevos = new HashMap<>();
+    private boolean escuchaRegistrada;
 
     @Override
     public void initialize(URL ubicacion, ResourceBundle recursos) {
@@ -135,6 +184,215 @@ public class DashboardController implements Initializable, VistaConRefresco {
         actualizarCreatina(dia, objetivos);
         actualizarSueno(dia, objetivos);
         actualizarRecomendaciones(dia, objetivos, hoy);
+        mostrarFrase(QuoteService.fraseDelDia(perfil, hoy));
+        actualizarRpg();
+        iniciarRelojRpg();
+    }
+
+    // ------------------------------------------------------------------
+    // Frase de poder
+    // ------------------------------------------------------------------
+
+    private void mostrarFrase(Frase frase) {
+        etiquetaFrase.setText(frase.texto());
+        etiquetaAutorFrase.setText("\u2014 " + frase.autor());
+        etiquetaAutorFrase.getStyleClass().remove("frase-autor-personal");
+        if (frase.personal()) {
+            etiquetaAutorFrase.getStyleClass().add("frase-autor-personal");
+        }
+    }
+
+    /** Cambia a otra frase (distinta de la actual) sin salir del Inicio. */
+    @FXML
+    private void otraFrase() {
+        mostrarFrase(QuoteService.siguiente(gestor.getDatos().getPerfil(), LocalDate.now()));
+    }
+
+    // ------------------------------------------------------------------
+    // Gamificacion: nivel, metas del dia y retos
+    // ------------------------------------------------------------------
+
+    /** Observa los logros para animar las filas y tarjetas del propio panel. */
+    private void registrarEscuchaVfx() {
+        if (escuchaRegistrada) {
+            return;
+        }
+        escuchaRegistrada = true;
+        gestor.getGamificacion().agregarEscucha(new GamificacionService.Escucha() {
+            @Override
+            public void metaCumplida(MetaXp meta, int xp) {
+                metasNuevas.put(meta, xp);
+            }
+
+            @Override
+            public void retoCompletado(RetoDiario reto) {
+                retosNuevos.put(reto.getId(), reto.getXpRecompensa());
+            }
+        });
+    }
+
+    private void iniciarRelojRpg() {
+        if (relojRpg != null) {
+            return;
+        }
+        relojRpg = new Timeline(new KeyFrame(Duration.minutes(1), evento -> {
+            // Si la vista ya no esta en pantalla se pausa; refrescar() la reanuda al volver.
+            if (rejillaRetos.getScene() == null) {
+                relojRpg.stop();
+                relojRpg = null;
+                return;
+            }
+            actualizarRpg();
+        }));
+        relojRpg.setCycleCount(Animation.INDEFINITE);
+        relojRpg.play();
+    }
+
+    private void actualizarRpg() {
+        GamificacionService rpg = gestor.getGamificacion();
+        registrarEscuchaVfx();
+        metasNuevas.clear();
+        retosNuevos.clear();
+        rpg.evaluar();
+
+        InfoNivel nivel = rpg.infoNivel();
+        etiquetaNivelNumero.setText(String.valueOf(nivel.nivel()));
+        etiquetaNivelTitulo.setText("Nivel " + nivel.nivel() + " · " + nivel.titulo());
+        barraXp.setProgress(nivel.fraccion());
+        etiquetaXp.setText(nivel.xpEnNivel() + " / " + nivel.xpParaSiguiente() + " XP para el nivel "
+                + (nivel.nivel() + 1) + " (" + GamificacionService.titulo(nivel.nivel() + 1) + ")");
+        etiquetaXpResumen.setText(nivel.xpTotal() + " XP totales · "
+                + gestor.getDatos().getProgresoRpg().getRetosCompletados() + " retos completados");
+
+        listaMetas.getChildren().clear();
+        filasMeta.clear();
+        for (EstadoMeta estado : rpg.metasDeHoy()) {
+            HBox fila = filaMeta(estado);
+            filasMeta.put(estado.meta(), fila);
+            listaMetas.getChildren().add(fila);
+        }
+
+        LocalDateTime ahora = LocalDateTime.now();
+        List<RetoDiario> retos = rpg.retosVigentes();
+        rejillaRetos.getChildren().clear();
+        tarjetasReto.clear();
+        for (RetoDiario reto : retos) {
+            VBox tarjeta = tarjetaReto(reto, ahora);
+            tarjetasReto.put(reto.getId(), tarjeta);
+            rejillaRetos.getChildren().add(tarjeta);
+        }
+        celebrarLogrosNuevos();
+        long completados = retos.stream().filter(RetoDiario::isCompletado).count();
+        etiquetaRetosEstado.setText(completados + " de " + retos.size() + " completados");
+    }
+
+    /** Pulso de brillo y "+XP" flotante sobre cada fila o tarjeta recien cumplida. */
+    private void celebrarLogrosNuevos() {
+        if (metasNuevas.isEmpty() && retosNuevos.isEmpty()) {
+            return;
+        }
+        Map<MetaXp, Integer> metas = new EnumMap<>(metasNuevas);
+        Map<String, Integer> retos = new HashMap<>(retosNuevos);
+        // Se espera al siguiente pulso para que las filas ya tengan posicion en pantalla.
+        Platform.runLater(() -> {
+            metas.forEach((meta, xp) -> {
+                HBox fila = filasMeta.get(meta);
+                if (fila != null && fila.getScene() != null) {
+                    AchievementVFX.celebrarMeta(fila, "+" + xp + " XP");
+                }
+            });
+            retos.forEach((id, xp) -> {
+                VBox tarjeta = tarjetasReto.get(id);
+                if (tarjeta != null && tarjeta.getScene() != null) {
+                    AchievementVFX.celebrarMeta(tarjeta, "+" + xp + " XP · ¡Completado!");
+                }
+            });
+        });
+    }
+
+    private static HBox filaMeta(EstadoMeta estado) {
+        boolean hecha = estado.cumplida() || estado.reclamada();
+        Label icono = new Label(hecha ? "\u2713" : "\u25CB");
+        icono.getStyleClass().add("meta-icono");
+        if (hecha) {
+            icono.getStyleClass().add("meta-icono-hecha");
+        }
+        Label texto = new Label(estado.meta().getTitulo());
+        texto.getStyleClass().add("meta-texto");
+        if (hecha) {
+            texto.getStyleClass().add("meta-texto-hecha");
+        }
+        Label xp = new Label("+" + estado.meta().getXp() + " XP");
+        xp.getStyleClass().add("chip-xp");
+        if (hecha) {
+            xp.getStyleClass().add("chip-xp-hecho");
+        }
+        Region espacio = new Region();
+        HBox.setHgrow(espacio, Priority.ALWAYS);
+        HBox fila = new HBox(8, icono, texto, espacio, xp);
+        fila.setAlignment(Pos.CENTER_LEFT);
+        fila.getStyleClass().add("meta-fila");
+        Tooltip.install(fila, new Tooltip(estado.meta().getDescripcion()));
+        return fila;
+    }
+
+    private VBox tarjetaReto(RetoDiario reto, LocalDateTime ahora) {
+        StringBuilder etiqueta = new StringBuilder(reto.isFlash() ? "FLASH · 12 H" : "DIARIO · 24 H");
+        etiqueta.append("  ·  ").append(reto.getTipo().getEtiqueta().toUpperCase(Locale.ROOT));
+        if (reto.getGrupoMuscular() != null) {
+            etiqueta.append("  ·  ").append(reto.getGrupoMuscular().getEtiqueta().toUpperCase(Locale.ROOT));
+        }
+        Label tipo = new Label(etiqueta.toString());
+        tipo.getStyleClass().add("reto-tipo");
+        if (reto.isFlash()) {
+            tipo.getStyleClass().add("reto-tipo-flash");
+        }
+        Label xp = new Label("+" + reto.getXpRecompensa() + " XP");
+        xp.getStyleClass().add("chip-xp");
+        Region espacio = new Region();
+        HBox.setHgrow(espacio, Priority.ALWAYS);
+        HBox cabecera = new HBox(8, tipo, espacio, xp);
+        cabecera.setAlignment(Pos.CENTER_LEFT);
+
+        Label titulo = new Label(reto.getTitulo());
+        titulo.getStyleClass().add("reto-titulo");
+        titulo.setWrapText(true);
+        Label descripcion = new Label(reto.getDescripcion());
+        descripcion.getStyleClass().add("reto-descripcion");
+        descripcion.setWrapText(true);
+
+        ProgressBar barra = new ProgressBar(reto.getFraccion());
+        barra.setMaxWidth(Double.MAX_VALUE);
+        barra.getStyleClass().add("barra-xp");
+
+        Label estado = new Label(reto.isCompletado()
+                ? "\u2713 Completado · XP otorgada"
+                : reto.getProgresoTexto() + " · expira en " + reto.restante(ahora));
+        estado.getStyleClass().add(reto.isCompletado() ? "reto-completado" : "texto-secundario");
+
+        VBox tarjeta = new VBox(7, cabecera, titulo, descripcion, barra, estado);
+        tarjeta.getStyleClass().add("tarjeta-reto");
+        if (reto.isFlash()) {
+            tarjeta.getStyleClass().add("tarjeta-reto-flash");
+        }
+        if (reto.esManual()) {
+            tarjeta.getStyleClass().add("tarjeta-reto-recuperacion");
+        }
+        if (reto.isCompletado()) {
+            tarjeta.getStyleClass().add("tarjeta-reto-completo");
+        } else if (reto.esManual()) {
+            Button confirmar = new Button("Marcar como hecho");
+            confirmar.getStyleClass().add("boton-reto-completar");
+            confirmar.setMaxWidth(Double.MAX_VALUE);
+            confirmar.setOnAction(evento -> {
+                gestor.getGamificacion().completarReto(reto.getId());
+                actualizarRpg();
+            });
+            tarjeta.getChildren().add(confirmar);
+        }
+        tarjeta.setPrefWidth(ANCHO_TARJETA);
+        tarjeta.setMinWidth(ANCHO_TARJETA - 40);
+        return tarjeta;
     }
 
     private String saludo() {

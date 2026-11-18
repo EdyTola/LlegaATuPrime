@@ -20,6 +20,8 @@ public class PerfilUsuario {
     private Integer edad;
     /** Objetivo principal declarado por el usuario (por ejemplo, ganar masa muscular). */
     private String objetivoGeneral;
+    /** Frase de poder escrita por el usuario; se mezcla con las frases legendarias del Inicio. */
+    private String customQuote;
     /** Ruta de la foto de perfil local elegida por el usuario. */
     private String rutaFotoPerfil;
     private LocalDate fechaRegistro = LocalDate.now();
@@ -93,6 +95,14 @@ public class PerfilUsuario {
 
     public void setObjetivoGeneral(String objetivoGeneral) {
         this.objetivoGeneral = objetivoGeneral;
+    }
+
+    public String getCustomQuote() {
+        return customQuote;
+    }
+
+    public void setCustomQuote(String customQuote) {
+        this.customQuote = customQuote;
     }
 
     public String getRutaFotoPerfil() {

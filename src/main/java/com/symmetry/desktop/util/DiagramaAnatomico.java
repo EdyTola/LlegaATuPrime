@@ -47,6 +47,11 @@ public final class DiagramaAnatomico extends HBox {
     private static final double ALTO_MINI = 40;
     private static final double ESCALA_MINI = 0.21;
 
+    /** Tamano del icono grande usado en las tarjetas amplias de la biblioteca. */
+    private static final double ANCHO_GRANDE = 78;
+    private static final double ALTO_GRANDE = 112;
+    private static final double ESCALA_GRANDE = 0.64;
+
     private final List<Figura> figuras = new ArrayList<>();
 
     public DiagramaAnatomico() {
@@ -106,6 +111,37 @@ public final class DiagramaAnatomico extends HBox {
                 if (!region.getStyleClass().contains(CLASE_PRINCIPAL)) {
                     region.getStyleClass().add(CLASE_PRINCIPAL);
                 }
+                region.setOpacity(OPACIDAD_PRINCIPAL);
+            }
+        }
+        return marco;
+    }
+
+    /**
+     * Icono grande (78x112 px) de un grupo muscular: muestra la vista (frontal o dorsal) donde
+     * el grupo es mas visible, con el musculo principal en color de acento y los secundarios
+     * en verde, para identificar de un vistazo que trabaja el ejercicio.
+     */
+    public static Node iconoGrande(GrupoMuscular grupo) {
+        Figura figura = prefiereDorsal(grupo) ? figuraDorsal() : figuraFrontal();
+        figura.nodo.setScaleX(ESCALA_GRANDE);
+        figura.nodo.setScaleY(ESCALA_GRANDE);
+
+        StackPane marco = new StackPane(figura.nodo);
+        marco.getStyleClass().add("icono-musculo");
+        marco.setMinSize(ANCHO_GRANDE, ALTO_GRANDE);
+        marco.setPrefSize(ANCHO_GRANDE, ALTO_GRANDE);
+        marco.setMaxSize(ANCHO_GRANDE, ALTO_GRANDE);
+
+        if (grupo != null) {
+            for (GrupoMuscular secundario : grupo.getSecundarios()) {
+                for (Shape region : figura.regiones.getOrDefault(secundario, List.of())) {
+                    region.getStyleClass().add(CLASE_SECUNDARIO);
+                    region.setOpacity(OPACIDAD_SECUNDARIO);
+                }
+            }
+            for (Shape region : figura.regiones.getOrDefault(grupo, List.of())) {
+                region.getStyleClass().add(CLASE_PRINCIPAL);
                 region.setOpacity(OPACIDAD_PRINCIPAL);
             }
         }

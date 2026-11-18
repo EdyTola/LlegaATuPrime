@@ -43,7 +43,24 @@ public class Ejercicio {
     /** Alternativas adicionales definidas por el usuario para este ejercicio. */
     private List<String> alternativasPersonalizadas = new ArrayList<>();
 
+    /**
+     * Nombre del ejercicio original cuando esta instancia es una variante generada por el
+     * modo sin equipo. Es solo de presentacion: nunca se persiste.
+     */
+    @JsonIgnore
+    private String adaptadoDe;
+
     public Ejercicio() {
+    }
+
+    @JsonIgnore
+    public String getAdaptadoDe() {
+        return adaptadoDe;
+    }
+
+    @JsonIgnore
+    public void setAdaptadoDe(String adaptadoDe) {
+        this.adaptadoDe = adaptadoDe;
     }
 
     public Ejercicio(String nombre, GrupoMuscular grupoMuscular, int series, int repeticionesMin,

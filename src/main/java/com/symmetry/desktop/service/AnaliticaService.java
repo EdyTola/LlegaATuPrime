@@ -183,10 +183,13 @@ public class AnaliticaService {
             acumulado.put(grupo, 0.0);
         }
         for (SesionEntrenamiento sesion : gestor.getDatos().getSesiones()) {
-            if (sesion.getFechaInicio() == null || !dentro(sesion.getFecha(), desde)) {
-                continue;
-            }
             for (RegistroEjercicio registro : sesion.getRegistros()) {
+                // Se lee directamente la fecha guardada en cada registro (con respaldo en la sesion
+                // para los historiales antiguos que no la incluian).
+                LocalDate fecha = registro.getFecha() != null ? registro.getFecha() : sesion.getFecha();
+                if (!dentro(fecha, desde)) {
+                    continue;
+                }
                 String grupo = grupoVisible(registro.getGrupoMuscular());
                 if (grupo != null) {
                     acumulado.merge(grupo, registro.getVolumenTotal(), Double::sum);

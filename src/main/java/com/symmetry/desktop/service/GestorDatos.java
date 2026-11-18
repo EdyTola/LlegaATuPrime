@@ -6,6 +6,7 @@ import com.symmetry.desktop.model.DiaSalud;
 import com.symmetry.desktop.model.Ejercicio;
 import com.symmetry.desktop.model.FotoProgreso;
 import com.symmetry.desktop.model.MedicionCorporal;
+import com.symmetry.desktop.model.ModalidadEntrenamiento;
 import com.symmetry.desktop.model.PistaAudio;
 import com.symmetry.desktop.model.Recipiente;
 import com.symmetry.desktop.model.RegistroHidratacion;
@@ -13,6 +14,8 @@ import com.symmetry.desktop.model.Rutina;
 import com.symmetry.desktop.model.SesionEntrenamiento;
 import com.symmetry.desktop.model.TemaApp;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +36,7 @@ public class GestorDatos {
 
     private PersistenciaService persistencia;
     private BaseDatos datos;
+    private final GamificacionService gamificacion = new GamificacionService(this);
 
     private GestorDatos(PersistenciaService persistencia) {
         this.persistencia = persistencia;
@@ -132,14 +136,16 @@ public class GestorDatos {
         return new ArrayList<>(alternativas);
     }
 
-    /** Registra una sesion finalizada y la persiste. */
+    /** Registra una sesion finalizada y la persiste siempre en el archivo JSON local. */
     public void guardarSesion(SesionEntrenamiento sesion) {
         if (sesion == null) {
             return;
         }
         getDatos().getSesiones().removeIf(s -> s.getId().equals(sesion.getId()));
         getDatos().getSesiones().add(sesion);
-        guardarAutomatico();
+        // "Finalizar y guardar" implica un guardado explicito: no depende del guardado automatico.
+        guardar();
+        gamificacion.evaluar();
     }
 
     public void agregarRutina(Rutina rutina) {
@@ -163,6 +169,25 @@ public class GestorDatos {
         guardarAutomatico();
     }
 
+    /** Modalidad de entrenamiento activa (con equipo o sin equipo / casa). */
+    public ModalidadEntrenamiento getModalidad() {
+        return getDatos().getConfiguracion().getModalidad();
+    }
+
+    /** Cambia y persiste la modalidad de entrenamiento. */
+    public void setModalidad(ModalidadEntrenamiento modalidad) {
+        getDatos().getConfiguracion().setModalidad(modalidad);
+        guardarAutomatico();
+    }
+
+    // ------------------------------------------------------------------
+    // Gamificacion (XP, niveles y retos)
+    // ------------------------------------------------------------------
+
+    public GamificacionService getGamificacion() {
+        return gamificacion;
+    }
+
     // ------------------------------------------------------------------
     // Nutricion, hidratacion, suplementacion y descanso
     // ------------------------------------------------------------------
@@ -183,6 +208,7 @@ public class GestorDatos {
                 ? LocalDate.now() : comida.getFechaHora().toLocalDate();
         dia(fecha).getComidas().add(comida);
         guardarAutomatico();
+        gamificacion.evaluar();
     }
 
     public void eliminarComida(LocalDate fecha, Comida comida) {
@@ -200,6 +226,7 @@ public class GestorDatos {
                 LocalDateTime.now());
         dia(fecha).getHidratacion().add(registro);
         guardarAutomatico();
+        gamificacion.evaluar();
     }
 
     public void eliminarHidratacion(LocalDate fecha, RegistroHidratacion registro) {
@@ -210,11 +237,13 @@ public class GestorDatos {
     public void setCreatinaTomada(LocalDate fecha, boolean tomada) {
         dia(fecha).setCreatinaTomada(tomada);
         guardarAutomatico();
+        gamificacion.evaluar();
     }
 
     public void registrarSueno(LocalDate fecha, double horas) {
         dia(fecha).setHorasSueno(horas);
         guardarAutomatico();
+        gamificacion.evaluar();
     }
 
     // ------------------------------------------------------------------
@@ -338,6 +367,21 @@ public class GestorDatos {
         biblioteca.clear();
         biblioteca.addAll(copia);
         guardarAutomatico();
+    }
+
+    /**
+     * Carpeta gestionada por la aplicacion donde se guarda el audio descargado y convertido
+     * a MP3 ({@code userData/music}). Se crea de forma perezosa si todavia no existe.
+     */
+    public Path getCarpetaMusica() {
+        Path base = JsonPersistenciaService.rutaPorDefecto().getParent();
+        Path carpeta = (base == null ? Path.of(".") : base).resolve("music");
+        try {
+            Files.createDirectories(carpeta);
+        } catch (IOException ignored) {
+            // Si no se puede crear, se devuelve la ruta igualmente; el error se informara al descargar.
+        }
+        return carpeta;
     }
 
     /** Guarda la ultima carpeta utilizada en el reproductor de musica. */

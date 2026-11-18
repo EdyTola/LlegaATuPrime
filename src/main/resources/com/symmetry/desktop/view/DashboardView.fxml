@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
@@ -30,6 +34,72 @@
                             <Label fx:id="etiquetaEstadoDia" styleClass="dash-hero-badge"/>
                         </children>
                     </HBox>
+
+                    <!-- ============ Frase de poder ============ -->
+                    <HBox styleClass="tarjeta-frase" spacing="14" alignment="CENTER_LEFT">
+                        <children>
+                            <Label text="&#8220;" styleClass="frase-comillas"/>
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label fx:id="etiquetaFrase" styleClass="frase-texto" wrapText="true"/>
+                                    <Label fx:id="etiquetaAutorFrase" styleClass="frase-autor"/>
+                                </children>
+                            </VBox>
+                            <Button text="&#8635;" styleClass="boton-icono" onAction="#otraFrase">
+                                <tooltip>
+                                    <Tooltip text="Mostrar otra frase"/>
+                                </tooltip>
+                            </Button>
+                        </children>
+                    </HBox>
+
+                    <!-- ============ Panel RPG: nivel, XP y metas del dia ============ -->
+                    <HBox styleClass="rpg-panel" spacing="24" alignment="CENTER_LEFT">
+                        <children>
+                            <HBox spacing="16" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <StackPane styleClass="rpg-medalla" minWidth="80" minHeight="80"
+                                               maxWidth="80" maxHeight="80">
+                                        <children>
+                                            <Label fx:id="etiquetaNivelNumero" styleClass="rpg-medalla-numero"/>
+                                        </children>
+                                    </StackPane>
+                                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label fx:id="etiquetaNivelTitulo" styleClass="rpg-titulo"/>
+                                            <ProgressBar fx:id="barraXp" styleClass="barra-xp, barra-xp-grande"
+                                                         maxWidth="Infinity" progress="0"/>
+                                            <Label fx:id="etiquetaXp" styleClass="texto-secundario"/>
+                                            <Label fx:id="etiquetaXpResumen" styleClass="texto-secundario"/>
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </HBox>
+                            <VBox spacing="2" minWidth="300" prefWidth="320">
+                                <children>
+                                    <Label text="Metas del día · XP" styleClass="rpg-subtitulo-meta"/>
+                                    <VBox fx:id="listaMetas" spacing="0"/>
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+
+                    <!-- ============ Retos flash (12 h) y diarios (24 h) ============ -->
+                    <VBox spacing="4">
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <children>
+                                    <Label text="Retos flash y diarios" styleClass="titulo-seccion"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="etiquetaRetosEstado" styleClass="texto-secundario"/>
+                                </children>
+                            </HBox>
+                            <Label text="Se sincronizan con tu entrenamiento del día: proponen movilidad, estiramientos y micro-hábitos de recuperación para la zona que trabajas, sin sumar más fatiga. Confírmalos al completarlos; los flash se renuevan cada 12 h y los diarios cada 24 h."
+                                   styleClass="texto-secundario" wrapText="true"/>
+                        </children>
+                    </VBox>
+
+                    <FlowPane fx:id="rejillaRetos" hgap="14" vgap="14" prefWrapLength="1000"/>
 
                     <GridPane hgap="14" vgap="14">
                         <columnConstraints>

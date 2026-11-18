@@ -23,7 +23,39 @@ public class ConfiguracionApp {
     /** Tema visual preferido por el usuario (claro u oscuro). */
     private TemaApp tema = TemaApp.CLARO;
 
+    /** Modalidad de entrenamiento elegida (con equipo de gimnasio o sin equipo / casa). */
+    private ModalidadEntrenamiento modalidad = ModalidadEntrenamiento.GIMNASIO;
+
+    /** Efectos de sonido de logros (chime, fanfarria). Se pueden silenciar desde el perfil. */
+    private boolean sfxActivados = true;
+    private double volumenSfx = 0.6;
+
     public ConfiguracionApp() {
+    }
+
+    public boolean isSfxActivados() {
+        return sfxActivados;
+    }
+
+    public void setSfxActivados(boolean sfxActivados) {
+        this.sfxActivados = sfxActivados;
+    }
+
+    public double getVolumenSfx() {
+        return volumenSfx;
+    }
+
+    public void setVolumenSfx(double volumenSfx) {
+        this.volumenSfx = Math.max(0, Math.min(1, volumenSfx));
+    }
+
+    /** Modalidad activa; nunca es null (los archivos antiguos usan el modo con equipo). */
+    public ModalidadEntrenamiento getModalidad() {
+        return modalidad == null ? ModalidadEntrenamiento.GIMNASIO : modalidad;
+    }
+
+    public void setModalidad(ModalidadEntrenamiento modalidad) {
+        this.modalidad = modalidad == null ? ModalidadEntrenamiento.GIMNASIO : modalidad;
     }
 
     public int getDescansoPorDefectoSegundos() {

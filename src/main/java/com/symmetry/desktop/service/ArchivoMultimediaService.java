@@ -1,5 +1,7 @@
 package com.symmetry.desktop.service;
 
+import com.symmetry.desktop.model.PistaAudio;
+import javafx.scene.image.Image;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
@@ -9,8 +11,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -22,6 +26,9 @@ public final class ArchivoMultimediaService {
     public static final List<String> EXTENSIONES_IMAGEN = List.of("png", "jpg", "jpeg", "gif", "bmp");
     public static final List<String> EXTENSIONES_VIDEO = List.of("mp4", "m4v", "mov");
     public static final List<String> EXTENSIONES_AUDIO = List.of("mp3", "wav", "m4a", "aac");
+
+    /** Cache de miniaturas descargadas, compartida por el reproductor y el mini-reproductor. */
+    private static final Map<String, Image> CACHE_PORTADAS = new HashMap<>();
 
     private ArchivoMultimediaService() {
     }
@@ -200,6 +207,22 @@ public final class ArchivoMultimediaService {
     public static String miniaturaYoutube(String url) {
         String id = idYoutube(url);
         return id == null ? null : "https://img.youtube.com/vi/" + id + "/mqdefault.jpg";
+    }
+
+    /**
+     * Miniatura de la pista cuando es un enlace de YouTube, o {@code null} si no aplica o el
+     * enlace no tiene identificador. La descarga se hace en segundo plano y se cachea; sin
+     * conexion simplemente no hay imagen y la vista muestra su icono de respaldo.
+     */
+    public static Image portada(PistaAudio pista) {
+        if (pista == null || !pista.esEnlace()) {
+            return null;
+        }
+        String url = miniaturaYoutube(pista.getEnlace());
+        if (url == null) {
+            return null;
+        }
+        return CACHE_PORTADAS.computeIfAbsent(url, clave -> new Image(clave, 0, 0, true, true, true));
     }
 
     private static String recortarId(String valor) {

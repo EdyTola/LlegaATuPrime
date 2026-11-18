@@ -10,11 +10,11 @@ if not defined JAVA_HOME (
 )
 
 rem --- Maven (PATH si esta instalado; si no, el portable ya descargado) ---
-set "MVN_CMD=mvn"
-where mvn >nul 2>nul
+set "MVN_CMD=mvn.cmd"
+where mvn.cmd >nul 2>nul
 if errorlevel 1 set "MVN_CMD=%TEMP%\symmetry-buildtools\apache-maven-3.9.9\bin\mvn.cmd"
 
-if not exist "%MVN_CMD%" if /i not "%MVN_CMD%"=="mvn" (
+if not exist "%MVN_CMD%" if /i not "%MVN_CMD%"=="mvn.cmd" (
   echo [ERROR] No se encontro Maven.
   echo Instala Maven ^(https://maven.apache.org/download.cgi^) o descarga el portable en:
   echo   %TEMP%\symmetry-buildtools\apache-maven-3.9.9
@@ -23,7 +23,11 @@ if not exist "%MVN_CMD%" if /i not "%MVN_CMD%"=="mvn" (
 )
 
 echo Compilando y ejecutando Llega a tu Prime...
-call "%MVN_CMD%" javafx:run
+if /i "%MVN_CMD%"=="mvn.cmd" (
+  call mvn.cmd javafx:run
+) else (
+  call "%MVN_CMD%" javafx:run
+)
 
 if errorlevel 1 (
   echo.

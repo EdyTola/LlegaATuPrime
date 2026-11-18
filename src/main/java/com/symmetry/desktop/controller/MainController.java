@@ -1,18 +1,30 @@
 package com.symmetry.desktop.controller;
 
 import com.symmetry.desktop.model.TemaApp;
+import com.symmetry.desktop.service.GamificacionService;
+import com.symmetry.desktop.service.GamificacionService.InfoNivel;
+import com.symmetry.desktop.service.SonidoService;
+import com.symmetry.desktop.service.SonidoService.Efecto;
+import com.symmetry.desktop.model.MetaXp;
+import com.symmetry.desktop.model.RetoDiario;
+import java.util.List;
 import com.symmetry.desktop.service.GestorDatos;
 import com.symmetry.desktop.service.TemaService;
+import com.symmetry.desktop.util.AchievementVFX;
 import com.symmetry.desktop.util.Dialogos;
 import com.symmetry.desktop.util.Formato;
+import com.symmetry.desktop.util.MarcaApp;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.net.URL;
@@ -43,6 +55,8 @@ public class MainController implements Initializable {
     @FXML
     private StackPane contenedorVistas;
     @FXML
+    private StackPane logoMarca;
+    @FXML
     private Label etiquetaTituloSeccion;
     @FXML
     private Label etiquetaFechaCabecera;
@@ -64,11 +78,32 @@ public class MainController implements Initializable {
     private ToggleButton botonTema;
     @FXML
     private Label iconoTema;
+    @FXML
+    private StackPane capaCelebracion;
+    @FXML
+    private Pane capaConfeti;
+    @FXML
+    private VBox contenedorToasts;
+    @FXML
+    private VBox menuLateral;
+    @FXML
+    private VBox tarjetaNivelNav;
+    @FXML
+    private Label etiquetaNivelNav;
+    @FXML
+    private Label etiquetaTituloNav;
+    @FXML
+    private Label etiquetaXpNav;
+    @FXML
+    private ProgressBar barraXpNav;
 
     private final Map<String, VistaCargada> vistas = new HashMap<>();
 
     @Override
     public void initialize(URL ubicacion, ResourceBundle recursos) {
+        // Identidad de marca en la barra lateral: isotipo oficial a 44 px.
+        logoMarca.getChildren().setAll(MarcaApp.isotipo(44));
+
         ToggleGroup grupo = new ToggleGroup();
         botonInicio.setToggleGroup(grupo);
         botonEntrenamiento.setToggleGroup(grupo);
@@ -80,8 +115,64 @@ public class MainController implements Initializable {
         etiquetaFechaCabecera.setText(Formato.fechaLarga(LocalDate.now()));
         etiquetaRutaDatos.setText("Archivo: " + GestorDatos.getInstancia().getRutaDatos().getFileName());
         sincronizarBotonTema();
+        configurarGamificacion();
 
         mostrar(CLAVE_DASHBOARD);
+    }
+
+    // ------------------------------------------------------------------
+    // Gamificacion: tarjeta de nivel, avisos de XP y celebracion de Level Up
+    // ------------------------------------------------------------------
+
+    private void configurarGamificacion() {
+        GamificacionService rpg = GestorDatos.getInstancia().getGamificacion();
+        AchievementVFX.registrarCapas(capaCelebracion, capaConfeti);
+        rpg.agregarEscucha(new GamificacionService.Escucha() {
+            @Override
+            public void xpGanada(int xp, String motivo) {
+                AchievementVFX.avisoXp(contenedorToasts, xp, motivo);
+                actualizarNivelNav();
+                // La tarjeta de nivel late y suelta un "+XP" flotante.
+                AchievementVFX.pulsoGlow(tarjetaNivelNav);
+                AchievementVFX.textoFlotante(tarjetaNivelNav, "+" + xp + " XP");
+                SonidoService.reproducir(Efecto.EXITO);
+            }
+
+            @Override
+            public void metaCumplida(MetaXp meta, int xp) {
+                if (meta == MetaXp.DIA_PERFECTO) {
+                    // Todas las metas del dia: lluvia de confeti y banner de logro.
+                    AchievementVFX.confeti();
+                    AchievementVFX.bannerLogro("¡Día perfecto!", "Completaste todas las metas de hoy");
+                    SonidoService.reproducir(Efecto.LOGRO);
+                }
+            }
+
+            @Override
+            public void retoCompletado(RetoDiario reto) {
+                AchievementVFX.bannerLogro("¡Reto completado!", reto.getTitulo());
+                SonidoService.reproducir(Efecto.LOGRO);
+            }
+
+            @Override
+            public void nivelSubido(InfoNivel nivel) {
+                actualizarNivelNav();
+                AchievementVFX.nivelSubido(capaCelebracion, capaConfeti, nivel,
+                        List.of(contenedorVistas, menuLateral), null);
+            }
+        });
+        // Renueva los retos vencidos y concede la XP pendiente al abrir la aplicacion.
+        rpg.evaluar();
+        actualizarNivelNav();
+    }
+
+    /** Refleja en el menu lateral el nivel, el titulo y la barra de XP actuales. */
+    private void actualizarNivelNav() {
+        InfoNivel info = GestorDatos.getInstancia().getGamificacion().infoNivel();
+        etiquetaNivelNav.setText("Nv " + info.nivel());
+        etiquetaTituloNav.setText(info.titulo());
+        barraXpNav.setProgress(info.fraccion());
+        etiquetaXpNav.setText(info.xpEnNivel() + " / " + info.xpParaSiguiente() + " XP");
     }
 
     /** Alterna el tema claro/oscuro de toda la aplicacion en caliente. */
@@ -148,6 +239,8 @@ public class MainController implements Initializable {
         vistas.clear();
         contenedorVistas.getChildren().clear();
         etiquetaRutaDatos.setText("Archivo: " + GestorDatos.getInstancia().getRutaDatos().getFileName());
+        GestorDatos.getInstancia().getGamificacion().evaluar();
+        actualizarNivelNav();
         botonInicio.setSelected(true);
         mostrar(CLAVE_DASHBOARD);
     }

@@ -2,9 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
@@ -15,27 +17,24 @@
             styleClass="raiz">
 
     <left>
-        <VBox styleClass="nav-lateral" prefWidth="250">
+        <VBox fx:id="menuLateral" styleClass="nav-lateral" prefWidth="250">
             <children>
                 <HBox styleClass="nav-marca" spacing="12" alignment="CENTER_LEFT">
                     <padding>
                         <Insets top="22" right="18" bottom="16" left="18"/>
                     </padding>
                     <children>
-                        <StackPane styleClass="nav-logo-marco" minWidth="44" minHeight="44"
-                                   maxWidth="44" maxHeight="44">
-                            <children>
-                                <SVGPath styleClass="nav-logo-barras"
-                                         content="M10,34 L15,34 L15,27 L10,27 Z M19,34 L24,34 L24,21 L19,21 Z M28,34 L33,34 L33,15 L28,15 Z"/>
-                                <SVGPath styleClass="nav-logo-pico"
-                                         content="M9,24 L16,17 L22,21 L35,11"/>
-                                <SVGPath styleClass="nav-logo-flecha"
-                                         content="M30,11 L36,11 L36,17"/>
-                            </children>
-                        </StackPane>
+                        <!-- Isotipo oficial: se inyecta desde el controlador (MarcaApp). -->
+                        <StackPane fx:id="logoMarca" minWidth="44" minHeight="44"
+                                   maxWidth="44" maxHeight="44"/>
                         <VBox spacing="2">
                             <children>
-                                <Label text="Llega a tu Prime" styleClass="nav-marca-titulo"/>
+                                <HBox alignment="BASELINE_LEFT" spacing="5">
+                                    <children>
+                                        <Label text="Llega a tu" styleClass="nav-marca-titulo"/>
+                                        <Label text="Prime" styleClass="nav-marca-acento"/>
+                                    </children>
+                                </HBox>
                                 <Label text="Rendimiento · Salud" styleClass="nav-marca-subtitulo"/>
                             </children>
                         </VBox>
@@ -93,6 +92,19 @@
                         <Insets top="12" right="16" bottom="16" left="16"/>
                     </padding>
                     <children>
+                        <!-- Tarjeta de nivel RPG: se actualiza al ganar XP. -->
+                        <VBox fx:id="tarjetaNivelNav" styleClass="nav-nivel" spacing="6" onMouseClicked="#mostrarInicio">
+                            <children>
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label fx:id="etiquetaNivelNav" styleClass="nav-nivel-insignia"/>
+                                        <Label fx:id="etiquetaTituloNav" styleClass="nav-nivel-titulo" HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                </HBox>
+                                <ProgressBar fx:id="barraXpNav" styleClass="barra-xp" maxWidth="Infinity" progress="0"/>
+                                <Label fx:id="etiquetaXpNav" styleClass="nav-pie-texto"/>
+                            </children>
+                        </VBox>
                         <ToggleButton fx:id="botonTema" styleClass="nav-tema" text="Modo oscuro"
                                       maxWidth="Infinity" contentDisplay="LEFT" onAction="#alternarTema">
                             <graphic>
@@ -126,9 +138,32 @@
                 </HBox>
             </top>
             <center>
-                <StackPane fx:id="contenedorVistas" styleClass="contenedor-vistas"/>
+                <StackPane>
+                    <children>
+                        <StackPane fx:id="contenedorVistas" styleClass="contenedor-vistas"/>
+                        <!-- Capa superior para celebraciones: Level Up, confeti y avisos de XP. -->
+                        <StackPane fx:id="capaCelebracion" pickOnBounds="false">
+                            <children>
+                                <Pane fx:id="capaConfeti" mouseTransparent="true"/>
+                                <VBox fx:id="contenedorToasts" spacing="8" alignment="BOTTOM_RIGHT"
+                                      mouseTransparent="true" maxWidth="-Infinity" maxHeight="-Infinity"
+                                      StackPane.alignment="BOTTOM_RIGHT">
+                                    <padding>
+                                        <Insets top="0" right="22" bottom="22" left="0"/>
+                                    </padding>
+                                </VBox>
+                            </children>
+                        </StackPane>
+                    </children>
+                </StackPane>
             </center>
         </BorderPane>
     </center>
+
+    <!-- Mini-reproductor global: permanece visible en todas las secciones mientras haya
+         una pista cargada (sonando o en pausa). Se auto-oculta cuando no hay nada activo. -->
+    <bottom>
+        <fx:include source="MiniReproductorView.fxml"/>
+    </bottom>
 
 </BorderPane>

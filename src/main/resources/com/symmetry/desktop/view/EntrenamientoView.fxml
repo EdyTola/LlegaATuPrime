@@ -4,18 +4,25 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
 
 <!--
   Modulo 2 - Entrenamiento.
   La tabla de ejercicios del dia ocupa todo el ancho disponible; el panel de
-  sugerencias por nivel se abre como drawer lateral sobre el contenido para no
-  comprimir las columnas ni provocar scroll horizontal.
+  biblioteca de ejercicios se abre como modal centrado sobre el contenido, de modo que la
+  tabla conserva el 100% del ancho sin scroll horizontal.
 -->
 <StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="com.symmetry.desktop.controller.EntrenamientoController"
@@ -25,55 +32,97 @@
         <!-- ============ Contenido principal: selector de rutinas + tabla ============ -->
         <HBox spacing="16" alignment="TOP_LEFT">
             <children>
-                <VBox spacing="10" prefWidth="240" minWidth="205">
+                <VBox spacing="10" prefWidth="252" minWidth="222">
                     <children>
-                        <Label text="Rutinas semanales" styleClass="titulo-seccion"/>
-                        <Label text="Selecciona una rutina para ver y editar sus ejercicios."
-                               styleClass="texto-secundario" wrapText="true"/>
-                        <ListView fx:id="listaRutinas" VBox.vgrow="ALWAYS"/>
-                        <HBox spacing="8">
+                        <!-- Cabecera del panel con las acciones de rutina como barra de iconos -->
+                        <HBox alignment="CENTER_LEFT" spacing="6">
                             <children>
-                                <Button fx:id="botonNuevaRutina" text="Nueva rutina" styleClass="boton-primario"
-                                        onAction="#nuevaRutina" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
-                                <Button fx:id="botonEditarRutina" text="Editar" styleClass="boton-secundario"
-                                        onAction="#editarRutina"/>
-                                <Button fx:id="botonEliminarRutina" text="Eliminar" styleClass="boton-peligro"
-                                        onAction="#eliminarRutina"/>
+                                <Label text="Rutinas semanales" styleClass="titulo-seccion" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="botonEditarRutina" onAction="#editarRutina"
+                                        styleClass="boton-icono-borde" focusTraversable="false">
+                                    <graphic>
+                                        <SVGPath styleClass="icono-accion" scaleX="0.72" scaleY="0.72"
+                                                 content="M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25zM20.71,7.04c0.39,-0.39 0.39,-1.02 0,-1.41l-2.34,-2.34c-0.39,-0.39 -1.02,-0.39 -1.41,0l-1.83,1.83 3.75,3.75 1.83,-1.83z"/>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Editar la rutina seleccionada"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="botonEliminarRutina" onAction="#eliminarRutina"
+                                        styleClass="boton-icono-borde-peligro" focusTraversable="false">
+                                    <graphic>
+                                        <SVGPath styleClass="icono-accion" scaleX="0.72" scaleY="0.72"
+                                                 content="M6,19c0,1.1 0.9,2 2,2h8c1.1,0 2,-0.9 2,-2V7H6v12zM19,4h-3.5l-1,-1h-5l-1,1H5v2h14V4z"/>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Eliminar la rutina seleccionada"/>
+                                    </tooltip>
+                                </Button>
                             </children>
                         </HBox>
+                        <Label text="Selecciona una rutina para ver y editar sus ejercicios."
+                               styleClass="texto-secundario" wrapText="true"/>
+                        <ListView fx:id="listaRutinas" styleClass="lista-rutinas" VBox.vgrow="ALWAYS"/>
+                        <Button fx:id="botonNuevaRutina" text="＋  Nueva rutina" styleClass="boton-primario"
+                                onAction="#nuevaRutina" maxWidth="Infinity"/>
                     </children>
                 </VBox>
 
                 <VBox styleClass="tarjeta" spacing="14" HBox.hgrow="ALWAYS">
                     <children>
-                        <!-- Cabecera de la rutina activa -->
+                        <!-- Cabecera de la rutina activa: titulo + accion principal destacada -->
                         <HBox spacing="12" alignment="CENTER_LEFT">
                             <children>
                                 <VBox spacing="3" HBox.hgrow="ALWAYS">
                                     <children>
-                                        <Label fx:id="etiquetaNombreRutina" text="Sin rutina seleccionada"
-                                               styleClass="titulo-seccion"/>
+                                        <HBox spacing="8" alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label fx:id="etiquetaNombreRutina" text="Sin rutina seleccionada"
+                                                       styleClass="titulo-seccion"/>
+                                                <Label fx:id="etiquetaRutinaHoy" text="Programada para hoy"
+                                                       styleClass="chip-hoy" visible="false" managed="false"/>
+                                            </children>
+                                        </HBox>
                                         <Label fx:id="etiquetaDetalleRutina" styleClass="texto-secundario"/>
                                         <Label fx:id="etiquetaNotasRutina" styleClass="subtitulo"
                                                wrapText="true"/>
                                     </children>
                                 </VBox>
-                                <Label fx:id="etiquetaRutinaHoy" text="Programada para hoy"
-                                       styleClass="chip-hoy" visible="false" managed="false"/>
-                                <Label fx:id="etiquetaEstado" styleClass="texto-secundario"/>
+                                <Button fx:id="botonIniciarEntrenamiento" text="Iniciar entrenamiento"
+                                        styleClass="boton-iniciar" onAction="#iniciarEntrenamiento">
+                                    <graphic>
+                                        <SVGPath styleClass="icono-iniciar" scaleX="0.72" scaleY="0.72"
+                                                 content="M8,5 L19,12 L8,19 Z"/>
+                                    </graphic>
+                                </Button>
                             </children>
                         </HBox>
 
-                        <!-- Barra de acciones de la rutina -->
+                        <!-- Barra de acciones secundarias: alta de ejercicios + modalidad -->
                         <HBox spacing="8" alignment="CENTER_LEFT">
                             <children>
-                                <Button fx:id="botonAgregarEjercicio" text="Añadir ejercicio"
-                                        styleClass="boton-acento" onAction="#agregarEjercicio"/>
+                                <Button fx:id="botonAgregarEjercicio" text="＋  Añadir ejercicio"
+                                        styleClass="boton-secundario" onAction="#agregarEjercicio"/>
                                 <Button fx:id="botonAbrirSugerencias" text="＋  Añadir desde biblioteca"
                                         styleClass="boton-secundario" onAction="#alternarSugerencias"/>
                                 <Region HBox.hgrow="ALWAYS"/>
-                                <Button fx:id="botonIniciarEntrenamiento" text="Iniciar entrenamiento"
-                                        styleClass="boton-primario" onAction="#iniciarEntrenamiento"/>
+                                <HBox styleClass="segmento-contenedor" alignment="CENTER">
+                                    <children>
+                                        <ToggleButton fx:id="botonModoGimnasio" text="Con equipo"
+                                                      styleClass="segmento-boton" onAction="#usarModoGimnasio"/>
+                                        <ToggleButton fx:id="botonModoCasa" text="Sin equipo"
+                                                      styleClass="segmento-boton" onAction="#usarModoCasa"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </HBox>
+
+                        <!-- Linea de estado: modalidad activa y mensajes del modulo -->
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <children>
+                                <Label fx:id="etiquetaModalidad" styleClass="chip-modalidad"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="etiquetaEstado" styleClass="texto-secundario"/>
                             </children>
                         </HBox>
 
@@ -82,9 +131,9 @@
                                 <TableColumn fx:id="columnaNombre" text="Ejercicio" prefWidth="260"/>
                                 <TableColumn fx:id="columnaGrupo" text="Grupo muscular" prefWidth="140"/>
                                 <TableColumn fx:id="columnaPrescripcion" text="Prescripción" prefWidth="100"/>
-                                <TableColumn fx:id="columnaRir" text="RIR" prefWidth="70"/>
+                                <TableColumn fx:id="columnaRir" text="RIR" prefWidth="80"/>
                                 <TableColumn fx:id="columnaDescanso" text="Descanso" prefWidth="85"/>
-                                <TableColumn fx:id="columnaMultimedia" text="Multimedia" prefWidth="105"/>
+                                <TableColumn fx:id="columnaMultimedia" text="Multimedia" prefWidth="120"/>
                                 <TableColumn fx:id="columnaAcciones" text="Acciones" prefWidth="150"
                                              sortable="false" resizable="false"/>
                             </columns>
@@ -94,34 +143,69 @@
             </children>
         </HBox>
 
-        <!-- ============ Velo + drawer lateral de sugerencias ============ -->
-        <Region fx:id="scrimSugerencias" styleClass="drawer-scrim" visible="false"
-                onMouseClicked="#cerrarSugerencias"/>
-
-        <VBox fx:id="panelSugerencias" styleClass="panel-drawer" spacing="10"
-              maxWidth="340" maxHeight="Infinity" translateX="380" visible="false"
-              StackPane.alignment="CENTER_RIGHT">
+        <!-- ============ Modal centrado: biblioteca de ejercicios ============ -->
+        <StackPane fx:id="modalBiblioteca" visible="false" managed="false" focusTraversable="true">
             <children>
-                <HBox spacing="8" alignment="CENTER_LEFT">
+                <Region styleClass="modal-scrim" onMouseClicked="#cerrarSugerencias"/>
+
+                <VBox styleClass="modal-biblioteca" spacing="14" maxWidth="960" maxHeight="680"
+                      StackPane.alignment="CENTER">
+                    <StackPane.margin>
+                        <Insets top="24" right="24" bottom="24" left="24"/>
+                    </StackPane.margin>
                     <children>
-                        <Label text="Sugerencias de ejercicios" styleClass="titulo-seccion"
-                               HBox.hgrow="ALWAYS"/>
-                        <Button text="&#10005;" styleClass="boton-icono" onAction="#cerrarSugerencias"/>
+                        <!-- Cabecera: titulo, nivel, modalidad y cierre -->
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <children>
+                                <VBox spacing="3" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label text="Biblioteca de ejercicios" styleClass="titulo-seccion"/>
+                                        <Label fx:id="etiquetaDescripcionNivel" styleClass="texto-secundario"
+                                               wrapText="true"/>
+                                    </children>
+                                </VBox>
+                                <ComboBox fx:id="comboNivelSugerencias" prefWidth="150"/>
+                                <HBox styleClass="segmento-contenedor" alignment="CENTER">
+                                    <children>
+                                        <ToggleButton fx:id="botonModalGimnasio" text="Con equipo"
+                                                      styleClass="segmento-boton" onAction="#usarModoGimnasio"/>
+                                        <ToggleButton fx:id="botonModalCasa" text="Sin equipo"
+                                                      styleClass="segmento-boton" onAction="#usarModoCasa"/>
+                                    </children>
+                                </HBox>
+                                <Button text="&#10005;" styleClass="boton-icono" onAction="#cerrarSugerencias"/>
+                            </children>
+                        </HBox>
+
+                        <!-- Cuerpo: cuadricula de 2 columnas con scroll vertical -->
+                        <ScrollPane fx:id="scrollSugerencias" fitToWidth="true" hbarPolicy="NEVER"
+                                    styleClass="scroll-fondo" VBox.vgrow="ALWAYS" prefHeight="440">
+                            <content>
+                                <GridPane fx:id="cuadriculaSugerencias" hgap="12" vgap="12">
+                                    <padding>
+                                        <Insets top="2" right="6" bottom="6" left="2"/>
+                                    </padding>
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                    </columnConstraints>
+                                </GridPane>
+                            </content>
+                        </ScrollPane>
+
+                        <!-- Pie: seleccion y confirmacion -->
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <children>
+                                <Label fx:id="etiquetaSeleccion" styleClass="texto-secundario" HBox.hgrow="ALWAYS"/>
+                                <Button text="Cancelar" styleClass="boton-secundario" onAction="#cerrarSugerencias"/>
+                                <Button fx:id="botonAgregarSugerencia"
+                                        text="Añadir ejercicios seleccionados a la rutina"
+                                        styleClass="boton-acento" onAction="#agregarSugerencia"/>
+                            </children>
+                        </HBox>
                     </children>
-                </HBox>
-                <Label text="Elige tu nivel y añade ejercicios recomendados a la rutina activa."
-                       styleClass="texto-secundario" wrapText="true"/>
-                <ComboBox fx:id="comboNivelSugerencias" maxWidth="Infinity"/>
-                <Label fx:id="etiquetaDescripcionNivel" styleClass="texto-secundario" wrapText="true"/>
-                <ListView fx:id="listaSugerencias" VBox.vgrow="ALWAYS" prefHeight="280"/>
-                <!-- Diagrama anatomico del ejercicio seleccionado (se rellena en el controlador). -->
-                <VBox fx:id="contenedorAnatomia" styleClass="tarjeta-anatomia" spacing="6"
-                      alignment="TOP_LEFT"/>
-                <Label fx:id="detalleSugerencia" styleClass="texto-secundario" wrapText="true"
-                       minHeight="20"/>
-                <Button fx:id="botonAgregarSugerencia" text="Añadir a la rutina" styleClass="boton-acento"
-                        maxWidth="Infinity" onAction="#agregarSugerencia"/>
+                </VBox>
             </children>
-        </VBox>
+        </StackPane>
     </children>
 </StackPane>

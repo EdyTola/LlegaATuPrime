@@ -9,7 +9,13 @@ import com.symmetry.desktop.service.ArchivoMultimediaService;
 import com.symmetry.desktop.service.GestorDatos;
 import com.symmetry.desktop.util.Dialogos;
 import com.symmetry.desktop.util.Formato;
-import com.symmetry.desktop.util.VisorMultimedia;
+import com.symmetry.desktop.service.SonidoService;
+import com.symmetry.desktop.service.SonidoService.Efecto;
+import com.symmetry.desktop.service.TemaService;
+import com.symmetry.desktop.util.AchievementVFX;
+import com.symmetry.desktop.util.GuiaTecnicaDialogo;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -30,10 +36,12 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
@@ -49,6 +57,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 
 /**
  * Modulo 2 - Workout Player: cronometro global de la sesion, registro serie a serie
@@ -69,6 +78,8 @@ public class WorkoutPlayerController {
     private Stage escenario;
     private Runnable alFinalizar;
     private Ejercicio ejercicioActual;
+    /** Capa transparente sobre el reproductor para los efectos de logro (texto flotante). */
+    private Pane capaEfectos;
 
     private Timeline relojGlobal;
     private Timeline relojDescanso;
@@ -96,6 +107,12 @@ public class WorkoutPlayerController {
     @FXML
     private Spinner<Integer> spinnerDescanso;
     @FXML
+    private Button botonDescanso;
+    @FXML
+    private Button botonAgregar15;
+    @FXML
+    private Button botonSaltarDescanso;
+    @FXML
     private Label etiquetaDescanso;
     @FXML
     private Label etiquetaVolumen;
@@ -121,7 +138,12 @@ public class WorkoutPlayerController {
                 escenario.initOwner(propietario);
                 escenario.initModality(Modality.WINDOW_MODAL);
             }
-            Scene escena = new Scene(raiz, 1140, 740);
+            Pane capaEfectos = new Pane();
+            capaEfectos.setMouseTransparent(true);
+            Scene escena = new Scene(new StackPane(raiz, capaEfectos), 1140, 740);
+            controlador.capaEfectos = capaEfectos;
+            TemaService.registrar(escena);
+            escenario.setOnHidden(evento -> TemaService.desregistrar(escena));
             URL css = WorkoutPlayerController.class.getResource(RUTA_CSS);
             if (css != null) {
                 escena.getStylesheets().add(css.toExternalForm());
@@ -158,6 +180,7 @@ public class WorkoutPlayerController {
         });
         listaEjercicios.getSelectionModel().selectedItemProperty()
                 .addListener((obs, anterior, actual) -> mostrarEjercicio(actual));
+        actualizarEstadoDescanso(false);
     }
 
     private void iniciar(Rutina rutina, Stage escenario, Runnable alFinalizar) {
@@ -174,7 +197,8 @@ public class WorkoutPlayerController {
 
         spinnerDescanso.getValueFactory()
                 .setValue(gestor.getDatos().getConfiguracion().getDescansoPorDefectoSegundos());
-        etiquetaDescanso.setText(spinnerDescanso.getValue() + " s");
+        segundosDescanso = descansoConfigurado();
+        actualizarEtiquetaDescanso();
         etiquetaEstado.setText("Sesión iniciada " + Formato.hora(sesion.getFechaInicio()));
 
         escenario.setOnHidden(evento -> detener());
@@ -198,51 +222,18 @@ public class WorkoutPlayerController {
 
         TableColumn<FilaSerie, Double> colPeso = new TableColumn<>("Peso (kg)");
         colPeso.setCellValueFactory(datos -> datos.getValue().pesoProperty().asObject());
-        colPeso.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<>() {
-            @Override
-            public String toString(Double valor) {
-                return valor == null ? "" : Formato.numero(valor);
-            }
-
-            @Override
-            public Double fromString(String texto) {
-                return Formato.aNumero(texto);
-            }
-        }));
-        colPeso.setOnEditCommit(evento -> evento.getRowValue().setPeso(evento.getNewValue()));
+        colPeso.setCellFactory(columna -> celdaEditable(convertidorPeso(), FilaSerie::setPeso));
+        colPeso.setPrefWidth(120);
 
         TableColumn<FilaSerie, Integer> colReps = new TableColumn<>("Reps");
         colReps.setCellValueFactory(datos -> datos.getValue().repeticionesProperty().asObject());
-        colReps.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<>() {
-            @Override
-            public String toString(Integer valor) {
-                return valor == null ? "" : String.valueOf(valor);
-            }
-
-            @Override
-            public Integer fromString(String texto) {
-                return (int) Math.round(Formato.aNumero(texto));
-            }
-        }));
-        colReps.setOnEditCommit(evento -> evento.getRowValue().setRepeticiones(evento.getNewValue()));
+        colReps.setCellFactory(columna -> celdaEditable(convertidorRepeticiones(), FilaSerie::setRepeticiones));
+        colReps.setPrefWidth(90);
 
         TableColumn<FilaSerie, Integer> colRir = new TableColumn<>("RIR real");
         colRir.setCellValueFactory(datos -> datos.getValue().rirProperty().asObject());
-        colRir.setCellFactory(TextFieldTableCell.forTableColumn(new StringConverter<>() {
-            @Override
-            public String toString(Integer valor) {
-                return valor == null || valor < 0 ? "" : String.valueOf(valor);
-            }
-
-            @Override
-            public Integer fromString(String texto) {
-                if (texto == null || texto.isBlank()) {
-                    return -1;
-                }
-                return (int) Math.round(Formato.aNumero(texto));
-            }
-        }));
-        colRir.setOnEditCommit(evento -> evento.getRowValue().setRir(evento.getNewValue()));
+        colRir.setCellFactory(columna -> celdaEditable(convertidorRir(), FilaSerie::setRir));
+        colRir.setPrefWidth(90);
 
         TableColumn<FilaSerie, Boolean> colHecha = new TableColumn<>("Hecha");
         colHecha.setCellValueFactory(datos -> datos.getValue().completadaProperty());
@@ -259,6 +250,129 @@ public class WorkoutPlayerController {
         tablaSeries.getColumns().setAll(columnas);
     }
 
+    /**
+     * Celda numerica con un campo de texto SIEMPRE visible y editable. Cada pulsacion vuelca el
+     * valor directamente sobre el objeto de modelo de la serie (peso, repeticiones o RIR), sin
+     * depender de entrar en modo edicion (doble clic) ni de confirmar con Intro. De este modo lo
+     * introducido por el usuario nunca se pierde al pulsar "Finalizar y guardar".
+     */
+    private static <T> TableCell<FilaSerie, T> celdaEditable(StringConverter<T> convertidor,
+                                                            BiConsumer<FilaSerie, T> aplicador) {
+        return new TableCell<>() {
+            private final TextField campo = new TextField();
+            /** Evita reaplicar texto mientras se sincroniza de forma programatica. */
+            private boolean sincronizando;
+
+            {
+                // La celda no usa el modo edicion de JavaFX: el campo de texto ya es interactivo.
+                setEditable(false);
+                campo.getStyleClass().add("editor-celda");
+                campo.textProperty().addListener((obs, anterior, actual) -> {
+                    if (sincronizando) {
+                        return;
+                    }
+                    FilaSerie fila = filaActual();
+                    if (fila != null) {
+                        aplicador.accept(fila, convertidor.fromString(actual));
+                    }
+                });
+                campo.focusedProperty().addListener((obs, antes, enfocado) -> {
+                    if (enfocado) {
+                        campo.selectAll();
+                    } else {
+                        sincronizar(convertidor.toString(getItem()));
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(T valor, boolean vacio) {
+                super.updateItem(valor, vacio);
+                if (vacio || valor == null || filaActual() == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+                // Nunca se reescribe el texto mientras el usuario esta escribiendo en el campo.
+                if (!campo.isFocused()) {
+                    sincronizar(convertidor.toString(valor));
+                }
+                setText(null);
+                setGraphic(campo);
+            }
+
+            private FilaSerie filaActual() {
+                TableRow<FilaSerie> fila = getTableRow();
+                return fila == null ? null : fila.getItem();
+            }
+
+            private void sincronizar(String texto) {
+                if (texto == null || texto.equals(campo.getText())) {
+                    return;
+                }
+                sincronizando = true;
+                campo.setText(texto);
+                sincronizando = false;
+            }
+        };
+    }
+
+    /** Convertidor de la columna de peso: acepta coma o punto decimal y muestra vacio si es 0. */
+    private static StringConverter<Double> convertidorPeso() {
+        return new StringConverter<>() {
+            @Override
+            public String toString(Double valor) {
+                return valor == null || valor == 0 ? "" : Formato.numero(valor);
+            }
+
+            @Override
+            public Double fromString(String texto) {
+                return Formato.aNumero(texto);
+            }
+        };
+    }
+
+    /** Convertidor de la columna de repeticiones (entero). */
+    private static StringConverter<Integer> convertidorRepeticiones() {
+        return new StringConverter<>() {
+            @Override
+            public String toString(Integer valor) {
+                return valor == null ? "" : String.valueOf(valor);
+            }
+
+            @Override
+            public Integer fromString(String texto) {
+                return (int) Math.round(Formato.aNumero(texto));
+            }
+        };
+    }
+
+    /** Convertidor de la columna de RIR real: vacio equivale a "no informado" (-1). */
+    private static StringConverter<Integer> convertidorRir() {
+        return new StringConverter<>() {
+            @Override
+            public String toString(Integer valor) {
+                return valor == null || valor < 0 ? "" : String.valueOf(valor);
+            }
+
+            @Override
+            public Integer fromString(String texto) {
+                if (texto == null || texto.isBlank()) {
+                    return -1;
+                }
+                return (int) Math.round(Formato.aNumero(texto));
+            }
+        };
+    }
+
+    /**
+     * Una serie entra en el historial si el usuario la marco como hecha o si registro carga real
+     * (peso y repeticiones). De este modo el volumen introducido nunca se descarta al finalizar.
+     */
+    private static boolean registrable(FilaSerie fila) {
+        return fila.isCompletada() || (fila.getPeso() > 0 && fila.getRepeticiones() > 0);
+    }
+
     private List<FilaSerie> filas(Ejercicio ejercicio) {
         return seriesPorEjercicio.computeIfAbsent(ejercicio.getId(), clave -> {
             List<FilaSerie> lista = new ArrayList<>();
@@ -267,6 +381,7 @@ public class WorkoutPlayerController {
                 fila.completadaProperty().addListener((obs, antes, ahora) -> {
                     if (ahora) {
                         iniciarDescanso();
+                        celebrarSerie(ejercicio, lista);
                     }
                     actualizarResumen();
                 });
@@ -276,6 +391,23 @@ public class WorkoutPlayerController {
             }
             return lista;
         });
+    }
+
+    /**
+     * Micro-interaccion al completar una serie: brillo sobre la tabla, texto flotante y sonido.
+     * Si era la ultima serie del ejercicio, la celebracion es mayor (lista de ejercicios).
+     */
+    private void celebrarSerie(Ejercicio ejercicio, List<FilaSerie> filas) {
+        boolean ejercicioCompleto = filas.stream().allMatch(FilaSerie::isCompletada);
+        if (capaEfectos != null && tablaSeries.getScene() != null) {
+            AchievementVFX.pulsoGlow(tablaSeries);
+            AchievementVFX.textoFlotante(tablaSeries, capaEfectos,
+                    ejercicioCompleto ? "¡Ejercicio completado!" : "¡Serie completada!");
+            if (ejercicioCompleto) {
+                AchievementVFX.pulsoGlow(listaEjercicios);
+            }
+        }
+        SonidoService.reproducir(ejercicioCompleto ? Efecto.EXITO : Efecto.SERIE);
     }
 
     private void mostrarEjercicio(Ejercicio ejercicio) {
@@ -341,21 +473,55 @@ public class WorkoutPlayerController {
             segundosDescanso--;
             actualizarEtiquetaDescanso();
             if (segundosDescanso <= 0) {
+                segundosDescanso = 0;
                 relojDescanso.stop();
                 etiquetaDescanso.setText("¡Listo!");
+                actualizarEstadoDescanso(false);
             }
         }));
         relojDescanso.setCycleCount(Animation.INDEFINITE);
         relojDescanso.play();
+        actualizarEstadoDescanso(true);
+    }
+
+    /**
+     * Salta el descanso en curso: detiene la cuenta regresiva, reinicia el contador visual al
+     * descanso configurado y devuelve los controles a su estado inicial. No afecta al
+     * cronometro global de la sesion, que sigue corriendo.
+     */
+    @FXML
+    private void saltarDescanso() {
+        if (relojDescanso != null) {
+            relojDescanso.stop();
+        }
+        segundosDescanso = descansoConfigurado();
+        actualizarEtiquetaDescanso();
+        actualizarEstadoDescanso(false);
+        etiquetaEstado.setText("Descanso saltado. Listo para la siguiente serie.");
+    }
+
+    /** Sincroniza visibilidad y estado de los controles del descanso con la cuenta regresiva. */
+    private void actualizarEstadoDescanso(boolean corriendo) {
+        if (botonSaltarDescanso != null) {
+            botonSaltarDescanso.setVisible(corriendo);
+            botonSaltarDescanso.setManaged(corriendo);
+            botonSaltarDescanso.setDisable(!corriendo);
+        }
+        if (botonAgregar15 != null) {
+            botonAgregar15.setDisable(!corriendo);
+        }
+        if (botonDescanso != null) {
+            botonDescanso.setText(corriendo ? "Reiniciar descanso" : "Iniciar descanso");
+        }
     }
 
     @FXML
     private void agregarQuinceSegundos() {
+        if (relojDescanso == null || relojDescanso.getStatus() != Animation.Status.RUNNING) {
+            return;
+        }
         segundosDescanso += 15;
         actualizarEtiquetaDescanso();
-        if (relojDescanso != null && relojDescanso.getStatus() != Animation.Status.RUNNING && segundosDescanso > 0) {
-            relojDescanso.play();
-        }
     }
 
     @FXML
@@ -396,11 +562,11 @@ public class WorkoutPlayerController {
         if (ejercicioActual == null) {
             return;
         }
-        VisorMultimedia.mostrar(ejercicioActual.getRutaMultimedia(), ejercicioActual.getEnlaceMultimedia(),
-                ventana(), ruta -> {
-                    ejercicioActual.setRutaMultimedia(ruta);
-                    gestor.guardarCambiosEntrenamiento();
-                });
+        // Guia tecnica: modelo 2D animado siempre disponible + multimedia personalizada del usuario.
+        GuiaTecnicaDialogo.mostrar(ejercicioActual, sustituciones.get(ejercicioActual.getId()), ventana(), ruta -> {
+            ejercicioActual.setRutaMultimedia(ruta);
+            gestor.guardarCambiosEntrenamiento();
+        });
     }
 
     @FXML
@@ -422,33 +588,39 @@ public class WorkoutPlayerController {
 
     @FXML
     private void finalizar() {
-        long completadas = seriesPorEjercicio.values().stream()
-                .flatMap(List::stream).filter(FilaSerie::isCompletada).count();
-        if (completadas == 0 && !Dialogos.confirmar("Sesión sin series",
-                "No has marcado ninguna serie como completada.\n¿Guardar la sesión de todos modos?", ventana())) {
+        long registradas = seriesPorEjercicio.values().stream()
+                .flatMap(List::stream).filter(WorkoutPlayerController::registrable).count();
+        if (registradas == 0 && !Dialogos.confirmar("Sesión sin series",
+                "No has registrado ninguna serie.\n¿Guardar la sesión de todos modos?", ventana())) {
             return;
         }
 
         sesion.getRegistros().clear();
         for (Ejercicio ejercicio : rutina.getEjercicios()) {
             List<FilaSerie> filas = seriesPorEjercicio.getOrDefault(ejercicio.getId(), List.of());
-            if (filas.stream().noneMatch(FilaSerie::isCompletada)) {
-                continue;
-            }
-            RegistroEjercicio registro = new RegistroEjercicio(ejercicio);
+            // El registro conserva fecha, nombre del ejercicio, grupo muscular y sus series
+            // (peso en kg y repeticiones), de modo que el historial quede autocontenido en el JSON.
+            RegistroEjercicio registro = new RegistroEjercicio(ejercicio, sesion.getFecha());
             String alternativa = sustituciones.get(ejercicio.getId());
             if (alternativa != null) {
                 registro.setNombreEjercicio(alternativa);
             }
             for (FilaSerie fila : filas) {
+                if (!registrable(fila)) {
+                    continue;
+                }
+                // Se transcribe obligatoriamente el peso (kg) y las repeticiones de cada serie.
                 SerieRegistrada serie = new SerieRegistrada(fila.getNumero());
                 serie.setPesoKg(fila.getPeso());
                 serie.setRepeticiones(fila.getRepeticiones());
                 serie.setRirReal(fila.getRir());
-                serie.setCompletada(fila.isCompletada());
+                serie.setCompletada(true);
+                // El volumen de carga real (peso x repeticiones) se deriva de estos valores.
                 registro.getSeries().add(serie);
             }
-            sesion.getRegistros().add(registro);
+            if (!registro.getSeries().isEmpty()) {
+                sesion.getRegistros().add(registro);
+            }
         }
         sesion.setFechaFin(LocalDateTime.now());
         gestor.guardarSesion(sesion);
@@ -506,22 +678,22 @@ public class WorkoutPlayerController {
 
     private void actualizarResumen() {
         double volumen = 0;
-        int completadas = 0;
+        int registradas = 0;
         for (List<FilaSerie> filas : seriesPorEjercicio.values()) {
             for (FilaSerie fila : filas) {
-                if (fila.isCompletada()) {
+                if (registrable(fila)) {
                     volumen += fila.getPeso() * fila.getRepeticiones();
-                    completadas++;
+                    registradas++;
                 }
             }
         }
         etiquetaVolumen.setText("Volumen: " + Formato.numero(volumen) + " kg · "
-                + completadas + " series completadas");
+                + registradas + " series registradas");
 
         if (rutina != null) {
             long conSeries = rutina.getEjercicios().stream()
                     .filter(e -> seriesPorEjercicio.getOrDefault(e.getId(), List.of()).stream()
-                            .anyMatch(FilaSerie::isCompletada))
+                            .anyMatch(WorkoutPlayerController::registrable))
                     .count();
             etiquetaProgreso.setText(conSeries + " de " + rutina.getEjercicios().size()
                     + " ejercicios con series registradas");
