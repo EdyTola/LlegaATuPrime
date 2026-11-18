@@ -2,6 +2,7 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -34,8 +35,17 @@
         </children>
     </HBox>
 
-    <Label text="Arrastra una fila para reordenar la lista de reproducción."
+    <Label text="Haz doble clic en una pista para reproducirla, arrastra las filas para reordenar la lista o suelta archivos MP3/WAV desde el explorador."
            styleClass="texto-secundario"/>
+
+    <!-- Progreso de la descarga y conversion de enlaces, dentro de la propia aplicacion. -->
+    <HBox fx:id="panelDescarga" styleClass="panel-descarga" spacing="12" alignment="CENTER_LEFT"
+          visible="false" managed="false">
+        <children>
+            <ProgressBar fx:id="progresoDescarga" progress="0" prefWidth="220"/>
+            <Label fx:id="etiquetaDescarga" styleClass="texto-secundario"/>
+        </children>
+    </HBox>
 
     <TableView fx:id="listaPistas" VBox.vgrow="ALWAYS">
         <columns>
@@ -45,6 +55,8 @@
             <TableColumn fx:id="columnaArtista" text="Artista" prefWidth="180"/>
             <TableColumn fx:id="columnaOrigen" text="Origen" prefWidth="130"/>
             <TableColumn fx:id="columnaDuracion" text="Duración" prefWidth="100"/>
+            <TableColumn fx:id="columnaAcciones" text="Acciones" prefWidth="90"
+                         minWidth="70" sortable="false" resizable="false"/>
         </columns>
     </TableView>
 

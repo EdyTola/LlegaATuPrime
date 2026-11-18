@@ -2,6 +2,7 @@ package com.symmetry.desktop.controller;
 
 import com.symmetry.desktop.model.DiaSemana;
 import com.symmetry.desktop.model.Ejercicio;
+import com.symmetry.desktop.model.GrupoMuscular;
 import com.symmetry.desktop.model.ModalidadEntrenamiento;
 import com.symmetry.desktop.model.NivelEjercicio;
 import com.symmetry.desktop.model.Rutina;
@@ -83,6 +84,18 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
     private static final String SVG_ELIMINAR =
             "M6,19c0,1.1 0.9,2 2,2h8c1.1,0 2,-0.9 2,-2V7H6v12zM19,4h-3.5l-1,-1h-5l-1,1H5v2h14V4z";
 
+    /* Estado de la columna Multimedia: recurso disponible (video/archivo), enlace o sin adjunto. */
+    private static final String SVG_MEDIA_DISPONIBLE =
+            "M17,10.5V7c0,-0.55 -0.45,-1 -1,-1H4c-0.55,0 -1,0.45 -1,1v10c0,0.55 0.45,1 1,1h12"
+            + "c0.55,0 1,-0.45 1,-1v-3.5l4,4v-11l-4,4z";
+    private static final String SVG_MEDIA_ENLACE =
+            "M3.9,12c0,-1.71 1.39,-3.1 3.1,-3.1h4V7H7c-2.76,0 -5,2.24 -5,5s2.24,5 5,5h4v-1.9H7"
+            + "c-1.71,0 -3.1,-1.39 -3.1,-3.1zM8,13h8v-2H8v2zM17,7h-4v1.9h4c1.71,0 3.1,1.39 3.1,3.1"
+            + "s-1.39,3.1 -3.1,3.1h-4V17h4c2.76,0 5,-2.24 5,-5s-2.24,-5 -5,-5z";
+
+    /** Tamano final (en px) de los iconos de estado de la columna Multimedia. */
+    private static final double LADO_ICONO_MEDIA = 16;
+
     /** Ayuda compartida que identifica la rutina programada para el dia en curso. */
     private static final Tooltip AYUDA_RUTINA_HOY = new Tooltip("Rutina programada para hoy");
 
@@ -159,9 +172,14 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
     public void initialize(URL ubicacion, ResourceBundle recursos) {
         columnaNombre.setCellValueFactory(new PropertyValueFactory<>("nombre"));
         columnaNombre.setCellFactory(column -> celdaNombre());
-        columnaGrupo.setCellValueFactory(new PropertyValueFactory<>("grupoMuscular"));
+        columnaGrupo.setCellValueFactory(datos -> {
+            GrupoMuscular grupo = datos.getValue().getGrupoMuscular();
+            return new SimpleStringProperty(grupo == null ? "" : grupo.getEtiqueta());
+        });
+        columnaGrupo.setCellFactory(column -> celdaChip("chip-grupo"));
         columnaPrescripcion.setCellValueFactory(new PropertyValueFactory<>("prescripcion"));
         columnaRir.setCellValueFactory(new PropertyValueFactory<>("rirTexto"));
+        columnaRir.setCellFactory(column -> celdaRir());
         columnaDescanso.setCellValueFactory(new PropertyValueFactory<>("descansoSegundos"));
         columnaDescanso.setCellFactory(column -> new TableCell<>() {
             @Override
@@ -170,8 +188,8 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
                 setText(vacio || valor == null ? null : valor + " s");
             }
         });
-        columnaMultimedia.setCellValueFactory(datos -> new SimpleStringProperty(
-                resumenMultimedia(datos.getValue())));
+        columnaMultimedia.setCellValueFactory(datos -> null);
+        columnaMultimedia.setCellFactory(column -> celdaMultimedia());
         columnaAcciones.setCellValueFactory(datos -> null);
         columnaAcciones.setCellFactory(column -> celdaAcciones());
 
@@ -181,21 +199,7 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
                 "Esta rutina no tiene ejercicios. Añade uno o usa \"Añadir desde biblioteca\"."));
 
         listaRutinas.setItems(rutinas);
-        listaRutinas.setCellFactory(lista -> new ListCell<>() {
-            @Override
-            protected void updateItem(Rutina rutina, boolean vacio) {
-                super.updateItem(rutina, vacio);
-                if (vacio || rutina == null) {
-                    setText(null);
-                    setTooltip(null);
-                    return;
-                }
-                // La rutina programada para hoy se marca con un punto y un tooltip informativo.
-                boolean esHoy = rutina.getDiaSemana() == DiaSemana.desdeFecha(LocalDate.now());
-                setText((esHoy ? "\u25CF  " : "") + rutina.getTituloCompleto());
-                setTooltip(esHoy ? AYUDA_RUTINA_HOY : null);
-            }
-        });
+        listaRutinas.setCellFactory(lista -> celdaRutina());
         listaRutinas.getSelectionModel().selectedItemProperty()
                 .addListener((obs, anterior, actual) -> mostrarRutina(actual));
 
@@ -300,6 +304,8 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
 
             {
                 origen.getStyleClass().add("texto-variante");
+                caja.setAlignment(Pos.CENTER_LEFT);
+                setAlignment(Pos.CENTER_LEFT);
             }
 
             @Override
@@ -320,6 +326,207 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
                 setGraphic(caja);
             }
         };
+    }
+
+    // ------------------------------------------------------------------
+    // Lista de rutinas: tarjetas con subtitulo e indicador de rutina activa
+    // ------------------------------------------------------------------
+
+    /** Tarjeta de la lista de rutinas: titulo, dia y volumen de trabajo, e indicador lateral. */
+    private ListCell<Rutina> celdaRutina() {
+        return new ListCell<>() {
+            private final Label titulo = new Label();
+            private final Label subtitulo = new Label();
+            private final Label chipHoy = new Label("Hoy");
+            private final HBox filaTitulo = new HBox(6, titulo, chipHoy);
+            private final VBox textos = new VBox(2, filaTitulo, subtitulo);
+            private final Region indicador = new Region();
+            private final HBox contenido = new HBox(10, indicador, textos);
+
+            {
+                titulo.getStyleClass().add("rutina-item-titulo");
+                subtitulo.getStyleClass().add("rutina-item-subtitulo");
+                chipHoy.getStyleClass().add("rutina-item-hoy");
+                indicador.getStyleClass().add("rutina-item-indicador");
+                filaTitulo.setAlignment(Pos.CENTER_LEFT);
+                textos.setAlignment(Pos.CENTER_LEFT);
+                contenido.setAlignment(Pos.CENTER_LEFT);
+                textos.setMaxWidth(Double.MAX_VALUE);
+                HBox.setHgrow(textos, Priority.ALWAYS);
+                // El indicador se estira a lo alto de la tarjeta para marcar la rutina activa.
+                indicador.setMaxHeight(Double.MAX_VALUE);
+            }
+
+            @Override
+            protected void updateItem(Rutina rutina, boolean vacio) {
+                super.updateItem(rutina, vacio);
+                if (vacio || rutina == null) {
+                    setGraphic(null);
+                    setText(null);
+                    setTooltip(null);
+                    return;
+                }
+                boolean esHoy = rutina.getDiaSemana() == DiaSemana.desdeFecha(LocalDate.now());
+                titulo.setText(rutina.getNombre());
+                chipHoy.setVisible(esHoy);
+                chipHoy.setManaged(esHoy);
+                String dia = rutina.getDiaSemana() == null
+                        ? "Sin día asignado" : rutina.getDiaSemana().getEtiqueta();
+                int total = rutina.getEjercicios().size();
+                subtitulo.setText(dia + " · " + total + (total == 1 ? " ejercicio" : " ejercicios")
+                        + " · " + rutina.getSeriesTotales() + " series");
+                setText(null);
+                setTooltip(esHoy ? AYUDA_RUTINA_HOY : null);
+                setGraphic(contenido);
+            }
+        };
+    }
+
+    // ------------------------------------------------------------------
+    // Celdas de la tabla: badges (grupo y RIR) y estado de multimedia
+    // ------------------------------------------------------------------
+
+    /** Celda de texto presentada como etiqueta tipo píldora para facilitar el escaneo. */
+    private TableCell<Ejercicio, String> celdaChip(String estilo) {
+        return new TableCell<>() {
+            private final Label chip = new Label();
+            private final HBox caja = new HBox(chip);
+
+            {
+                chip.getStyleClass().add(estilo);
+                caja.setAlignment(Pos.CENTER_LEFT);
+                setAlignment(Pos.CENTER_LEFT);
+            }
+
+            @Override
+            protected void updateItem(String valor, boolean vacio) {
+                super.updateItem(valor, vacio);
+                if (vacio || valor == null || valor.isBlank()) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+                setText(null);
+                chip.setText(valor);
+                setGraphic(caja);
+            }
+        };
+    }
+
+    /** Celda del RIR como badge; el color indica la cercania al fallo muscular. */
+    private TableCell<Ejercicio, String> celdaRir() {
+        return new TableCell<>() {
+            private final Label chip = new Label();
+            private final HBox caja = new HBox(chip);
+
+            {
+                chip.getStyleClass().add("chip-rir");
+                caja.setAlignment(Pos.CENTER_LEFT);
+                setAlignment(Pos.CENTER_LEFT);
+            }
+
+            @Override
+            protected void updateItem(String valor, boolean vacio) {
+                super.updateItem(valor, vacio);
+                chip.getStyleClass().removeAll("chip-rir-duro", "chip-rir-medio", "chip-rir-suave");
+                Ejercicio ejercicio = ejercicioDeLaFila(this);
+                if (vacio || valor == null || ejercicio == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+                setText(null);
+                chip.setText(valor);
+                chip.getStyleClass().add(claseRir(ejercicio.getRirObjetivo()));
+                setGraphic(caja);
+            }
+        };
+    }
+
+    /** Nivel de esfuerzo del RIR: 0-1 (al fallo), 2-3 (moderado) y 4 o mas (holgado). */
+    private static String claseRir(int rirObjetivo) {
+        if (rirObjetivo <= 1) {
+            return "chip-rir-duro";
+        }
+        if (rirObjetivo <= 3) {
+            return "chip-rir-medio";
+        }
+        return "chip-rir-suave";
+    }
+
+    /** Celda de multimedia: icono de estado (recurso, enlace o sin adjunto) con su etiqueta. */
+    private TableCell<Ejercicio, String> celdaMultimedia() {
+        return new TableCell<>() {
+            private final Label etiqueta = new Label();
+            private final HBox caja = new HBox(6);
+
+            {
+                caja.setAlignment(Pos.CENTER_LEFT);
+                setAlignment(Pos.CENTER_LEFT);
+            }
+
+            @Override
+            protected void updateItem(String valor, boolean vacio) {
+                super.updateItem(valor, vacio);
+                Ejercicio ejercicio = ejercicioDeLaFila(this);
+                if (vacio || ejercicio == null) {
+                    setText(null);
+                    setGraphic(null);
+                    return;
+                }
+                EstadoMedia estado = estadoMedia(ejercicio);
+                Node icono = nodoIcono(estado.svg(), estado.claseIcono(), LADO_ICONO_MEDIA);
+                etiqueta.setText(estado.texto());
+                etiqueta.getStyleClass().setAll(estado.claseTexto());
+                caja.getChildren().setAll(icono, etiqueta);
+                setText(null);
+                setGraphic(caja);
+            }
+        };
+    }
+
+    /** Estado visual de la columna Multimedia de un ejercicio. */
+    private record EstadoMedia(String texto, String svg, String claseIcono, String claseTexto) {
+    }
+
+    private static EstadoMedia estadoMedia(Ejercicio ejercicio) {
+        String ruta = ejercicio.getRutaMultimedia();
+        if (ArchivoMultimediaService.existe(ruta)) {
+            String tipo = ArchivoMultimediaService.esVideo(ruta) ? "Video"
+                    : (ArchivoMultimediaService.esImagen(ruta) ? "Imagen" : "Archivo");
+            return new EstadoMedia(tipo, SVG_MEDIA_DISPONIBLE, "icono-media-ok", "media-etiqueta-ok");
+        }
+        String enlace = ejercicio.getEnlaceMultimedia();
+        if (enlace != null && !enlace.isBlank()) {
+            String tipo = ArchivoMultimediaService.esYoutube(enlace) ? "YouTube" : "Enlace";
+            return new EstadoMedia(tipo, SVG_MEDIA_ENLACE, "icono-media-ok", "media-etiqueta-ok");
+        }
+        return new EstadoMedia("Sin multimedia", SVG_MEDIA_DISPONIBLE, "icono-media-vacio",
+                "media-etiqueta-vacio");
+    }
+
+    /** Ejercicio real de la fila de la tabla correspondiente al indice de la celda. */
+    private Ejercicio ejercicioDeLaFila(TableCell<Ejercicio, ?> celda) {
+        int indice = celda.getIndex();
+        List<Ejercicio> items = celda.getTableView().getItems();
+        return indice >= 0 && indice < items.size() ? items.get(indice) : null;
+    }
+
+    /** Icono vectorial pequeno de estado, escalado y centrado dentro de un marco cuadrado. */
+    private static Node nodoIcono(String contenidoSvg, String claseIcono, double lado) {
+        SVGPath ruta = new SVGPath();
+        ruta.setContent(contenidoSvg);
+        ruta.getStyleClass().add(claseIcono);
+        double escala = lado / 24.0;
+        ruta.setScaleX(escala);
+        ruta.setScaleY(escala);
+
+        StackPane marco = new StackPane(ruta);
+        marco.setMinSize(lado, lado);
+        marco.setPrefSize(lado, lado);
+        marco.setMaxSize(lado, lado);
+        marco.setMouseTransparent(true);
+        return marco;
     }
 
     // ------------------------------------------------------------------
@@ -480,10 +687,23 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
         textos.setAlignment(Pos.CENTER_LEFT);
         HBox.setHgrow(textos, Priority.ALWAYS);
 
-        StackPane lateral = new StackPane(marca);
+        // Guia tecnica animada del ejercicio, sin salir de la biblioteca ni alterar la seleccion.
+        Button verTecnica = new Button("▶");
+        verTecnica.getStyleClass().add("boton-icono");
+        verTecnica.setTooltip(new Tooltip("Ver técnica animada"));
+        verTecnica.setFocusTraversable(false);
+        verTecnica.setOnMouseClicked(evento -> evento.consume());
+        verTecnica.setOnAction(evento -> {
+            evento.consume();
+            GuiaTecnicaDialogo.mostrar(ejercicio, ejercicio.getNombre(), gestor.getModalidad(), ventana(), null);
+        });
+
+        StackPane lateral = new StackPane(marca, verTecnica);
+        StackPane.setAlignment(marca, Pos.TOP_RIGHT);
+        StackPane.setAlignment(verTecnica, Pos.BOTTOM_RIGHT);
         lateral.setAlignment(Pos.TOP_RIGHT);
-        lateral.setMinWidth(22);
-        lateral.setMaxWidth(22);
+        lateral.setMinWidth(34);
+        lateral.setMaxWidth(34);
 
         HBox contenido = new HBox(14, icono, textos, lateral);
         contenido.setAlignment(Pos.CENTER_LEFT);
@@ -517,18 +737,6 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
                 : total + (total == 1 ? " ejercicio seleccionado" : " ejercicios seleccionados")
                 + " · se añadirán" + destino);
         botonAgregarSugerencia.setDisable(rutina == null || total == 0);
-    }
-
-    /** Indicador corto del recurso visual: archivo local, YouTube u otro enlace. */
-    private static String resumenMultimedia(Ejercicio ejercicio) {
-        if (ArchivoMultimediaService.existe(ejercicio.getRutaMultimedia())) {
-            return "Archivo local";
-        }
-        String enlace = ejercicio.getEnlaceMultimedia();
-        if (enlace != null && !enlace.isBlank()) {
-            return ArchivoMultimediaService.esYoutube(enlace) ? "YouTube" : "Enlace";
-        }
-        return "—";
     }
 
     /**
@@ -705,7 +913,7 @@ public class EntrenamientoController implements Initializable, VistaConRefresco 
         Ejercicio ejercicio = visible.getAdaptadoDe() != null ? visible : original(visible);
         // Las variantes sin equipo son temporales: no se les puede adjuntar multimedia.
         boolean variante = ejercicio.getAdaptadoDe() != null;
-        GuiaTecnicaDialogo.mostrar(ejercicio, ejercicio.getNombre(), ventana(), variante ? null : ruta -> {
+        GuiaTecnicaDialogo.mostrar(ejercicio, ejercicio.getNombre(), gestor.getModalidad(), ventana(), variante ? null : ruta -> {
             ejercicio.setRutaMultimedia(ruta);
             gestor.guardarCambiosEntrenamiento();
             tablaEjercicios.refresh();

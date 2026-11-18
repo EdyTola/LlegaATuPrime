@@ -8,8 +8,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Reto dinamico generado a partir del historial del usuario. Vive en una ventana de tiempo
+ * Reto dinamico generado a partir de la rutina del dia. Vive en una ventana de tiempo
  * (12 h para los retos flash, 24 h para los diarios) y otorga XP extra al completarse.
+ * Los retos de recuperacion activa se confirman manualmente; el resto se miden solos.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RetoDiario {
@@ -50,11 +51,20 @@ public class RetoDiario {
         return horas > 0 ? horas + " h " + minutos + " min" : minutos + " min";
     }
 
-    /** Texto del progreso, por ejemplo "4 / 8 series" o "900 / 1500 ml". */
+    /** Texto del progreso, por ejemplo "4 / 8 series", "900 / 1500 ml" o el estado de un reto manual. */
     @JsonIgnore
     public String getProgresoTexto() {
+        if (tipo != null && tipo.requiereConfirmacion()) {
+            return completado ? "Completado" : "Pendiente de confirmar";
+        }
         String unidad = tipo == TipoReto.HIDRATACION_VENTANA ? "ml" : "series";
         return Math.min(progreso, objetivo) + " / " + objetivo + " " + unidad;
+    }
+
+    /** true si el reto se completa confirmandolo manualmente (recuperacion activa). */
+    @JsonIgnore
+    public boolean esManual() {
+        return tipo != null && tipo.requiereConfirmacion();
     }
 
     public String getId() {

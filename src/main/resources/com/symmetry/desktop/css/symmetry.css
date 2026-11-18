@@ -112,33 +112,16 @@
     -fx-text-fill: -color-acento;
 }
 
+/* "Prime" en la marca lateral: acento vibrante para el segundo termino. */
+.nav-marca-acento {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-menta;
+}
+
 .nav-marca-subtitulo {
     -fx-font-size: 11.5px;
     -fx-text-fill: -color-texto-secundario;
-}
-
-/* Logotipo corporativo: marca vectorial (isotipo + tipografia) */
-.nav-logo-marco {
-    -fx-background-color: linear-gradient(to bottom right, -color-acento-suave, transparent);
-    -fx-background-radius: 12px;
-    -fx-border-color: -color-acento-borde;
-    -fx-border-radius: 12px;
-    -fx-border-width: 1px;
-}
-
-/* Barras ascendentes: disciplina y constancia */
-.nav-logo-barras {
-    -fx-fill: -color-acento;
-}
-
-/* Linea de picos con flecha: evolucion y rendimiento */
-.nav-logo-pico,
-.nav-logo-flecha {
-    -fx-fill: transparent;
-    -fx-stroke: -color-menta;
-    -fx-stroke-width: 2.4px;
-    -fx-stroke-line-cap: round;
-    -fx-stroke-line-join: round;
 }
 
 .nav-boton {
@@ -731,9 +714,21 @@
     -fx-text-fill: -color-acento;
 }
 
-/* Grafico circular: colores Fluent para los grupos musculares y leyenda legible */
+/* Grafico circular: colores Fluent para los grupos musculares.
+   El color del texto de la leyenda se define mas abajo por tema activo
+   (Modo claro / Modo oscuro) para garantizar siempre el contraste. */
 .chart-legend-item {
     -fx-text-fill: -color-texto;
+}
+
+/* La leyenda del tema base de JavaFX (modena) trae su propio fondo claro,
+   que en modo oscuro se ve como un recuadro claro y deja el texto ilegible.
+   Se anula para que el grafico se fusione con la tarjeta. */
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 8 0 0 0;
 }
 
 .default-color0.chart-pie { -fx-pie-color: -color-acento; }
@@ -862,8 +857,24 @@
     -fx-font-size: 11px;
 }
 
+/* Titulo del eje: en JavaFX es un Label, por lo que usa -fx-text-fill. */
 .axis-label {
     -fx-text-fill: -color-texto-secundario;
+}
+
+/* Titulo y subtitulo del grafico (tambien Labels). */
+.chart-title,
+.chart-subtitle {
+    -fx-text-fill: -color-texto;
+}
+
+/* Etiquetas de las porciones del grafico circular (nodos Text: -fx-fill). */
+.chart-pie-label {
+    -fx-fill: -color-texto;
+}
+
+.chart-pie-label-line {
+    -fx-stroke: -color-borde-fuerte;
 }
 
 .default-color0.chart-series-line {
@@ -875,6 +886,47 @@
     -fx-background-color: -color-acento, -color-superficie;
     -fx-background-radius: 5px;
     -fx-padding: 4px;
+}
+
+/* ---------------------------------------------------------------------
+   Contraste dinamico de los graficos segun el tema activo.
+   Fuerza el color de textos, leyendas y ejes para que sigan siendo
+   legibles sobre las tarjetas claras (#FFFFFF) y oscuras (#181818),
+   tanto en el grafico de lineas como en el circular.
+   --------------------------------------------------------------------- */
+
+/* Modo claro: gris carbon formal */
+.root.tema-claro .chart .chart-legend-item,
+.root.tema-claro .chart-legend-item,
+.root.tema-claro .chart-title,
+.root.tema-claro .chart-subtitle,
+.root.tema-claro .axis-label {
+    -fx-text-fill: #242424;
+}
+
+.root.tema-claro .axis {
+    -fx-tick-label-fill: #333333;
+}
+
+.root.tema-claro .chart-pie-label {
+    -fx-fill: #242424;
+}
+
+/* Modo oscuro: blanco y gris muy claro sobre el fondo de la tarjeta */
+.root.tema-oscuro .chart .chart-legend-item,
+.root.tema-oscuro .chart-legend-item,
+.root.tema-oscuro .chart-title,
+.root.tema-oscuro .chart-subtitle,
+.root.tema-oscuro .axis-label {
+    -fx-text-fill: #E1DFDD;
+}
+
+.root.tema-oscuro .axis {
+    -fx-tick-label-fill: #E1DFDD;
+}
+
+.root.tema-oscuro .chart-pie-label {
+    -fx-fill: #FFFFFF;
 }
 
 /* ---------------------------- Multimedia ---------------------------- */
@@ -1432,6 +1484,32 @@
 .boton-media-activo:hover {
     -fx-background-color: -color-acento-suave;
     -fx-border-color: -color-acento;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, -color-acento, 10, 0.35, 0, 0);
+}
+
+/* Rotulo del modo de reproduccion bajo los controles */
+.etiqueta-modo {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.etiqueta-modo-activo {
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+/* Mini-reproductor: botones de modo activos */
+.boton-media-mini-activo,
+.boton-media-mini-activo:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-border-radius: 999px;
+    -fx-border-width: 2px;
+}
+
+.boton-media-mini-activo .icono-media {
+    -fx-fill: -color-acento;
 }
 
 .boton-media-principal {
@@ -1474,6 +1552,135 @@
 .table-row-cell.fila-destino {
     -fx-border-color: -color-acento transparent -color-separador transparent;
     -fx-border-width: 2 0 1 0;
+}
+
+/* Boton de accion por fila: eliminar una pista con un solo clic */
+.boton-accion-eliminar {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-pref-width: 28px;
+    -fx-pref-height: 28px;
+    -fx-padding: 0;
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-cursor: hand;
+}
+
+.boton-accion-eliminar:hover {
+    -fx-background-color: -color-peligro-suave;
+    -fx-border-color: -color-peligro-borde;
+    -fx-text-fill: -color-rojo;
+}
+
+.boton-accion-eliminar:pressed {
+    -fx-background-color: -color-peligro-borde;
+}
+
+/* Panel de progreso de la descarga y conversion de enlaces a MP3 (dentro de la app) */
+.panel-descarga {
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 10px 14px;
+}
+
+/* =====================================================================
+   Mini-reproductor global persistente (visible en todas las secciones)
+   ===================================================================== */
+
+.mini-reproductor {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 8px 18px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 16, 0.20, 0, -3);
+}
+
+.mini-portada {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.mini-portada-simbolo {
+    -fx-font-size: 18px;
+    -fx-text-fill: -color-texto-deshabilitado;
+}
+
+.mini-titulo {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.mini-artista {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.mini-tiempo {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.mini-volumen-icono {
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+/* Controles compactos del mini-reproductor */
+.boton-media-mini {
+    -fx-background-color: transparent;
+    -fx-background-radius: 999px;
+    -fx-border-color: transparent;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.boton-media-mini:hover {
+    -fx-background-color: -color-acento-suave;
+}
+
+.boton-media-mini .icono-media {
+    -fx-fill: -color-texto-secundario;
+}
+
+.boton-media-mini:hover .icono-media {
+    -fx-fill: -color-acento;
+}
+
+.boton-media-mini-principal {
+    -fx-background-color: -color-acento;
+    -fx-background-radius: 999px;
+    -fx-border-color: transparent;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-pref-width: 40px;
+    -fx-pref-height: 40px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, -color-acento, 12, 0.35, 0, 3);
+}
+
+.boton-media-mini-principal:hover {
+    -fx-background-color: -color-acento-hover;
+}
+
+.boton-media-mini-principal .icono-media {
+    -fx-fill: white;
 }
 
 
@@ -1626,6 +1833,24 @@
 
 .tarjeta-reto-flash {
     -fx-border-color: -color-naranja;
+}
+
+/* Retos de recuperacion activa: movilidad, respiracion, caminata, pausa activa y habitos */
+.tarjeta-reto-recuperacion {
+    -fx-border-color: -color-menta;
+}
+
+.boton-reto-completar {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 6 14 6 14;
+}
+
+.boton-reto-completar:hover {
+    -fx-background-color: -color-acento-suave-hover;
 }
 
 .tarjeta-reto-completo {
@@ -1904,4 +2129,266 @@
 
 .levelup-boton:hover {
     -fx-background-color: linear-gradient(to bottom, #FFE08A, #FFB800);
+}
+
+
+/* =====================================================================
+   Modulo de entrenamiento: pulido del panel de rutinas, badges de la
+   tabla de ejercicios y jerarquia de las acciones de la rutina activa.
+   ===================================================================== */
+
+/* --- TableView sin filas vacias: se ocultan fondo y cuadricula --- */
+.table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.table-row-cell:empty:hover {
+    -fx-background-color: transparent;
+}
+
+.table-row-cell:empty .table-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+/* --- Accion principal: boton vibrante con icono de Play --- */
+.boton-iniciar {
+    -fx-background-color: linear-gradient(to bottom, -color-acento, -color-acento-hover);
+    -fx-border-color: transparent;
+    -fx-background-radius: 7px;
+    -fx-border-radius: 7px;
+    -fx-text-fill: white;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 22 10 18;
+    -fx-graphic-text-gap: 8px;
+    -fx-effect: dropshadow(gaussian, -color-acento, 16, 0.38, 0, 3);
+    -fx-cursor: hand;
+}
+
+.boton-iniciar:hover {
+    -fx-background-color: linear-gradient(to bottom, -color-acento-hover, -color-acento-hover);
+}
+
+.boton-iniciar:disabled {
+    -fx-background-color: -color-deshabilitado;
+    -fx-effect: none;
+}
+
+.boton-iniciar .icono-iniciar {
+    -fx-fill: white;
+}
+
+/* --- Botones de icono con borde (acciones de la rutina) --- */
+.boton-icono-borde,
+.boton-icono-borde-peligro {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-width: 1px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-min-width: 30px;
+    -fx-min-height: 28px;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 28px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.boton-icono-borde:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+}
+
+.boton-icono-borde:hover .icono-accion {
+    -fx-fill: -color-acento;
+}
+
+.boton-icono-borde-peligro:hover {
+    -fx-background-color: -color-peligro-suave;
+    -fx-border-color: -color-peligro-borde;
+}
+
+.boton-icono-borde-peligro .icono-accion {
+    -fx-fill: -color-rojo;
+}
+
+/* --- Lista de rutinas: tarjetas con subtitulo e indicador lateral --- */
+.lista-rutinas {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 2px;
+}
+
+.lista-rutinas .list-cell {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-background-insets: 3 3 3 3;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-insets: 3 3 3 3;
+    -fx-border-width: 1px;
+    -fx-padding: 9 12 9 9;
+    -fx-text-fill: -color-texto;
+}
+
+.lista-rutinas .list-cell:filled:hover {
+    -fx-background-color: -color-superficie-hover;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-text-fill: -color-texto;
+    -fx-font-weight: normal;
+}
+
+.lista-rutinas .list-cell:filled:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento-borde;
+    -fx-text-fill: -color-texto;
+    -fx-font-weight: normal;
+}
+
+.rutina-item-titulo {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.lista-rutinas .list-cell:filled:selected .rutina-item-titulo {
+    -fx-text-fill: -color-acento;
+}
+
+.rutina-item-subtitulo {
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.rutina-item-hoy {
+    -fx-background-color: -color-acento;
+    -fx-text-fill: white;
+    -fx-font-size: 9.5px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 1 7 1 7;
+}
+
+.rutina-item-indicador {
+    -fx-background-color: transparent;
+    -fx-background-radius: 2px;
+    -fx-min-width: 3px;
+    -fx-pref-width: 3px;
+    -fx-max-width: 3px;
+    -fx-min-height: 26px;
+    -fx-pref-height: 26px;
+}
+
+.lista-rutinas .list-cell:filled:selected .rutina-item-indicador {
+    -fx-background-color: -color-acento;
+}
+
+/* --- Badges (etiquetas tipo pildora) del RIR segun la cercania al fallo --- */
+.chip-rir {
+    -fx-border-width: 1px;
+    -fx-background-radius: 9px;
+    -fx-border-radius: 9px;
+    -fx-padding: 1 8 1 8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.chip-rir-duro {
+    -fx-background-color: -color-peligro-suave;
+    -fx-text-fill: -color-naranja;
+    -fx-border-color: -color-naranja;
+}
+
+.chip-rir-medio {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+    -fx-border-color: -color-acento-borde;
+}
+
+.chip-rir-suave {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-verde;
+    -fx-border-color: -color-acento-borde;
+}
+
+/* --- Columna Multimedia: icono de estado + etiqueta --- */
+.icono-media-ok {
+    -fx-fill: -color-acento;
+}
+
+.icono-media-vacio {
+    -fx-fill: -color-texto-deshabilitado;
+}
+
+.media-etiqueta-ok {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto;
+}
+
+.media-etiqueta-vacio {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-deshabilitado;
+}
+
+
+/* =====================================================================
+   Pantalla de carga (Splash Screen): impacto de marca sobre fondo oscuro.
+   ===================================================================== */
+
+.splash-raiz {
+    -fx-background-color: transparent;
+}
+
+.splash-panel {
+    -fx-background-color: linear-gradient(to bottom, #10141C, #0A0D14);
+    -fx-background-radius: 20px;
+    -fx-border-color: rgba(42, 169, 240, 0.35);
+    -fx-border-radius: 20px;
+    -fx-border-width: 1px;
+    -fx-padding: 46 56 40 56;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.65), 46, 0.35, 0, 16);
+}
+
+.splash-titulo-base {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #F5F8FC;
+}
+
+.splash-titulo-acento {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2AA9F0;
+}
+
+.splash-lema {
+    -fx-font-size: 11.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7E8CA0;
+}
+
+.splash-progreso {
+    -fx-pref-height: 5px;
+}
+
+.splash-progreso > .track {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 3px;
+    -fx-background-insets: 0;
+}
+
+.splash-progreso > .bar {
+    -fx-background-color: linear-gradient(to right, #2AA9F0, #0078D4);
+    -fx-background-radius: 3px;
+    -fx-background-insets: 0;
+    -fx-padding: 3px;
+}
+
+.splash-carga {
+    -fx-font-size: 12px;
+    -fx-text-fill: #9AA7B8;
 }

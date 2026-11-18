@@ -14,6 +14,8 @@ import com.symmetry.desktop.model.Rutina;
 import com.symmetry.desktop.model.SesionEntrenamiento;
 import com.symmetry.desktop.model.TemaApp;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -134,14 +136,15 @@ public class GestorDatos {
         return new ArrayList<>(alternativas);
     }
 
-    /** Registra una sesion finalizada y la persiste. */
+    /** Registra una sesion finalizada y la persiste siempre en el archivo JSON local. */
     public void guardarSesion(SesionEntrenamiento sesion) {
         if (sesion == null) {
             return;
         }
         getDatos().getSesiones().removeIf(s -> s.getId().equals(sesion.getId()));
         getDatos().getSesiones().add(sesion);
-        guardarAutomatico();
+        // "Finalizar y guardar" implica un guardado explicito: no depende del guardado automatico.
+        guardar();
         gamificacion.evaluar();
     }
 
@@ -364,6 +367,21 @@ public class GestorDatos {
         biblioteca.clear();
         biblioteca.addAll(copia);
         guardarAutomatico();
+    }
+
+    /**
+     * Carpeta gestionada por la aplicacion donde se guarda el audio descargado y convertido
+     * a MP3 ({@code userData/music}). Se crea de forma perezosa si todavia no existe.
+     */
+    public Path getCarpetaMusica() {
+        Path base = JsonPersistenciaService.rutaPorDefecto().getParent();
+        Path carpeta = (base == null ? Path.of(".") : base).resolve("music");
+        try {
+            Files.createDirectories(carpeta);
+        } catch (IOException ignored) {
+            // Si no se puede crear, se devuelve la ruta igualmente; el error se informara al descargar.
+        }
+        return carpeta;
     }
 
     /** Guarda la ultima carpeta utilizada en el reproductor de musica. */

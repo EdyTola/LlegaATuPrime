@@ -154,6 +154,28 @@ public class GamificacionService {
         return List.copyOf(progreso().getRetos());
     }
 
+    /**
+     * Confirma manualmente un reto de recuperacion activa y otorga su XP si sigue vigente.
+     * Es idempotente: los retos automaticos, ya completados o vencidos se ignoran.
+     */
+    public void completarReto(String idReto) {
+        if (idReto == null) {
+            return;
+        }
+        RetoDiario reto = progreso().getRetos().stream()
+                .filter(r -> idReto.equals(r.getId()))
+                .findFirst()
+                .orElse(null);
+        if (reto == null || reto.isCompletado() || !reto.esManual()) {
+            return;
+        }
+        if (reto.getExpira() != null && !LocalDateTime.now().isBefore(reto.getExpira())) {
+            return;
+        }
+        reto.setProgreso(reto.getObjetivo());
+        evaluar();
+    }
+
     private ProgresoRpg progreso() {
         return gestor.getDatos().getProgresoRpg();
     }
@@ -246,15 +268,14 @@ public class GamificacionService {
         String limite = ahora.toLocalDate().minusDays(90).toString();
         cambio |= progreso.getMetasReclamadas().keySet().removeIf(fecha -> fecha.compareTo(limite) < 0);
 
-        var modalidad = datos.getConfiguracion().getModalidad();
         String diaria = GeneradorRetosService.idVentanaDiaria(ahora);
         if (progreso.getRetos().stream().noneMatch(r -> diaria.equals(r.getVentanaId()))) {
-            progreso.getRetos().addAll(GeneradorRetosService.generarDiarios(datos, modalidad, ahora));
+            progreso.getRetos().addAll(GeneradorRetosService.generarDiarios(datos, ahora));
             cambio = true;
         }
         String flash = GeneradorRetosService.idVentanaFlash(ahora);
         if (progreso.getRetos().stream().noneMatch(r -> flash.equals(r.getVentanaId()))) {
-            progreso.getRetos().add(GeneradorRetosService.generarFlash(datos, modalidad, ahora));
+            progreso.getRetos().add(GeneradorRetosService.generarFlash(datos, ahora));
             cambio = true;
         }
         return cambio;

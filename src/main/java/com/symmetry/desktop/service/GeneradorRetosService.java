@@ -1,54 +1,43 @@
 package com.symmetry.desktop.service;
 
 import com.symmetry.desktop.model.BaseDatos;
+import com.symmetry.desktop.model.DiaSalud;
 import com.symmetry.desktop.model.Ejercicio;
 import com.symmetry.desktop.model.GrupoMuscular;
-import com.symmetry.desktop.model.ModalidadEntrenamiento;
-import com.symmetry.desktop.model.NivelEjercicio;
 import com.symmetry.desktop.model.RegistroEjercicio;
 import com.symmetry.desktop.model.RegistroHidratacion;
-import com.symmetry.desktop.model.DiaSalud;
 import com.symmetry.desktop.model.RetoDiario;
+import com.symmetry.desktop.model.Rutina;
 import com.symmetry.desktop.model.SesionEntrenamiento;
 import com.symmetry.desktop.model.TipoReto;
 
-import java.text.Normalizer;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.EnumMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.Optional;
 
 /**
- * Genera los retos dinamicos a partir del historial real del usuario y mide su progreso.
+ * Genera los retos dinamicos flash y diarios a partir de la rutina programada para el dia
+ * y mide su progreso dentro de la ventana de tiempo del reto.
  *
  * <p>Ventanas: los retos diarios duran 24 h (de 00:00 a 00:00) y los retos flash 12 h
  * (00:00-12:00 y 12:00-24:00). Cada ventana se genera una sola vez.</p>
  *
- * <p>Criterios de personalizacion:</p>
- * <ul>
- *   <li><b>Grupo muscular</b>: se prioriza el que lleva mas dias sin entrenarse (o nunca).</li>
- *   <li><b>Nivel</b>: se infiere por la frecuencia de las ultimas 4 semanas y, entre los
- *       niveles ya alcanzados, se elige aquel cuyo catalogo se practico hace mas tiempo.</li>
- * </ul>
+ * <p>Criterio de contextualizacion: el sistema lee que parte del cuerpo se entrena hoy
+ * segun la rutina activa y propone acciones de <b>recuperacion activa</b> para esa zona
+ * (movilidad, estiramientos, respiracion, caminatas y micro-habitos) en lugar de mas
+ * series de fuerza. Asi se evita repetir los ejercicios de la rutina y el sobreentrenamiento.
+ * En los dias sin rutina se proponen retos de recuperacion de cuerpo completo.</p>
  */
 public final class GeneradorRetosService {
-
-    private static final int SIN_HISTORIAL = 999;
 
     private GeneradorRetosService() {
     }
 
-    /** Resultado del analisis del historial. */
-    public record Analisis(Map<GrupoMuscular, Integer> diasSinEntrenar, List<GrupoMuscular> prioridad,
-                           NivelEjercicio nivelInferido, NivelEjercicio nivelObjetivo) {
-    }
-
     // ------------------------------------------------------------------
-    // Generacion
+    // Ventanas
     // ------------------------------------------------------------------
 
     public static String idVentanaDiaria(LocalDateTime ahora) {
@@ -59,66 +48,98 @@ public final class GeneradorRetosService {
         return "F-" + ahora.toLocalDate() + "-" + (ahora.getHour() < 12 ? 0 : 1);
     }
 
-    /** Retos de la ventana diaria (24 h): foco en el musculo rezagado y volumen total. */
-    public static List<RetoDiario> generarDiarios(BaseDatos datos, ModalidadEntrenamiento modalidad,
-                                                  LocalDateTime ahora) {
-        Analisis analisis = analizar(datos, ahora.toLocalDate());
-        LocalDateTime inicio = ahora.toLocalDate().atStartOfDay();
+    // ------------------------------------------------------------------
+    // Generacion
+    // ------------------------------------------------------------------
+
+    /** Retos de la ventana diaria (24 h): movilidad de la zona entrenada y un micro-habito. */
+    public static List<RetoDiario> generarDiarios(BaseDatos datos, LocalDateTime ahora) {
+        LocalDate hoy = ahora.toLocalDate();
+        LocalDateTime inicio = hoy.atStartOfDay();
         LocalDateTime expira = inicio.plusHours(24);
         String ventana = idVentanaDiaria(ahora);
+        Optional<Rutina> rutina = datos.buscarRutinaDe(hoy);
+
         List<RetoDiario> retos = new ArrayList<>();
-
-        GrupoMuscular foco = analisis.prioridad().get(0);
-        int dias = analisis.diasSinEntrenar().get(foco);
-        RetoDiario reto = nuevo(ventana, false, TipoReto.SERIES_GRUPO, inicio, expira);
-        reto.setGrupoMuscular(foco);
-        reto.setNivel(analisis.nivelObjetivo());
-        reto.setObjetivo(porNivel(analisis.nivelObjetivo(), 6, 8, 10));
-        reto.setXpRecompensa(dias >= SIN_HISTORIAL ? 60 : 45);
-        reto.setTitulo("Rescata tu " + foco.getEtiqueta().toLowerCase(Locale.ROOT));
-        reto.setDescripcion(descripcionFoco(foco, dias, analisis.nivelObjetivo(), modalidad, reto.getObjetivo()));
-        retos.add(reto);
-
-        RetoDiario volumen = nuevo(ventana, false, TipoReto.SERIES_TOTALES, inicio, expira);
-        volumen.setNivel(analisis.nivelInferido());
-        volumen.setObjetivo(porNivel(analisis.nivelInferido(), 14, 18, 22));
-        volumen.setXpRecompensa(50);
-        volumen.setTitulo("Volumen del día");
-        volumen.setDescripcion("Completa " + volumen.getObjetivo()
-                + " series efectivas hoy. Nivel detectado: " + analisis.nivelInferido().getEtiqueta() + ".");
-        retos.add(volumen);
+        retos.add(retoMovilidad(ventana, inicio, expira, rutina.orElse(null), hoy));
+        retos.add(retoHabito(ventana, inicio, expira, hoy));
         return retos;
     }
 
-    /** Reto flash de 12 h: el segundo musculo mas rezagado por la manana, agua por la tarde. */
-    public static RetoDiario generarFlash(BaseDatos datos, ModalidadEntrenamiento modalidad,
-                                          LocalDateTime ahora) {
+    /** Reto flash de 12 h: movilidad matinal centrada en el dia; hidratacion post-entreno por la tarde. */
+    public static RetoDiario generarFlash(BaseDatos datos, LocalDateTime ahora) {
         boolean manana = ahora.getHour() < 12;
         LocalDateTime inicio = ahora.toLocalDate().atTime(manana ? 0 : 12, 0);
         LocalDateTime expira = inicio.plusHours(12);
         String ventana = idVentanaFlash(ahora);
 
-        if (manana) {
-            Analisis analisis = analizar(datos, ahora.toLocalDate());
-            GrupoMuscular grupo = analisis.prioridad().get(1);
-            RetoDiario reto = nuevo(ventana, true, TipoReto.SERIES_GRUPO, inicio, expira);
-            reto.setGrupoMuscular(grupo);
-            reto.setNivel(analisis.nivelObjetivo());
-            reto.setObjetivo(porNivel(analisis.nivelObjetivo(), 4, 5, 6));
-            reto.setXpRecompensa(30);
-            reto.setTitulo("Flash · " + grupo.getEtiqueta());
-            reto.setDescripcion(descripcionFoco(grupo, analisis.diasSinEntrenar().get(grupo),
-                    analisis.nivelObjetivo(), modalidad, reto.getObjetivo()));
+        return manana
+                ? flashActivacion(datos, ventana, ahora.toLocalDate(), inicio, expira)
+                : flashHidratacion(ventana, inicio, expira);
+    }
+
+    /** Movilidad y estiramiento de recuperacion de la zona que se entrena hoy (o de cuerpo completo). */
+    private static RetoDiario retoMovilidad(String ventana, LocalDateTime inicio, LocalDateTime expira,
+                                            Rutina rutina, LocalDate hoy) {
+        RetoDiario reto = nuevo(ventana, false, TipoReto.MOVILIDAD, inicio, expira);
+        reto.setObjetivo(1);
+        reto.setXpRecompensa(45);
+        if (rutina == null) {
+            CatalogoRecuperacion.Sugerencia sugerencia = CatalogoRecuperacion.movilidadGeneral(hoy);
+            reto.setTitulo(sugerencia.titulo());
+            reto.setDescripcion("Día sin entrenamiento. " + sugerencia.instruccion()
+                    + " Movimiento sin carga para favorecer la recuperación.");
             return reto;
         }
+        GrupoMuscular foco = grupoPrincipal(rutina);
+        CatalogoRecuperacion.Sugerencia sugerencia = CatalogoRecuperacion.movilidadDe(foco, hoy);
+        reto.setGrupoMuscular(foco);
+        reto.setTitulo(sugerencia.titulo());
+        reto.setDescripcion("Hoy entrenas " + rutina.getNombre() + ". " + sugerencia.instruccion()
+                + " Recupera la zona trabajada sin añadir carga ni fatiga muscular.");
+        return reto;
+    }
 
-        int meta = datos.getPerfil().getObjetivos().getAguaMililitros();
-        int objetivo = Math.max(500, (int) Math.round(meta * 0.55 / 100.0) * 100);
-        RetoDiario reto = nuevo(ventana, true, TipoReto.HIDRATACION_VENTANA, inicio, expira);
-        reto.setObjetivo(objetivo);
+    /** Micro-habito de recuperacion del dia (rota entre respiracion, descompresion y pausa activa). */
+    private static RetoDiario retoHabito(String ventana, LocalDateTime inicio, LocalDateTime expira,
+                                         LocalDate hoy) {
+        CatalogoRecuperacion.Habito habito = CatalogoRecuperacion.habitoDelDia(hoy);
+        RetoDiario reto = nuevo(ventana, false, habito.tipo(), inicio, expira);
+        reto.setObjetivo(1);
+        reto.setXpRecompensa(30);
+        reto.setTitulo(habito.titulo());
+        reto.setDescripcion(habito.instruccion());
+        return reto;
+    }
+
+    /** Movilidad matinal de la zona del dia para preparar la sesion sin generar fatiga. */
+    private static RetoDiario flashActivacion(BaseDatos datos, String ventana, LocalDate hoy,
+                                              LocalDateTime inicio, LocalDateTime expira) {
+        Rutina rutina = datos.buscarRutinaDe(hoy).orElse(null);
+        GrupoMuscular grupo = rutina == null ? null : grupoSecundario(rutina);
+        RetoDiario reto = nuevo(ventana, true, TipoReto.MOVILIDAD, inicio, expira);
+        reto.setObjetivo(1);
         reto.setXpRecompensa(25);
-        reto.setTitulo("Flash · Hidratación");
-        reto.setDescripcion("Bebe " + objetivo + " ml entre las 12:00 y las 24:00. Tu rendimiento y tu recuperación lo notarán.");
+        reto.setGrupoMuscular(grupo);
+        CatalogoRecuperacion.Sugerencia sugerencia = grupo == null
+                ? CatalogoRecuperacion.movilidadGeneral(hoy)
+                : CatalogoRecuperacion.movilidadDe(grupo, hoy);
+        reto.setTitulo("Flash · " + sugerencia.titulo());
+        reto.setDescripcion((rutina == null
+                ? "Empieza el día con recuperación activa. "
+                : "Antes de tu sesión de " + rutina.getNombre() + ". ")
+                + sugerencia.instruccion());
+        return reto;
+    }
+
+    /** Hidratacion post-entreno que cierra la recuperacion del dia. */
+    private static RetoDiario flashHidratacion(String ventana, LocalDateTime inicio, LocalDateTime expira) {
+        CatalogoRecuperacion.Habito habito = CatalogoRecuperacion.hidratacionPostEntreno();
+        RetoDiario reto = nuevo(ventana, true, TipoReto.HIDRATACION_VENTANA, inicio, expira);
+        reto.setObjetivo(CatalogoRecuperacion.ML_HIDRATACION_POST_ENTRENO);
+        reto.setXpRecompensa(25);
+        reto.setTitulo("Flash · " + habito.titulo());
+        reto.setDescripcion(habito.instruccion());
         return reto;
     }
 
@@ -133,134 +154,50 @@ public final class GeneradorRetosService {
         return reto;
     }
 
-    private static String descripcionFoco(GrupoMuscular grupo, int dias, NivelEjercicio nivel,
-                                          ModalidadEntrenamiento modalidad, int objetivo) {
-        String antiguedad = dias >= SIN_HISTORIAL
-                ? "Aún no has registrado series de " + grupo.getEtiqueta().toLowerCase(Locale.ROOT) + "."
-                : "Llevas " + dias + (dias == 1 ? " día" : " días") + " sin trabajar "
-                + grupo.getEtiqueta().toLowerCase(Locale.ROOT) + ".";
-        String ejemplo = ejemploPara(grupo, nivel, modalidad);
-        return antiguedad + " Completa " + objetivo + " series"
-                + (ejemplo == null ? "." : ", por ejemplo con " + ejemplo + ".");
-    }
-
-    private static String ejemploPara(GrupoMuscular grupo, NivelEjercicio nivel, ModalidadEntrenamiento modalidad) {
-        return SugerenciasEjerciciosService.paraNivel(nivel, modalidad).stream()
-                .filter(e -> e.getGrupoMuscular() == grupo)
-                .map(Ejercicio::getNombre)
-                .findFirst()
-                .orElse(null);
-    }
-
-    private static int porNivel(NivelEjercicio nivel, int principiante, int intermedio, int avanzado) {
-        return switch (nivel) {
-            case PRINCIPIANTE -> principiante;
-            case INTERMEDIO -> intermedio;
-            case AVANZADO -> avanzado;
-        };
-    }
-
     // ------------------------------------------------------------------
-    // Analisis del historial
+    // Lectura de la rutina del dia
     // ------------------------------------------------------------------
 
-    /** Examina las sesiones guardadas para decidir que musculo y que nivel necesitan atencion. */
-    public static Analisis analizar(BaseDatos datos, LocalDate hoy) {
-        Map<GrupoMuscular, LocalDate> ultimo = new EnumMap<>(GrupoMuscular.class);
-        Map<NivelEjercicio, LocalDate> ultimoNivel = new EnumMap<>(NivelEjercicio.class);
-        int sesionesRecientes = 0;
-
-        for (SesionEntrenamiento sesion : datos.sesionesOrdenadas()) {
-            LocalDate fecha = sesion.getFecha();
-            if (fecha == null) {
-                continue;
-            }
-            if (!fecha.isBefore(hoy.minusDays(28))) {
-                sesionesRecientes++;
-            }
-            for (RegistroEjercicio registro : sesion.getRegistros()) {
-                if (registro.getSeriesCompletadas() <= 0) {
-                    continue;
-                }
-                if (registro.getGrupoMuscular() != null) {
-                    ultimo.merge(registro.getGrupoMuscular(), fecha, GeneradorRetosService::masReciente);
-                }
-                NivelEjercicio nivel = nivelDe(registro.getNombreEjercicio());
-                if (nivel != null) {
-                    ultimoNivel.merge(nivel, fecha, GeneradorRetosService::masReciente);
-                }
-            }
-        }
-
-        Map<GrupoMuscular, Integer> dias = new EnumMap<>(GrupoMuscular.class);
-        for (GrupoMuscular grupo : GrupoMuscular.values()) {
-            LocalDate fecha = ultimo.get(grupo);
-            dias.put(grupo, fecha == null ? SIN_HISTORIAL : (int) java.time.temporal.ChronoUnit.DAYS.between(fecha, hoy));
-        }
-        List<GrupoMuscular> prioridad = new ArrayList<>(List.of(GrupoMuscular.values()));
-        prioridad.sort(Comparator.comparing((GrupoMuscular g) -> dias.get(g)).reversed()
-                .thenComparing(Enum::ordinal));
-
-        NivelEjercicio inferido = sesionesRecientes < 6 ? NivelEjercicio.PRINCIPIANTE
-                : sesionesRecientes < 12 ? NivelEjercicio.INTERMEDIO : NivelEjercicio.AVANZADO;
-
-        // Entre los niveles ya alcanzados, el que lleva mas tiempo sin practicarse necesita atencion.
-        NivelEjercicio objetivo = inferido;
-        int mayorAntiguedad = -1;
-        for (NivelEjercicio nivel : NivelEjercicio.values()) {
-            if (nivel.ordinal() > inferido.ordinal()) {
-                break;
-            }
-            LocalDate fecha = ultimoNivel.get(nivel);
-            int antiguedad = fecha == null ? SIN_HISTORIAL
-                    : (int) java.time.temporal.ChronoUnit.DAYS.between(fecha, hoy);
-            if (antiguedad >= mayorAntiguedad) {
-                mayorAntiguedad = antiguedad;
-                objetivo = nivel;
-            }
-        }
-        return new Analisis(dias, prioridad, inferido, objetivo);
-    }
-
-    private static LocalDate masReciente(LocalDate a, LocalDate b) {
-        return a.isAfter(b) ? a : b;
-    }
-
-    /** Nivel al que pertenece un ejercicio segun los catalogos de sugerencias (gimnasio y casa). */
-    private static NivelEjercicio nivelDe(String nombre) {
-        if (nombre == null) {
-            return null;
-        }
-        String buscado = normalizar(nombre);
-        for (NivelEjercicio nivel : NivelEjercicio.values()) {
-            boolean coincide = SugerenciasEjerciciosService.paraNivel(nivel).stream()
-                    .anyMatch(e -> normalizar(e.getNombre()).equals(buscado))
-                    || AdaptadorEquipoService.nombresCatalogoCasa(nivel).stream()
-                    .anyMatch(n -> normalizar(n).equals(buscado));
-            if (coincide) {
-                return nivel;
+    /** Primer grupo muscular principal de la rutina (el de mayor presencia en la sesion). */
+    private static GrupoMuscular grupoPrincipal(Rutina rutina) {
+        for (Ejercicio ejercicio : rutina.getEjercicios()) {
+            if (ejercicio.getGrupoMuscular() != null) {
+                return ejercicio.getGrupoMuscular();
             }
         }
         return null;
     }
 
-    private static String normalizar(String texto) {
-        return Normalizer.normalize(texto, Normalizer.Form.NFD)
-                .replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT).trim();
+    /** Segundo grupo muscular distinto de la rutina, o null si la sesion trabaja uno solo. */
+    private static GrupoMuscular grupoSecundario(Rutina rutina) {
+        LinkedHashSet<GrupoMuscular> grupos = new LinkedHashSet<>();
+        for (Ejercicio ejercicio : rutina.getEjercicios()) {
+            if (ejercicio.getGrupoMuscular() != null) {
+                grupos.add(ejercicio.getGrupoMuscular());
+            }
+        }
+        if (grupos.size() < 2) {
+            return null;
+        }
+        return new ArrayList<>(grupos).get(1);
     }
 
     // ------------------------------------------------------------------
     // Progreso
     // ------------------------------------------------------------------
 
-    /** Progreso actual del reto, medido solo con los registros dentro de su ventana. */
+    /**
+     * Progreso actual del reto, medido solo con los registros dentro de su ventana.
+     * Los retos de recuperacion se confirman manualmente y no se recalculan aqui.
+     */
     public static int calcularProgreso(RetoDiario reto, BaseDatos datos) {
+        TipoReto tipo = reto.getTipo();
         LocalDateTime desde = reto.getInicio();
         LocalDateTime hasta = reto.getExpira();
-        if (desde == null || hasta == null || reto.getTipo() == null) {
+        if (tipo == null || !tipo.esAutomatico() || desde == null || hasta == null) {
             return reto.getProgreso();
         }
-        if (reto.getTipo() == TipoReto.HIDRATACION_VENTANA) {
+        if (tipo == TipoReto.HIDRATACION_VENTANA) {
             int total = 0;
             for (DiaSalud dia : datos.getDias()) {
                 for (RegistroHidratacion registro : dia.getHidratacion()) {
@@ -272,6 +209,7 @@ public final class GeneradorRetosService {
             }
             return total;
         }
+        // Legado: retos de fuerza de versiones anteriores (series de un grupo o totales).
         long series = 0;
         for (SesionEntrenamiento sesion : datos.getSesiones()) {
             LocalDateTime momento = sesion.getFechaFin() != null ? sesion.getFechaFin() : sesion.getFechaInicio();
@@ -279,7 +217,7 @@ public final class GeneradorRetosService {
                 continue;
             }
             for (RegistroEjercicio registro : sesion.getRegistros()) {
-                boolean cuenta = reto.getTipo() == TipoReto.SERIES_TOTALES
+                boolean cuenta = tipo == TipoReto.SERIES_TOTALES
                         || registro.getGrupoMuscular() == reto.getGrupoMuscular();
                 if (cuenta) {
                     series += registro.getSeriesCompletadas();

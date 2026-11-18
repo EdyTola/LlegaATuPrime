@@ -30,6 +30,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
@@ -50,6 +51,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
@@ -334,9 +336,13 @@ public class DashboardController implements Initializable, VistaConRefresco {
         return fila;
     }
 
-    private static VBox tarjetaReto(RetoDiario reto, LocalDateTime ahora) {
-        Label tipo = new Label((reto.isFlash() ? "FLASH · 12 H" : "DIARIO · 24 H") + "  ·  "
-                + reto.getTipo().getEtiqueta().toUpperCase());
+    private VBox tarjetaReto(RetoDiario reto, LocalDateTime ahora) {
+        StringBuilder etiqueta = new StringBuilder(reto.isFlash() ? "FLASH · 12 H" : "DIARIO · 24 H");
+        etiqueta.append("  ·  ").append(reto.getTipo().getEtiqueta().toUpperCase(Locale.ROOT));
+        if (reto.getGrupoMuscular() != null) {
+            etiqueta.append("  ·  ").append(reto.getGrupoMuscular().getEtiqueta().toUpperCase(Locale.ROOT));
+        }
+        Label tipo = new Label(etiqueta.toString());
         tipo.getStyleClass().add("reto-tipo");
         if (reto.isFlash()) {
             tipo.getStyleClass().add("reto-tipo-flash");
@@ -369,8 +375,20 @@ public class DashboardController implements Initializable, VistaConRefresco {
         if (reto.isFlash()) {
             tarjeta.getStyleClass().add("tarjeta-reto-flash");
         }
+        if (reto.esManual()) {
+            tarjeta.getStyleClass().add("tarjeta-reto-recuperacion");
+        }
         if (reto.isCompletado()) {
             tarjeta.getStyleClass().add("tarjeta-reto-completo");
+        } else if (reto.esManual()) {
+            Button confirmar = new Button("Marcar como hecho");
+            confirmar.getStyleClass().add("boton-reto-completar");
+            confirmar.setMaxWidth(Double.MAX_VALUE);
+            confirmar.setOnAction(evento -> {
+                gestor.getGamificacion().completarReto(reto.getId());
+                actualizarRpg();
+            });
+            tarjeta.getChildren().add(confirmar);
         }
         tarjeta.setPrefWidth(ANCHO_TARJETA);
         tarjeta.setMinWidth(ANCHO_TARJETA - 40);

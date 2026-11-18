@@ -79,10 +79,13 @@
                                 <Spinner fx:id="spinnerDescanso" editable="true" prefWidth="110"/>
                                 <Button fx:id="botonDescanso" text="Iniciar descanso" styleClass="boton-acento"
                                         onAction="#iniciarDescanso"/>
-                                <Button text="+15 s" styleClass="boton-secundario"
+                                <Button fx:id="botonAgregar15" text="+15 s" styleClass="boton-secundario"
                                         onAction="#agregarQuinceSegundos"/>
                                 <Region HBox.hgrow="ALWAYS"/>
-                                <Label fx:id="etiquetaDescanso" text="90 s" styleClass="etiqueta-descanso"/>
+                                <Label fx:id="etiquetaDescanso" text="01:30" styleClass="etiqueta-descanso"/>
+                                <Button fx:id="botonSaltarDescanso" text="Saltar descanso"
+                                        styleClass="boton-secundario" onAction="#saltarDescanso"
+                                        visible="false" managed="false"/>
                             </children>
                         </HBox>
                     </children>

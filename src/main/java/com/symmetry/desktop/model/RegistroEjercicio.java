@@ -3,6 +3,7 @@ package com.symmetry.desktop.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class RegistroEjercicio {
 
+    /** Fecha de la sesion en que se registro el ejercicio. */
+    private LocalDate fecha;
     private String ejercicioId;
     private String nombreEjercicio;
     private GrupoMuscular grupoMuscular;
@@ -24,15 +27,20 @@ public class RegistroEjercicio {
     }
 
     public RegistroEjercicio(Ejercicio ejercicio) {
+        this(ejercicio, null);
+    }
+
+    public RegistroEjercicio(Ejercicio ejercicio, LocalDate fecha) {
         this.ejercicioId = ejercicio.getId();
         this.nombreEjercicio = ejercicio.getNombre();
         this.grupoMuscular = ejercicio.getGrupoMuscular();
         this.prescripcion = ejercicio.getPrescripcion();
+        this.fecha = fecha;
     }
 
     @JsonIgnore
     public double getVolumenTotal() {
-        return series.stream().filter(SerieRegistrada::isCompletada)
+        return series.stream().filter(SerieRegistrada::esRegistrada)
                 .mapToDouble(SerieRegistrada::getVolumen).sum();
     }
 
@@ -44,8 +52,16 @@ public class RegistroEjercicio {
     /** Peso maximo levantado en el ejercicio (indicador de sobrecarga progresiva). */
     @JsonIgnore
     public double getPesoMaximo() {
-        return series.stream().filter(SerieRegistrada::isCompletada)
+        return series.stream().filter(SerieRegistrada::esRegistrada)
                 .mapToDouble(SerieRegistrada::getPesoKg).max().orElse(0);
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDate fecha) {
+        this.fecha = fecha;
     }
 
     public String getEjercicioId() {

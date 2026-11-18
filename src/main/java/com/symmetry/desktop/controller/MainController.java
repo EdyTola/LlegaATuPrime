@@ -13,6 +13,7 @@ import com.symmetry.desktop.service.TemaService;
 import com.symmetry.desktop.util.AchievementVFX;
 import com.symmetry.desktop.util.Dialogos;
 import com.symmetry.desktop.util.Formato;
+import com.symmetry.desktop.util.MarcaApp;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -53,6 +54,8 @@ public class MainController implements Initializable {
 
     @FXML
     private StackPane contenedorVistas;
+    @FXML
+    private StackPane logoMarca;
     @FXML
     private Label etiquetaTituloSeccion;
     @FXML
@@ -98,6 +101,9 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL ubicacion, ResourceBundle recursos) {
+        // Identidad de marca en la barra lateral: isotipo oficial a 44 px.
+        logoMarca.getChildren().setAll(MarcaApp.isotipo(44));
+
         ToggleGroup grupo = new ToggleGroup();
         botonInicio.setToggleGroup(grupo);
         botonEntrenamiento.setToggleGroup(grupo);

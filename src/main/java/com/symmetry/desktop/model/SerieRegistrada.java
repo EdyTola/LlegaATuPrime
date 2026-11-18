@@ -28,6 +28,16 @@ public class SerieRegistrada {
         return pesoKg * repeticiones;
     }
 
+    /**
+     * true si la serie aporta al historico: se marco como completada o registra una carga real
+     * (peso y repeticiones introducidos). Permite que el volumen no se pierda aunque la serie
+     * se haya guardado sin marcar la casilla "Hecha".
+     */
+    @JsonIgnore
+    public boolean esRegistrada() {
+        return completada || (pesoKg > 0 && repeticiones > 0);
+    }
+
     public int getNumeroSerie() {
         return numeroSerie;
     }

@@ -1,11 +1,15 @@
 package com.symmetry.desktop.controller;
 
-import com.symmetry.desktop.MainApp;
+import com.symmetry.desktop.model.OrigenPista;
 import com.symmetry.desktop.model.PistaAudio;
 import com.symmetry.desktop.service.ArchivoMultimediaService;
+import com.symmetry.desktop.service.DescargadorAudioService;
 import com.symmetry.desktop.service.GestorDatos;
+import com.symmetry.desktop.service.GestorHerramientasService;
+import com.symmetry.desktop.service.ReproductorService;
 import com.symmetry.desktop.util.Dialogos;
 import com.symmetry.desktop.util.EspectroAudio;
+import com.symmetry.desktop.util.IconosMedia;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -19,6 +23,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -34,59 +39,34 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.SVGPath;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
-import javafx.util.Duration;
 
 import java.io.File;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 /**
  * Modulo 4 - Reproductor de musica: biblioteca de pistas MP3/WAV y enlaces, controles de
  * reproduccion con modo aleatorio y repeticion, espectro de audio animado, miniaturas de los
- * videos de YouTube y reordenacion de la lista de reproduccion por arrastrar y soltar.
+ * videos, reordenacion por arrastrar y soltar, borrado individual por fila y descarga y
+ * conversion de enlaces a MP3 dentro de la propia aplicacion.
+ *
+ * <p>La reproduccion se delega en el {@link ReproductorService} global, de modo que la musica
+ * sigue sonando al cambiar de seccion a traves del mini-reproductor persistente.</p>
  */
 public class MusicaController implements Initializable, VistaConRefresco {
 
-    /* Iconos vectoriales (viewBox 24x24) de los controles multimedia. */
-    private static final String SVG_REPRODUCIR = "M8,5 L19,12 L8,19 Z";
-    private static final String SVG_PAUSA = "M6,19h4V5H6v14zM14,5v14h4V5h-4z";
-    private static final String SVG_ANTERIOR = "M6,6h2.4v12H6V6z M18,6v12l-8.6,-6L18,6z";
-    private static final String SVG_SIGUIENTE = "M15.6,6H18v12h-2.4V6z M6,6v12l8.6,-6L6,6z";
-    private static final String SVG_ALEATORIO =
-            "M10.59,9.17L5.41,4 4,5.41l5.17,5.17 1.42,-1.41zM14.5,4l2.04,2.04L4,18.59 5.41,20 "
-            + "17.96,7.46 20,9.5V4h-5.5zM14.83,13.41l-1.41,1.41 3.13,3.13L14.5,20H20v-5.5l-2.04,2.04 -3.13,-3.13z";
-    private static final String SVG_REPETIR =
-            "M7,7h10v3l4,-4 -4,-4v3H5v6h2V7zM17,17H7v-3l-4,4 4,4v-3h12v-6h-2v4z";
-    private static final String SVG_REPETIR_UNA =
-            "M7,7h10v3l4,-4 -4,-4v3H5v6h2V7zM17,17H7v-3l-4,4 4,4v-3h12v-6h-2v4zM13,15V9h-1l-2,1v1h1.5v4H13z";
-
-    /** Cache de miniaturas descargadas, compartida entre la lista y la portada del reproductor. */
-    private static final Map<String, Image> PORTADAS = new HashMap<>();
-
-    /** Estados del modo de repeticion, recorridos al pulsar el boton correspondiente. */
-    private enum ModoRepeticion { DESACTIVADO, TODAS, UNA }
-
     private final GestorDatos gestor = GestorDatos.getInstancia();
+    private final ReproductorService servicio = ReproductorService.getInstancia();
     private final EspectroAudio espectro = new EspectroAudio();
 
-    private MediaPlayer reproductor;
-    private PistaAudio pistaActual;
     private PistaAudio pistaArrastrada;
-    private boolean arrastrando;
-    private boolean aleatorio;
-    private ModoRepeticion modoRepeticion = ModoRepeticion.DESACTIVADO;
+    private boolean descargando;
 
     @FXML
     private TableView<PistaAudio> listaPistas;
@@ -101,6 +81,8 @@ public class MusicaController implements Initializable, VistaConRefresco {
     @FXML
     private TableColumn<PistaAudio, String> columnaDuracion;
     @FXML
+    private TableColumn<PistaAudio, Void> columnaAcciones;
+    @FXML
     private Button botonEliminarPista;
     @FXML
     private Button botonAleatorio;
@@ -112,6 +94,12 @@ public class MusicaController implements Initializable, VistaConRefresco {
     private Button botonSiguiente;
     @FXML
     private Button botonRepeticion;
+    @FXML
+    private HBox panelDescarga;
+    @FXML
+    private ProgressBar progresoDescarga;
+    @FXML
+    private Label etiquetaDescarga;
     @FXML
     private HBox zonaEspectro;
     @FXML
@@ -145,36 +133,33 @@ public class MusicaController implements Initializable, VistaConRefresco {
                         ? "—" : datos.getValue().getArtista()));
         columnaDuracion.setCellValueFactory(datos -> new SimpleStringProperty(
                 datos.getValue().getDuracionFormateada()));
-        columnaOrigen.setCellValueFactory(datos -> new SimpleStringProperty(origenDe(datos.getValue())));
+        columnaOrigen.setCellValueFactory(datos -> new SimpleStringProperty(
+                datos.getValue().getOrigen().getEtiqueta()));
         columnaPortada.setCellValueFactory(datos -> new ReadOnlyObjectWrapper<>(datos.getValue()));
         columnaPortada.setCellFactory(columna -> celdaPortada());
+        columnaAcciones.setCellValueFactory(datos -> null);
+        columnaAcciones.setCellFactory(columna -> celdaAcciones());
         listaPistas.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         listaPistas.setPlaceholder(new Label(
-                "La biblioteca está vacía. Añade archivos MP3/WAV o un enlace de YouTube."));
+                "La biblioteca está vacía. Añade archivos MP3/WAV, suéltalos aquí o descarga un enlace."));
         listaPistas.setRowFactory(tabla -> filaReproducible());
+        configurarArrastreExterno();
         listaPistas.getSelectionModel().selectedItemProperty()
                 .addListener((obs, anterior, actual) -> botonEliminarPista.setDisable(actual == null));
 
         configurarEspectro();
         configurarPortada();
         configurarControles();
+        configurarEnlacesGlobales();
 
-        sliderVolumen.setValue(gestor.getDatos().getConfiguracion().getVolumenReproductor());
+        sliderVolumen.valueProperty().bindBidirectional(servicio.volumenProperty());
+        sliderVolumen.valueProperty().addListener((obs, anterior, actual) -> actualizarEtiquetaVolumen());
         actualizarEtiquetaVolumen();
-        sliderVolumen.valueProperty().addListener((obs, anterior, actual) -> {
-            if (reproductor != null) {
-                reproductor.setVolume(actual.doubleValue());
-            }
-            gestor.getDatos().getConfiguracion().setVolumenReproductor(actual.doubleValue());
-            actualizarEtiquetaVolumen();
-        });
 
-        sliderProgreso.setOnMousePressed(evento -> arrastrando = true);
+        sliderProgreso.setOnMousePressed(evento -> servicio.setArrastrandoProgreso(true));
         sliderProgreso.setOnMouseReleased(evento -> {
-            arrastrando = false;
-            if (reproductor != null) {
-                reproductor.seek(Duration.seconds(sliderProgreso.getValue()));
-            }
+            servicio.setArrastrandoProgreso(false);
+            servicio.seek(sliderProgreso.getValue());
         });
 
         botonEliminarPista.setDisable(true);
@@ -192,9 +177,10 @@ public class MusicaController implements Initializable, VistaConRefresco {
     // Espectro, portada y controles multimedia
     // ------------------------------------------------------------------
 
-    /** Coloca el visualizador de audio en su zona de la tarjeta del reproductor. */
+    /** Coloca el visualizador de audio en su zona y lo alimenta con el espectro global. */
     private void configurarEspectro() {
         zonaEspectro.getChildren().setAll(espectro);
+        servicio.setEscuchaEspectro(datos -> espectro.actualizar(datos));
     }
 
     /** Recorta la portada del reproductor en un marco redondeado, estilo Fluent. */
@@ -208,76 +194,100 @@ public class MusicaController implements Initializable, VistaConRefresco {
 
     /** Sustituye los textos de los controles por iconos vectoriales y aplica las ayudas. */
     private void configurarControles() {
-        botonAnterior.setGraphic(iconoMedia(SVG_ANTERIOR, 22));
+        botonAnterior.setGraphic(IconosMedia.icono(IconosMedia.ANTERIOR, 22));
         botonAnterior.setTooltip(new Tooltip("Pista anterior"));
-        botonSiguiente.setGraphic(iconoMedia(SVG_SIGUIENTE, 22));
+        botonSiguiente.setGraphic(IconosMedia.icono(IconosMedia.SIGUIENTE, 22));
         botonSiguiente.setTooltip(new Tooltip("Pista siguiente"));
-        botonAleatorio.setGraphic(iconoMedia(SVG_ALEATORIO, 20));
-        botonAleatorio.setTooltip(new Tooltip("Modo aleatorio desactivado"));
-        actualizarBotonReproducir(false);
+        botonAleatorio.setGraphic(IconosMedia.icono(IconosMedia.ALEATORIO, 20));
+        actualizarBotonAleatorio();
         actualizarBotonRepeticion();
+        actualizarBotonReproducir(servicio.isReproduciendo());
+        servicio.setEscuchaError(mensaje -> Dialogos.info("Reproducción",
+                "JavaFX no pudo reproducir este archivo. Se recomienda MP3 o WAV estándar.\n" + mensaje));
     }
 
-    /** Boton circular con un icono vectorial centrado de tamano fijo. */
-    private static Node iconoMedia(String contenidoSvg, double lado) {
-        SVGPath ruta = new SVGPath();
-        ruta.setContent(contenidoSvg);
-        ruta.getStyleClass().add("icono-media");
-        double escala = lado / 24.0;
-        ruta.setScaleX(escala);
-        ruta.setScaleY(escala);
+    /** Enlaza la tarjeta del reproductor con el estado del reproductor global. */
+    private void configurarEnlacesGlobales() {
+        servicio.pistaActualProperty().addListener((obs, antes, ahora) -> actualizarPistaMostrada(ahora));
+        servicio.tituloProperty().addListener((obs, antes, ahora) -> etiquetaTituloPista.setText(
+                ahora == null || ahora.isBlank() ? "Sin pista en reproducción" : ahora));
+        servicio.artistaProperty().addListener((obs, antes, ahora) ->
+                etiquetaArtista.setText(ahora == null ? "" : ahora));
+        servicio.reproduciendoProperty().addListener((obs, antes, ahora) -> {
+            actualizarBotonReproducir(ahora);
+            if (ahora) {
+                espectro.activar();
+            } else {
+                espectro.desactivar();
+            }
+        });
+        servicio.progresoSegundosProperty().addListener((obs, antes, ahora) -> {
+            sliderProgreso.setValue(ahora.doubleValue());
+            etiquetaTiempoActual.setText(formatear(ahora.doubleValue()));
+        });
+        servicio.duracionSegundosProperty().addListener((obs, antes, ahora) -> {
+            sliderProgreso.setMax(Math.max(1, ahora.doubleValue()));
+            etiquetaTiempoTotal.setText(formatear(ahora.doubleValue()));
+        });
+        servicio.aleatorioProperty().addListener((obs, antes, ahora) -> actualizarBotonAleatorio());
+        servicio.modoRepeticionProperty().addListener((obs, antes, ahora) -> actualizarBotonRepeticion());
 
-        StackPane marco = new StackPane(ruta);
-        marco.setMinSize(lado, lado);
-        marco.setPrefSize(lado, lado);
-        marco.setMaxSize(lado, lado);
-        marco.setMouseTransparent(true);
-        return marco;
+        // Estado inicial: la pista pudo quedar activa desde otra seccion o desde el mini-reproductor.
+        PistaAudio actual = servicio.getPistaActual();
+        actualizarPistaMostrada(actual);
+        sliderProgreso.setMax(Math.max(1, servicio.getDuracionSegundos()));
+        sliderProgreso.setValue(servicio.getProgresoSegundos());
+        etiquetaTiempoActual.setText(formatear(servicio.getProgresoSegundos()));
+        etiquetaTiempoTotal.setText(formatear(servicio.getDuracionSegundos()));
+        if (servicio.isReproduciendo()) {
+            espectro.activar();
+        }
     }
 
     private void actualizarBotonReproducir(boolean reproduciendo) {
-        botonReproducir.setGraphic(iconoMedia(reproduciendo ? SVG_PAUSA : SVG_REPRODUCIR, 26));
+        botonReproducir.setGraphic(IconosMedia.icono(
+                reproduciendo ? IconosMedia.PAUSA : IconosMedia.REPRODUCIR, 26));
         botonReproducir.setTooltip(new Tooltip(reproduciendo ? "Pausar" : "Reproducir"));
     }
 
-    @FXML
-    private void alternarAleatorio() {
-        aleatorio = !aleatorio;
+    private void actualizarBotonAleatorio() {
+        boolean activo = servicio.isAleatorio();
         botonAleatorio.getStyleClass().remove("boton-media-activo");
-        if (aleatorio) {
+        if (activo) {
             botonAleatorio.getStyleClass().add("boton-media-activo");
         }
         botonAleatorio.setTooltip(new Tooltip(
-                aleatorio ? "Modo aleatorio activado" : "Modo aleatorio desactivado"));
-    }
-
-    /** Recorre los modos de repeticion: desactivado, toda la lista y esta pista. */
-    @FXML
-    private void cambiarRepeticion() {
-        modoRepeticion = switch (modoRepeticion) {
-            case DESACTIVADO -> ModoRepeticion.TODAS;
-            case TODAS -> ModoRepeticion.UNA;
-            case UNA -> ModoRepeticion.DESACTIVADO;
-        };
-        actualizarBotonRepeticion();
+                activo ? "Modo aleatorio activado" : "Modo aleatorio desactivado"));
     }
 
     private void actualizarBotonRepeticion() {
-        botonRepeticion.setGraphic(iconoMedia(
-                modoRepeticion == ModoRepeticion.UNA ? SVG_REPETIR_UNA : SVG_REPETIR, 20));
+        ReproductorService.ModoRepeticion modo = servicio.getModoRepeticion();
+        botonRepeticion.setGraphic(IconosMedia.icono(
+                modo == ReproductorService.ModoRepeticion.UNA
+                        ? IconosMedia.REPETIR_UNA : IconosMedia.REPETIR, 20));
         botonRepeticion.getStyleClass().remove("boton-media-activo");
-        if (modoRepeticion != ModoRepeticion.DESACTIVADO) {
+        if (modo != ReproductorService.ModoRepeticion.DESACTIVADO) {
             botonRepeticion.getStyleClass().add("boton-media-activo");
         }
-        botonRepeticion.setTooltip(new Tooltip(switch (modoRepeticion) {
+        botonRepeticion.setTooltip(new Tooltip(switch (modo) {
             case DESACTIVADO -> "Repetición desactivada";
             case TODAS -> "Repetir toda la lista";
             case UNA -> "Repetir esta pista";
         }));
     }
 
+    @FXML
+    private void alternarAleatorio() {
+        servicio.alternarAleatorio();
+    }
+
+    @FXML
+    private void cambiarRepeticion() {
+        servicio.ciclarRepeticion();
+    }
+
     // ------------------------------------------------------------------
-    // Lista de reproduccion: filas con arrastrar y soltar y miniaturas
+    // Lista de reproduccion: filas, acciones por fila y arrastrar y soltar
     // ------------------------------------------------------------------
 
     /** Fila de la biblioteca: doble clic para reproducir y arrastre para reordenar. */
@@ -286,7 +296,7 @@ public class MusicaController implements Initializable, VistaConRefresco {
 
         fila.setOnMouseClicked(evento -> {
             if (evento.getClickCount() == 2 && fila.getItem() != null) {
-                reproducir(fila.getItem());
+                iniciar(fila.getItem());
             }
         });
 
@@ -304,6 +314,10 @@ public class MusicaController implements Initializable, VistaConRefresco {
         });
 
         fila.setOnDragOver(evento -> {
+            if (evento.getDragboard().hasFiles()) {
+                // Suelta de archivos externos: la gestiona la tabla completa.
+                return;
+            }
             if (puedeSoltarEn(fila)) {
                 evento.acceptTransferModes(TransferMode.MOVE);
                 evento.consume();
@@ -311,7 +325,7 @@ public class MusicaController implements Initializable, VistaConRefresco {
         });
 
         fila.setOnDragEntered(evento -> {
-            if (puedeSoltarEn(fila)) {
+            if (!evento.getDragboard().hasFiles() && puedeSoltarEn(fila)) {
                 fila.getStyleClass().add("fila-destino");
             }
         });
@@ -319,6 +333,9 @@ public class MusicaController implements Initializable, VistaConRefresco {
         fila.setOnDragExited(evento -> fila.getStyleClass().remove("fila-destino"));
 
         fila.setOnDragDropped(evento -> {
+            if (evento.getDragboard().hasFiles()) {
+                return;
+            }
             if (puedeSoltarEn(fila)) {
                 reordenar(pistaArrastrada, listaPistas.getItems().indexOf(fila.getItem()));
                 evento.setDropCompleted(true);
@@ -334,6 +351,44 @@ public class MusicaController implements Initializable, VistaConRefresco {
         });
 
         return fila;
+    }
+
+    /** Admite archivos de audio (.mp3, .wav, .m4a, .aac) soltados desde el explorador. */
+    private void configurarArrastreExterno() {
+        listaPistas.setOnDragOver(evento -> {
+            if (evento.getDragboard().hasFiles() && contieneAudio(evento.getDragboard().getFiles())) {
+                evento.acceptTransferModes(TransferMode.COPY);
+            }
+            evento.consume();
+        });
+
+        listaPistas.setOnDragDropped(evento -> {
+            List<File> archivos = evento.getDragboard().getFiles();
+            List<File> audio = archivos == null ? List.of() : archivos.stream()
+                    .filter(archivo -> archivo.isFile()
+                            && ArchivoMultimediaService.esAudio(archivo.getName()))
+                    .toList();
+            if (audio.isEmpty()) {
+                evento.setDropCompleted(false);
+            } else {
+                agregar(audio);
+                refrescar();
+                evento.setDropCompleted(true);
+            }
+            evento.consume();
+        });
+    }
+
+    private static boolean contieneAudio(List<File> archivos) {
+        if (archivos == null) {
+            return false;
+        }
+        for (File archivo : archivos) {
+            if (archivo.isFile() && ArchivoMultimediaService.esAudio(archivo.getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean puedeSoltarEn(TableRow<PistaAudio> fila) {
@@ -355,7 +410,7 @@ public class MusicaController implements Initializable, VistaConRefresco {
         listaPistas.getSelectionModel().select(pista);
     }
 
-    /** Celda de la columna de portada: miniatura del video de YouTube o icono de musica. */
+    /** Celda de la columna de portada: miniatura del video o icono de musica. */
     private TableCell<PistaAudio, PistaAudio> celdaPortada() {
         return new TableCell<>() {
             private final ImageView vista = new ImageView();
@@ -385,7 +440,7 @@ public class MusicaController implements Initializable, VistaConRefresco {
                     setGraphic(null);
                     return;
                 }
-                Image imagen = cargarPortada(pista);
+                Image imagen = ArchivoMultimediaService.portada(pista);
                 vista.setImage(imagen);
                 vista.setVisible(imagen != null);
                 simbolo.setVisible(imagen == null);
@@ -395,27 +450,51 @@ public class MusicaController implements Initializable, VistaConRefresco {
         };
     }
 
-    /**
-     * Devuelve la miniatura del video cuando la pista es un enlace de YouTube. La descarga se
-     * hace en segundo plano y se cachea; sin conexion simplemente no hay imagen y la celda
-     * muestra su icono de respaldo.
-     */
-    private static Image cargarPortada(PistaAudio pista) {
-        if (pista == null || !pista.esEnlace()) {
-            return null;
-        }
-        String url = ArchivoMultimediaService.miniaturaYoutube(pista.getEnlace());
-        if (url == null) {
-            return null;
-        }
-        return PORTADAS.computeIfAbsent(url, clave -> new Image(clave, 0, 0, true, true, true));
+    /** Celda de la columna de acciones: borra la pista de esa fila con un solo clic. */
+    private TableCell<PistaAudio, Void> celdaAcciones() {
+        return new TableCell<>() {
+            private final Button boton = new Button("\u2715");
+
+            {
+                boton.getStyleClass().add("boton-accion-eliminar");
+                boton.setTooltip(new Tooltip("Eliminar esta pista de la lista"));
+                boton.setOnAction(evento -> {
+                    int indice = getIndex();
+                    if (indice >= 0 && indice < getTableView().getItems().size()) {
+                        eliminarDeLista(getTableView().getItems().get(indice));
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Void elemento, boolean vacio) {
+                super.updateItem(elemento, vacio);
+                setGraphic(vacio ? null : boton);
+            }
+        };
     }
 
     private void mostrarPortadaActual(PistaAudio pista) {
-        Image imagen = cargarPortada(pista);
+        Image imagen = ArchivoMultimediaService.portada(pista);
         portadaActual.setImage(imagen);
         portadaActual.setVisible(imagen != null);
         simboloPortada.setVisible(imagen == null);
+    }
+
+    /** Refleja en la tarjeta la pista que esta sonando y la selecciona en la lista. */
+    private void actualizarPistaMostrada(PistaAudio pista) {
+        if (pista == null) {
+            etiquetaTituloPista.setText("Sin pista en reproducción");
+            etiquetaArtista.setText("");
+            mostrarPortadaActual(null);
+            return;
+        }
+        etiquetaTituloPista.setText(pista.getTitulo());
+        etiquetaArtista.setText(servicio.getArtista());
+        mostrarPortadaActual(pista);
+        if (listaPistas.getItems().contains(pista)) {
+            listaPistas.getSelectionModel().select(pista);
+        }
     }
 
     // ------------------------------------------------------------------
@@ -463,15 +542,15 @@ public class MusicaController implements Initializable, VistaConRefresco {
         gestor.agregarPistas(nuevas);
     }
 
-    /** Agrega a la biblioteca un enlace externo (YouTube u otro) para abrirlo en el navegador. */
+    /** Descarga el audio del enlace a la carpeta gestionada y lo agrega como pista local. */
     @FXML
     private void agregarEnlace() {
         Dialog<ButtonType> dialogo = new Dialog<>();
-        dialogo.setTitle("Añadir enlace");
+        dialogo.setTitle("Descargar enlace de audio");
         dialogo.initOwner(ventana());
 
         DialogPane panel = dialogo.getDialogPane();
-        ButtonType aceptar = new ButtonType("Añadir", ButtonBar.ButtonData.OK_DONE);
+        ButtonType aceptar = new ButtonType("Descargar", ButtonBar.ButtonData.OK_DONE);
         panel.getButtonTypes().addAll(aceptar, new ButtonType("Cancelar", ButtonBar.ButtonData.CANCEL_CLOSE));
 
         TextField campoEnlace = new TextField();
@@ -479,6 +558,13 @@ public class MusicaController implements Initializable, VistaConRefresco {
         campoEnlace.setPrefWidth(360);
         TextField campoTitulo = new TextField();
         campoTitulo.setPromptText("Título (opcional)");
+
+        Label nota = new Label("El audio se descargará y convertirá a MP3 en la carpeta gestionada "
+                + "por la aplicación y se añadirá a la lista, sin abrir el navegador. "
+                + "La primera vez, las herramientas necesarias se preparan automáticamente.");
+        nota.setWrapText(true);
+        nota.setMaxWidth(360);
+        nota.getStyleClass().add("texto-secundario");
 
         GridPane formulario = new GridPane();
         formulario.setHgap(10);
@@ -488,8 +574,9 @@ public class MusicaController implements Initializable, VistaConRefresco {
         formulario.add(campoEnlace, 1, 0);
         formulario.add(new Label("Título"), 0, 1);
         formulario.add(campoTitulo, 1, 1);
+        formulario.add(nota, 1, 2);
         panel.setContent(formulario);
-        panel.setPrefWidth(520);
+        panel.setPrefWidth(540);
         Dialogos.aplicarEstilo(panel);
 
         Node nodoAceptar = panel.lookupButton(aceptar);
@@ -502,26 +589,95 @@ public class MusicaController implements Initializable, VistaConRefresco {
             return;
         }
         String enlace = campoEnlace.getText().trim();
+        if (!ArchivoMultimediaService.esUrl(enlace)) {
+            Dialogos.info("Enlace no válido", "Introduce una dirección http(s) válida.");
+            return;
+        }
         String titulo = campoTitulo.getText() == null || campoTitulo.getText().isBlank()
-                ? ArchivoMultimediaService.tipoEnlace(enlace) : campoTitulo.getText().trim();
-        gestor.agregarPista(PistaAudio.desdeEnlace(titulo, enlace));
-        refrescar();
+                ? null : campoTitulo.getText().trim();
+        descargarEnlace(enlace, titulo);
     }
 
-    /** Descripcion breve del origen de la pista, mostrada en la lista. */
-    private static String origenDe(PistaAudio pista) {
-        return pista.esEnlace() ? ArchivoMultimediaService.tipoEnlace(pista.getEnlace()) : "Archivo local";
+    /**
+     * Prepara las herramientas necesarias (yt-dlp y ffmpeg, descargándolas la primera vez) y,
+     * a continuación, descarga y convierte el enlace a MP3 en segundo plano. Todo el proceso
+     * se refleja dentro de la propia aplicación, sin ventanas de consola ni instalaciones
+     * manuales por parte del usuario.
+     */
+    private void descargarEnlace(String enlace, String titulo) {
+        if (descargando) {
+            Dialogos.info("Descarga en curso", "Espera a que finalice la descarga actual.");
+            return;
+        }
+        descargando = true;
+        mostrarPanelDescarga(true);
+        progresoDescarga.setProgress(-1);
+        etiquetaDescarga.setText("Preparando la descarga…");
+
+        GestorHerramientasService.asegurar(
+                (fraccion, mensaje) -> {
+                    etiquetaDescarga.setText(mensaje);
+                    progresoDescarga.setProgress(fraccion);
+                },
+                () -> convertirEnlace(enlace, titulo),
+                error -> {
+                    descargando = false;
+                    mostrarPanelDescarga(false);
+                    Dialogos.error("Preparación de la descarga", error);
+                });
+    }
+
+    /** Ejecuta la descarga y conversión del enlace una vez las herramientas están listas. */
+    private void convertirEnlace(String enlace, String titulo) {
+        progresoDescarga.setProgress(-1);
+        etiquetaDescarga.setText("Conectando con el servidor…");
+        DescargadorAudioService.descargar(enlace, gestor.getCarpetaMusica(),
+                (fraccion, mensaje) -> {
+                    etiquetaDescarga.setText(mensaje);
+                    progresoDescarga.setProgress(fraccion);
+                },
+                resultado -> {
+                    descargando = false;
+                    mostrarPanelDescarga(false);
+                    PistaAudio pista = new PistaAudio(
+                            resultado.titulo() == null || resultado.titulo().isBlank()
+                                    ? tituloDe(resultado.archivo().getName()) : resultado.titulo(),
+                            resultado.archivo().getAbsolutePath());
+                    pista.setOrigen(OrigenPista.DESCARGADO);
+                    if (titulo != null && !titulo.isBlank()) {
+                        pista.setTitulo(titulo);
+                    }
+                    pista.setArtista(resultado.artista() == null || resultado.artista().isBlank()
+                            ? ArchivoMultimediaService.tipoEnlace(enlace) : resultado.artista());
+                    pista.setDuracionSegundos(resultado.duracionSegundos());
+                    gestor.agregarPista(pista);
+                    refrescar();
+                    iniciar(pista);
+                },
+                error -> {
+                    descargando = false;
+                    mostrarPanelDescarga(false);
+                    Dialogos.error("No se pudo descargar el enlace", error);
+                });
+    }
+
+    private void mostrarPanelDescarga(boolean mostrar) {
+        panelDescarga.setVisible(mostrar);
+        panelDescarga.setManaged(mostrar);
     }
 
     @FXML
     private void eliminarPista() {
-        PistaAudio pista = listaPistas.getSelectionModel().getSelectedItem();
+        eliminarDeLista(listaPistas.getSelectionModel().getSelectedItem());
+    }
+
+    /** Quita una pista concreta de la biblioteca; si es la que suena, detiene el reproductor. */
+    private void eliminarDeLista(PistaAudio pista) {
         if (pista == null) {
             return;
         }
-        if (pista == pistaActual) {
-            detener();
-            limpiarReproductor();
+        if (pista == servicio.getPistaActual()) {
+            servicio.detener();
         }
         gestor.eliminarPista(pista);
         refrescar();
@@ -535,8 +691,7 @@ public class MusicaController implements Initializable, VistaConRefresco {
         if (Dialogos.confirmar("Vaciar biblioteca",
                 "¿Quitar todas las pistas de la biblioteca? Los archivos no se eliminan del disco.",
                 ventana())) {
-            detener();
-            limpiarReproductor();
+            servicio.detener();
             gestor.limpiarBiblioteca();
             refrescar();
         }
@@ -548,7 +703,7 @@ public class MusicaController implements Initializable, VistaConRefresco {
 
     @FXML
     private void alternarReproduccion() {
-        if (reproductor == null) {
+        if (!servicio.isActivo()) {
             PistaAudio pista = listaPistas.getSelectionModel().getSelectedItem();
             if (pista == null && !listaPistas.getItems().isEmpty()) {
                 pista = listaPistas.getItems().get(0);
@@ -557,88 +712,29 @@ public class MusicaController implements Initializable, VistaConRefresco {
                 Dialogos.info("Biblioteca vacía", "Añade archivos de audio antes de reproducir.");
                 return;
             }
-            reproducir(pista);
+            iniciar(pista);
             return;
         }
-        if (reproductor.getStatus() == MediaPlayer.Status.PLAYING) {
-            reproductor.pause();
-            espectro.desactivar();
-            actualizarBotonReproducir(false);
-        } else {
-            reproductor.play();
-            espectro.activar();
-            actualizarBotonReproducir(true);
-        }
+        servicio.alternar();
     }
 
     @FXML
     private void siguiente() {
-        List<PistaAudio> pistas = listaPistas.getItems();
-        if (pistas.isEmpty()) {
-            return;
-        }
-        reproducir(pistas.get(indiceSiguiente()));
+        servicio.siguiente();
     }
 
     @FXML
     private void anterior() {
-        List<PistaAudio> pistas = listaPistas.getItems();
-        if (pistas.isEmpty()) {
-            return;
-        }
-        int indice = indiceDe(pistaActual);
-        int anterior = indice <= 0 ? pistas.size() - 1 : indice - 1;
-        reproducir(pistas.get(anterior));
+        servicio.anterior();
     }
 
-    /** Indice de la siguiente pista respetando el modo aleatorio. */
-    private int indiceSiguiente() {
-        List<PistaAudio> pistas = listaPistas.getItems();
-        int indice = indiceDe(pistaActual);
-        if (aleatorio && pistas.size() > 1) {
-            int azar;
-            do {
-                azar = (int) (Math.random() * pistas.size());
-            } while (azar == indice);
-            return azar;
-        }
-        return indice < 0 ? 0 : (indice + 1) % pistas.size();
-    }
-
-    /** Avance automatico al terminar una pista, segun el modo de repeticion activo. */
-    private void avanzarAutomaticamente() {
-        if (modoRepeticion == ModoRepeticion.UNA && reproductor != null) {
-            reproductor.seek(Duration.ZERO);
-            reproductor.play();
-            return;
-        }
-        List<PistaAudio> pistas = listaPistas.getItems();
-        if (pistas.isEmpty()) {
-            return;
-        }
-        int indice = indiceDe(pistaActual);
-        if (aleatorio && pistas.size() > 1) {
-            reproducir(pistas.get(indiceSiguiente()));
-            return;
-        }
-        if (indice >= 0 && indice < pistas.size() - 1) {
-            reproducir(pistas.get(indice + 1));
-        } else if (modoRepeticion == ModoRepeticion.TODAS) {
-            reproducir(pistas.get(0));
-        } else {
-            botonReproducir.setText("");
-            actualizarBotonReproducir(false);
-            espectro.desactivar();
-            sliderProgreso.setValue(sliderProgreso.getMax());
-        }
-    }
-
-    private void reproducir(PistaAudio pista) {
+    /** Arranca una pista: los enlaces pendientes se descargan y los archivos suenan al momento. */
+    private void iniciar(PistaAudio pista) {
         if (pista == null) {
             return;
         }
         if (pista.esEnlace()) {
-            abrirEnlace(pista);
+            descargarEnlace(pista.getEnlace(), pista.getTitulo());
             return;
         }
         if (!ArchivoMultimediaService.existe(pista.getRutaArchivo())) {
@@ -646,111 +742,7 @@ public class MusicaController implements Initializable, VistaConRefresco {
                     "No se encontró el archivo:\n" + pista.getRutaArchivo());
             return;
         }
-        detener();
-        try {
-            Media media = new Media(Path.of(pista.getRutaArchivo()).toUri().toString());
-            reproductor = new MediaPlayer(media);
-            reproductor.setVolume(sliderVolumen.getValue());
-
-            // El espectro reacciona al audio real del archivo local.
-            reproductor.setAudioSpectrumNumBands(64);
-            reproductor.setAudioSpectrumInterval(0.05);
-            reproductor.setAudioSpectrumThreshold(-60);
-            reproductor.setAudioSpectrumListener((marca, duracion, magnitudes, fases) -> {
-                double[] datos = new double[magnitudes.length];
-                for (int i = 0; i < magnitudes.length; i++) {
-                    datos[i] = magnitudes[i];
-                }
-                espectro.actualizar(datos);
-            });
-
-            reproductor.setOnReady(() -> {
-                double segundos = media.getDuration().toSeconds();
-                sliderProgreso.setMax(Math.max(1, segundos));
-                etiquetaTiempoTotal.setText(formatear(segundos));
-                pista.setDuracionSegundos(segundos);
-                gestor.guardarAutomatico();
-                listaPistas.refresh();
-            });
-            reproductor.currentTimeProperty().addListener((obs, antes, ahora) -> {
-                if (!arrastrando) {
-                    sliderProgreso.setValue(ahora.toSeconds());
-                }
-                etiquetaTiempoActual.setText(formatear(ahora.toSeconds()));
-            });
-            reproductor.setOnEndOfMedia(this::avanzarAutomaticamente);
-            reproductor.setOnError(() -> Dialogos.info("Reproducción",
-                    "JavaFX no pudo reproducir este archivo. Se recomienda MP3 o WAV estándar."));
-            reproductor.play();
-            espectro.activar();
-
-            pistaActual = pista;
-            sliderProgreso.setValue(0);
-            etiquetaTiempoActual.setText("00:00");
-            etiquetaTiempoTotal.setText(pista.getDuracionFormateada());
-            etiquetaTituloPista.setText(pista.getTitulo());
-            etiquetaArtista.setText(pista.getArtista() == null || pista.getArtista().isBlank()
-                    ? ArchivoMultimediaService.nombreArchivo(pista.getRutaArchivo())
-                    : pista.getArtista());
-            mostrarPortadaActual(pista);
-            actualizarBotonReproducir(true);
-            listaPistas.getSelectionModel().select(pista);
-        } catch (RuntimeException e) {
-            Dialogos.error("Reproducción", "No se pudo abrir el archivo seleccionado.\n" + e.getMessage());
-        }
-    }
-
-    /** Reproduce un enlace externo abriendolo en el navegador del sistema. */
-    private void abrirEnlace(PistaAudio pista) {
-        detener();
-        MainApp.abrirEnlace(pista.getEnlace());
-        pistaActual = pista;
-        sliderProgreso.setMax(100);
-        sliderProgreso.setValue(0);
-        etiquetaTiempoActual.setText("00:00");
-        etiquetaTiempoTotal.setText("—");
-        etiquetaTituloPista.setText(pista.getTitulo());
-        etiquetaArtista.setText(pista.getEnlace());
-        mostrarPortadaActual(pista);
-        // El audio suena en el navegador: el espectro usa su patron animado.
-        espectro.activar();
-        actualizarBotonReproducir(false);
-        listaPistas.getSelectionModel().select(pista);
-    }
-
-    private void detener() {
-        if (reproductor != null) {
-            try {
-                reproductor.stop();
-                reproductor.dispose();
-            } catch (RuntimeException ignored) {
-                // Liberacion silenciosa de recursos de audio.
-            }
-            reproductor = null;
-        }
-    }
-
-    /** Restablece la tarjeta del reproductor cuando no hay ninguna pista activa. */
-    private void limpiarReproductor() {
-        pistaActual = null;
-        espectro.desactivar();
-        etiquetaTituloPista.setText("Sin pista en reproducción");
-        etiquetaArtista.setText("");
-        mostrarPortadaActual(null);
-        actualizarBotonReproducir(false);
-    }
-
-    private int indiceDe(PistaAudio pista) {
-        if (pista == null) {
-            return -1;
-        }
-        List<PistaAudio> pistas = listaPistas.getItems();
-        for (int i = 0; i < pistas.size(); i++) {
-            if (pistas.get(i).getId().equals(pista.getId())) {
-                return i;
-            }
-        }
-        return -1;
+        servicio.reproducir(pista);
     }
 
     private void actualizarEtiquetaVolumen() {

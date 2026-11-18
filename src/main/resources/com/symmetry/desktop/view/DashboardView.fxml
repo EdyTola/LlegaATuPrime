@@ -94,7 +94,7 @@
                                     <Label fx:id="etiquetaRetosEstado" styleClass="texto-secundario"/>
                                 </children>
                             </HBox>
-                            <Label text="Se generan según tu historial: priorizan el músculo y el nivel que más atención necesitan. Los flash se renuevan cada 12 h y los diarios cada 24 h."
+                            <Label text="Se sincronizan con tu entrenamiento del día: proponen movilidad, estiramientos y micro-hábitos de recuperación para la zona que trabajas, sin sumar más fatiga. Confírmalos al completarlos; los flash se renuevan cada 12 h y los diarios cada 24 h."
                                    styleClass="texto-secundario" wrapText="true"/>
                         </children>
                     </VBox>

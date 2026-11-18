@@ -7,6 +7,7 @@ package com.symmetry.desktop.model;
 public enum OrigenPista {
 
     LOCAL("Archivo local"),
+    DESCARGADO("Descargado"),
     ENLACE("Enlace / YouTube");
 
     private final String etiqueta;
