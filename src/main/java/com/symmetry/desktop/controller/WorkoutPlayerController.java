@@ -563,7 +563,8 @@ public class WorkoutPlayerController {
             return;
         }
         // Guia tecnica: modelo 2D animado siempre disponible + multimedia personalizada del usuario.
-        GuiaTecnicaDialogo.mostrar(ejercicioActual, sustituciones.get(ejercicioActual.getId()), ventana(), ruta -> {
+        GuiaTecnicaDialogo.mostrar(ejercicioActual, sustituciones.get(ejercicioActual.getId()),
+                gestor.getModalidad(), ventana(), ruta -> {
             ejercicioActual.setRutaMultimedia(ruta);
             gestor.guardarCambiosEntrenamiento();
         });

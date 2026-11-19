@@ -2,6 +2,7 @@ package com.symmetry.desktop.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.symmetry.desktop.util.ProcesoOculto;
 import javafx.application.Platform;
 
 import java.io.File;
@@ -112,34 +113,105 @@ public final class DescargadorAudioService {
 
     private static void ejecutar(String ejecutable, String url, Path carpetaDestino, Escucha escucha,
                                  Consumer<Resultado> alTerminar, Consumer<String> alFallar) {
-        Lanzamiento lanzamiento = null;
         try {
             Files.createDirectories(carpetaDestino);
-            notificar(escucha, -1, "Conectando con el servidor…");
-
-            lanzamiento = iniciar(ejecutable, argumentos(url, carpetaDestino));
-            int codigo = seguirProgreso(lanzamiento, escucha);
-            if (codigo != 0) {
-                fallar(alFallar, "No se pudo completar la descarga. Comprueba tu conexión a internet "
-                        + "y que el enlace sea válido y accesible.");
-                return;
+            String registro = "";
+            for (int intento = 1; intento <= INTENTOS_PROCESO; intento++) {
+                notificar(escucha, -1, intento == 1
+                        ? "Conectando con el servidor…"
+                        : "El servidor no respondió, reintentando (" + intento + "/" + INTENTOS_PROCESO + ")…");
+                Lanzamiento lanzamiento = iniciar(ejecutable, argumentos(url, carpetaDestino));
+                int codigo;
+                try {
+                    codigo = seguirProgreso(lanzamiento, escucha);
+                    registro = leerRegistro(lanzamiento.registro());
+                } finally {
+                    eliminar(lanzamiento.registro());
+                }
+                if (codigo == 0) {
+                    Resultado resultado = resolverResultado(carpetaDestino);
+                    if (resultado == null) {
+                        fallar(alFallar, "La conversión finalizó pero no se encontró el archivo MP3 generado."
+                                + SUGERENCIA_ARCHIVOS);
+                        return;
+                    }
+                    Platform.runLater(() -> alTerminar.accept(resultado));
+                    return;
+                }
+                if (!esTransitorio(registro) || intento == INTENTOS_PROCESO) {
+                    break;
+                }
+                Thread.sleep(3000L * intento);
             }
-            Resultado resultado = resolverResultado(carpetaDestino);
-            if (resultado == null) {
-                fallar(alFallar, "La conversión finalizó pero no se encontró el archivo MP3 generado.");
-                return;
-            }
-            Platform.runLater(() -> alTerminar.accept(resultado));
+            fallar(alFallar, diagnosticar(registro));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             fallar(alFallar, "La descarga fue interrumpida.");
         } catch (Exception e) {
             fallar(alFallar, mensajeAmigable(e));
-        } finally {
-            if (lanzamiento != null) {
-                eliminar(lanzamiento.registro());
-            }
         }
+    }
+
+    private static final int INTENTOS_PROCESO = 3;
+    private static final String SUGERENCIA_ARCHIVOS =
+            " Mientras tanto puedes usar «Añadir archivos» o arrastrar tus MP3/WAV a la lista.";
+    private static final Pattern ERROR_503 = Pattern.compile(
+            "HTTP Error 5\\d\\d|\\b50[0234]\\b.*(unavailable|gateway|timeout)|Service Unavailable",
+            Pattern.CASE_INSENSITIVE);
+
+    private static String leerRegistro(Path registro) {
+        try {
+            return Files.readString(registro, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return "";
+        }
+    }
+
+    /** true si el fallo parece un error temporal del servidor (5xx, tiempo agotado). */
+    private static boolean esTransitorio(String registro) {
+        String min = registro.toLowerCase(Locale.ROOT);
+        return ERROR_503.matcher(registro).find() || min.contains("timed out")
+                || min.contains("connection reset") || min.contains("temporarily");
+    }
+
+    /**
+     * Traduce la salida de error de yt-dlp en un mensaje claro que indica que fallo (el
+     * servidor del video, la extraccion o la red) y que puede hacer el usuario.
+     */
+    private static String diagnosticar(String registro) {
+        String min = registro.toLowerCase(Locale.ROOT);
+        if (ERROR_503.matcher(registro).find()) {
+            return "El servidor del enlace respondió con un error temporal (503) al obtener el audio, "
+                    + "incluso tras varios reintentos. No es un problema de la aplicación. Espera unos "
+                    + "segundos y vuelve a intentarlo, prueba con otro enlace o pulsa «Actualizar motor» "
+                    + "por si el extractor quedó desactualizado." + SUGERENCIA_ARCHIVOS;
+        }
+        if (min.contains("http error 429") || min.contains("too many requests")) {
+            return "La plataforma limitó temporalmente las peticiones (429). Espera unos minutos y "
+                    + "vuelve a intentarlo." + SUGERENCIA_ARCHIVOS;
+        }
+        if (min.contains("sign in") || min.contains("confirm you") || min.contains("http error 403")) {
+            return "La plataforma bloqueó la descarga (acceso denegado o verificación). Pulsa «Actualizar "
+                    + "motor» y reintenta; si persiste, prueba con otro enlace." + SUGERENCIA_ARCHIVOS;
+        }
+        if (min.contains("video unavailable") || min.contains("private video") || min.contains("not available")) {
+            return "El video no está disponible (privado, eliminado o restringido por región)."
+                    + SUGERENCIA_ARCHIVOS;
+        }
+        if (min.contains("unsupported url")) {
+            return "El enlace no corresponde a una plataforma de audio/video compatible.";
+        }
+        if (min.contains("unable to extract") || min.contains("unable to download")
+                || min.contains("extractor")) {
+            return "No se pudo extraer el audio del enlace; el motor de descarga probablemente está "
+                    + "desactualizado. Pulsa «Actualizar motor» y reintenta." + SUGERENCIA_ARCHIVOS;
+        }
+        if (min.contains("urlopen error") || min.contains("getaddrinfo") || min.contains("network is unreachable")) {
+            return "No se pudo conectar con el servidor. Comprueba tu conexión a internet."
+                    + SUGERENCIA_ARCHIVOS;
+        }
+        return "No se pudo completar la descarga. Comprueba tu conexión y que el enlace sea válido, o "
+                + "pulsa «Actualizar motor» y reintenta." + SUGERENCIA_ARCHIVOS;
     }
 
     /** Argumentos de yt-dlp: audio MP3 de maxima calidad, metadatos y carpeta de ffmpeg. */
@@ -148,6 +220,11 @@ public final class DescargadorAudioService {
                 "--no-playlist",
                 "--no-mtime",
                 "--newline",
+                "--retries", "5",
+                "--fragment-retries", "5",
+                "--extractor-retries", "3",
+                "--retry-sleep", "exp=1:20",
+                "--socket-timeout", "30",
                 "-x",
                 "--audio-format", "mp3",
                 "--audio-quality", "0",
@@ -165,56 +242,19 @@ public final class DescargadorAudioService {
 
     /**
      * Lanza yt-dlp redirigiendo su salida a un archivo temporal que la aplicacion lee para
-     * mostrar el progreso. En Windows se ejecuta a traves de un lanzador oculto (WScript y
-     * cmd) para que no aparezca ninguna ventana de consola; si el lanzador no estuviera
-     * disponible se recurre a la ejecucion directa.
+     * mostrar el progreso. Nunca abre una ventana de consola: en Windows se usa un lanzador
+     * oculto ({@link ProcesoOculto}).
      */
     private static Lanzamiento iniciar(String ejecutable, List<String> argumentos) throws IOException {
         Path registro = Files.createTempFile("ltp-descarga-", ".log");
-        if (esWindows() && System.console() == null) {
-            Path lanzador = crearLanzadorOculto(ejecutable, argumentos, registro);
-            if (lanzador != null) {
-                try {
-                    ProcessBuilder constructor = new ProcessBuilder(
-                            "wscript.exe", "//Nologo", lanzador.toString());
-                    constructor.redirectErrorStream(true);
-                    constructor.redirectOutput(ProcessBuilder.Redirect.DISCARD);
-                    Process proceso = constructor.start();
-                    proceso.onExit().thenRun(() -> eliminar(lanzador));
-                    return new Lanzamiento(proceso, registro);
-                } catch (IOException e) {
-                    eliminar(lanzador);
-                }
-            }
-        }
         List<String> comando = new ArrayList<>();
         comando.add(ejecutable);
         comando.addAll(argumentos);
-        ProcessBuilder constructor = new ProcessBuilder(comando);
-        constructor.redirectErrorStream(true);
-        constructor.redirectOutput(registro.toFile());
-        return new Lanzamiento(constructor.start(), registro);
-    }
-
-    /**
-     * Crea un script WScript que ejecuta el comando oculto (ventana 0) y vuelca su salida al
-     * archivo de registro. Devuelve la ruta del script, o {@code null} si no pudo crearse.
-     */
-    private static Path crearLanzadorOculto(String ejecutable, List<String> argumentos, Path registro) {
         try {
-            StringBuilder linea = new StringBuilder(citar(ejecutable));
-            for (String argumento : argumentos) {
-                linea.append(' ').append(citar(argumento));
-            }
-            String comando = "cmd.exe /c \"" + linea + " > " + citar(registro.toString()) + " 2>&1\"";
-            String script = "Set sh = CreateObject(\"WScript.Shell\")\r\n"
-                    + "codigo = sh.Run(" + literalVbs(comando) + ", 0, True)\r\n"
-                    + "WScript.Quit codigo\r\n";
-            Path archivo = Files.createTempFile("ltp-descarga-", ".vbs");
-            Files.writeString(archivo, script, StandardCharsets.UTF_8);
-            return archivo;
+            return new Lanzamiento(ProcesoOculto.lanzar(comando, registro).proceso(), registro);
         } catch (IOException e) {
-            return null;
+            eliminar(registro);
+            throw e;
         }
     }
 
@@ -328,14 +368,7 @@ public final class DescargadorAudioService {
         }
     }
 
-    private static String citar(String valor) {
-        return "\"" + valor + "\"";
-    }
 
-    /** Convierte un texto en un literal de cadena valido dentro del script VBScript. */
-    private static String literalVbs(String valor) {
-        return "\"" + valor.replace("\"", "\"\"") + "\"";
-    }
 
     private static void eliminar(Path archivo) {
         try {
@@ -388,14 +421,13 @@ public final class DescargadorAudioService {
         return lista;
     }
 
-    /** Comprueba que el comando responde ejecutando {@code --version}. */
+    /** Comprueba que el comando responde ejecutando {@code --version} (sin abrir consola). */
     private static boolean verifica(String comando) {
         try {
-            Process proceso = new ProcessBuilder(comando, "--version")
-                    .redirectErrorStream(true)
-                    .start();
-            proceso.getInputStream().readAllBytes();
-            return proceso.waitFor() == 0;
+            return ProcesoOculto.ejecutar(List.of(comando, "--version"), 15).exito();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
         } catch (Exception e) {
             return false;
         }

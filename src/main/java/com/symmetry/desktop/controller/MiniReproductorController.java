@@ -54,6 +54,10 @@ public class MiniReproductorController implements Initializable {
     private Slider miniVolumen;
     @FXML
     private Button miniCerrar;
+    @FXML
+    private Button miniAleatorio;
+    @FXML
+    private Button miniRepeticion;
 
     @Override
     public void initialize(URL ubicacion, ResourceBundle recursos) {
@@ -71,6 +75,10 @@ public class MiniReproductorController implements Initializable {
         miniAnterior.setTooltip(new Tooltip("Pista anterior"));
         miniSiguiente.setGraphic(IconosMedia.icono(IconosMedia.SIGUIENTE, 18));
         miniSiguiente.setTooltip(new Tooltip("Pista siguiente"));
+        miniAleatorio.setGraphic(IconosMedia.icono(IconosMedia.ALEATORIO, 17));
+        servicio.aleatorioProperty().addListener((obs, antes, ahora) -> actualizarModos());
+        servicio.modoRepeticionProperty().addListener((obs, antes, ahora) -> actualizarModos());
+        actualizarModos();
         miniCerrar.setGraphic(IconosMedia.icono(IconosMedia.CERRAR, 16));
         miniCerrar.setTooltip(new Tooltip("Cerrar el reproductor"));
 
@@ -119,6 +127,41 @@ public class MiniReproductorController implements Initializable {
     @FXML
     private void alternar() {
         servicio.alternar();
+    }
+
+    @FXML
+    private void alternarAleatorio() {
+        servicio.alternarAleatorio();
+    }
+
+    @FXML
+    private void cambiarRepeticion() {
+        servicio.ciclarRepeticion();
+    }
+
+    /** Refleja el modo activo (mismas reglas y mismo resaltado que la vista de musica). */
+    private void actualizarModos() {
+        boolean aleatorio = servicio.isAleatorio();
+        miniAleatorio.getStyleClass().remove("boton-media-mini-activo");
+        if (aleatorio) {
+            miniAleatorio.getStyleClass().add("boton-media-mini-activo");
+        }
+        miniAleatorio.setTooltip(new Tooltip(aleatorio
+                ? "Aleatorio activado (pulsa para desactivar)" : "Activar modo aleatorio"));
+
+        ReproductorService.ModoRepeticion modo = servicio.getModoRepeticion();
+        miniRepeticion.setGraphic(IconosMedia.icono(
+                modo == ReproductorService.ModoRepeticion.UNA
+                        ? IconosMedia.REPETIR_UNA : IconosMedia.REPETIR, 17));
+        miniRepeticion.getStyleClass().remove("boton-media-mini-activo");
+        if (modo != ReproductorService.ModoRepeticion.DESACTIVADO) {
+            miniRepeticion.getStyleClass().add("boton-media-mini-activo");
+        }
+        miniRepeticion.setTooltip(new Tooltip(switch (modo) {
+            case DESACTIVADO -> "Repetición desactivada";
+            case TODAS -> "Bucle de lista activado";
+            case UNA -> "Repetir esta pista";
+        }));
     }
 
     @FXML

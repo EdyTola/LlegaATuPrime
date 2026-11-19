@@ -1,5 +1,6 @@
 package com.symmetry.desktop.service;
 
+import com.symmetry.desktop.util.ProcesoOculto;
 import javafx.application.Platform;
 
 import java.io.IOException;
@@ -111,7 +112,7 @@ public final class GestorHerramientasService {
                 if (rutaYtDlp() == null) {
                     notificar(escucha, -1, "Preparando el motor de descargas (yt-dlp)…");
                     Path destino = carpeta.resolve(nombreYtDlp());
-                    descargar(urlYtDlp(), destino,
+                    descargar("yt-dlp", urlYtDlp(), destino,
                             avance -> notificar(escucha, avance * 0.5,
                                     "Descargando yt-dlp… " + porcentaje(avance)));
                     hacerEjecutable(destino);
@@ -121,7 +122,7 @@ public final class GestorHerramientasService {
                     if (esWindows()) {
                         Path zip = Files.createTempFile("ltp-ffmpeg-", ".zip");
                         try {
-                            descargar(URL_FFMPEG_WINDOWS, zip,
+                            descargar("ffmpeg", URL_FFMPEG_WINDOWS, zip,
                                     avance -> notificar(escucha, 0.5 + avance * 0.5,
                                             "Descargando ffmpeg… " + porcentaje(avance)));
                             extraerBinario(zip, carpeta, nombreFfmpeg());
@@ -131,7 +132,7 @@ public final class GestorHerramientasService {
                         }
                     } else {
                         Path destino = carpeta.resolve(nombreFfmpeg());
-                        descargar(urlFfmpeg(), destino,
+                        descargar("ffmpeg", urlFfmpeg(), destino,
                                 avance -> notificar(escucha, 0.5 + avance * 0.5,
                                         "Descargando ffmpeg… " + porcentaje(avance)));
                         hacerEjecutable(destino);
@@ -150,11 +151,121 @@ public final class GestorHerramientasService {
         hilo.start();
     }
 
+    /**
+     * Descarga bajo demanda la ultima version oficial de yt-dlp y reemplaza la instalada.
+     * YouTube cambia con frecuencia y los extractores antiguos dejan de funcionar; actualizar
+     * suele resolver errores de extraccion o de respuesta del servidor. La instalacion actual
+     * solo se sustituye cuando la nueva descarga termino completa.
+     *
+     * @param exito recibe el mensaje con la version instalada
+     */
+    public static void actualizarYtDlp(Escucha escucha, Consumer<String> exito, Consumer<String> error) {
+        Thread hilo = new Thread(() -> {
+            try {
+                Path carpeta = carpetaHerramientas();
+                Files.createDirectories(carpeta);
+                Path destino = carpeta.resolve(nombreYtDlp());
+                Path nuevo = carpeta.resolve(nombreYtDlp() + ".nuevo");
+                notificar(escucha, -1, "Buscando la última versión de yt-dlp…");
+                try {
+                    descargar("yt-dlp", urlYtDlp(), nuevo,
+                            avance -> notificar(escucha, avance, "Descargando yt-dlp… " + porcentaje(avance)));
+                    hacerEjecutable(nuevo);
+                    Files.move(nuevo, destino, StandardCopyOption.REPLACE_EXISTING);
+                } finally {
+                    Files.deleteIfExists(nuevo);
+                }
+                String version = versionYtDlp(destino);
+                String mensaje = version == null
+                        ? "yt-dlp se actualizó correctamente."
+                        : "yt-dlp se actualizó a la versión " + version + ".";
+                Platform.runLater(() -> exito.accept(mensaje));
+            } catch (Exception e) {
+                String mensaje = mensajeAmigable(e);
+                Platform.runLater(() -> error.accept(mensaje));
+            }
+        }, "herramientas-actualizar");
+        hilo.setDaemon(true);
+        hilo.start();
+    }
+
+    /** Version de yt-dlp instalada (salida de {@code --version}), o {@code null} si no responde. */
+    private static String versionYtDlp(Path ejecutable) {
+        try {
+            var resultado = ProcesoOculto.ejecutar(java.util.List.of(ejecutable.toString(), "--version"), 15);
+            return resultado.exito() && !resultado.salida().isBlank() ? resultado.salida() : null;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return null;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     // ------------------------------------------------------------------
     // Descarga HTTP con progreso
     // ------------------------------------------------------------------
 
-    private static void descargar(String url, Path destino, DoubleConsumer avance) throws IOException {
+    /** Intentos maximos al descargar un binario ante fallos transitorios (503, 429, cortes de red). */
+    private static final int INTENTOS_DESCARGA = 3;
+
+    /**
+     * Fallo del servidor al descargar un binario. Conserva el nombre de la herramienta y el
+     * codigo HTTP para poder explicarle al usuario que descarga fallo exactamente.
+     */
+    public static final class ErrorServidorHerramienta extends IOException {
+        private final String herramienta;
+        private final int codigo;
+
+        ErrorServidorHerramienta(String herramienta, int codigo) {
+            super("El servidor respondió con el código " + codigo + " al descargar " + herramienta + ".");
+            this.herramienta = herramienta;
+            this.codigo = codigo;
+        }
+
+        public String herramienta() {
+            return herramienta;
+        }
+
+        public int codigo() {
+            return codigo;
+        }
+    }
+
+    private static boolean transitorio(int codigo) {
+        return codigo == 429 || codigo >= 500;
+    }
+
+    /** Descarga con reintentos (espera creciente) cuando el fallo es transitorio. */
+    private static void descargar(String herramienta, String url, Path destino, DoubleConsumer avance)
+            throws IOException {
+        IOException ultimo = null;
+        for (int intento = 1; intento <= INTENTOS_DESCARGA; intento++) {
+            try {
+                descargarUnaVez(herramienta, url, destino, avance);
+                return;
+            } catch (ErrorServidorHerramienta e) {
+                if (!transitorio(e.codigo())) {
+                    throw e;
+                }
+                ultimo = e;
+            } catch (HttpTimeoutException | ConnectException e) {
+                ultimo = e;
+            }
+            if (intento < INTENTOS_DESCARGA) {
+                try {
+                    Thread.sleep(2000L * intento);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    throw new IOException("La descarga fue interrumpida.", e);
+                }
+            }
+        }
+        throw ultimo;
+    }
+
+    private static void descargarUnaVez(String herramienta, String url, Path destino, DoubleConsumer avance)
+            throws IOException {
         HttpClient cliente = HttpClient.newBuilder()
                 .followRedirects(HttpClient.Redirect.NORMAL)
                 .connectTimeout(Duration.ofSeconds(20))
@@ -173,7 +284,10 @@ public final class GestorHerramientasService {
             throw new IOException("La descarga fue interrumpida.", e);
         }
         if (respuesta.statusCode() / 100 != 2) {
-            throw new IOException("El servidor respondió con el código " + respuesta.statusCode() + ".");
+            try (InputStream cuerpo = respuesta.body()) {
+                // Se cierra el cuerpo para liberar la conexion antes de reintentar.
+            }
+            throw new ErrorServidorHerramienta(herramienta, respuesta.statusCode());
         }
 
         long total = respuesta.headers().firstValueAsLong("Content-Length").orElse(-1);
@@ -264,11 +378,25 @@ public final class GestorHerramientasService {
         return Math.round(Math.max(0, Math.min(1, fraccion)) * 100) + "%";
     }
 
+    private static final String SUGERENCIA_ARCHIVOS =
+            " Mientras tanto puedes usar «Añadir archivos» o arrastrar tus MP3/WAV a la lista.";
+
     private static String mensajeAmigable(Exception e) {
+        if (e instanceof ErrorServidorHerramienta fallo) {
+            String que = "yt-dlp".equals(fallo.herramienta())
+                    ? "el motor de descarga (yt-dlp)" : "el conversor de audio (ffmpeg)";
+            if (transitorio(fallo.codigo())) {
+                return "El servidor que aloja " + que + " no está disponible ahora mismo (error "
+                        + fallo.codigo() + "), incluso tras varios reintentos. Esto no depende del enlace "
+                        + "de música. Espera unos segundos e inténtalo de nuevo." + SUGERENCIA_ARCHIVOS;
+            }
+            return "No se pudo descargar " + que + " (el servidor respondió con el código "
+                    + fallo.codigo() + "). Inténtalo de nuevo más tarde." + SUGERENCIA_ARCHIVOS;
+        }
         if (e instanceof UnknownHostException || e instanceof ConnectException
                 || e instanceof HttpConnectTimeoutException || e instanceof HttpTimeoutException) {
             return "No se pudo conectar con el servidor para descargar las herramientas. "
-                    + "Comprueba tu conexión a internet e inténtalo de nuevo.";
+                    + "Comprueba tu conexión a internet e inténtalo de nuevo." + SUGERENCIA_ARCHIVOS;
         }
         String mensaje = e.getMessage();
         return mensaje == null || mensaje.isBlank()

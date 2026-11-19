@@ -4,6 +4,7 @@ import com.symmetry.desktop.model.OrigenPista;
 import com.symmetry.desktop.model.PistaAudio;
 import com.symmetry.desktop.service.ArchivoMultimediaService;
 import com.symmetry.desktop.service.DescargadorAudioService;
+import com.symmetry.desktop.service.DuracionPistaService;
 import com.symmetry.desktop.service.GestorDatos;
 import com.symmetry.desktop.service.GestorHerramientasService;
 import com.symmetry.desktop.service.ReproductorService;
@@ -17,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -34,6 +36,8 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.GridPane;
@@ -95,6 +99,8 @@ public class MusicaController implements Initializable, VistaConRefresco {
     @FXML
     private Button botonRepeticion;
     @FXML
+    private Button botonActualizarMotor;
+    @FXML
     private HBox panelDescarga;
     @FXML
     private ProgressBar progresoDescarga;
@@ -124,6 +130,8 @@ public class MusicaController implements Initializable, VistaConRefresco {
     private Slider sliderVolumen;
     @FXML
     private Label etiquetaVolumen;
+    @FXML
+    private Label etiquetaModoReproduccion;
 
     @Override
     public void initialize(URL ubicacion, ResourceBundle recursos) {
@@ -144,6 +152,16 @@ public class MusicaController implements Initializable, VistaConRefresco {
                 "La biblioteca está vacía. Añade archivos MP3/WAV, suéltalos aquí o descarga un enlace."));
         listaPistas.setRowFactory(tabla -> filaReproducible());
         configurarArrastreExterno();
+        // Enter reproduce la pista seleccionada (ademas del doble clic).
+        listaPistas.addEventFilter(KeyEvent.KEY_PRESSED, evento -> {
+            if (evento.getCode() == KeyCode.ENTER && !evento.isConsumed()) {
+                PistaAudio seleccionada = listaPistas.getSelectionModel().getSelectedItem();
+                if (seleccionada != null) {
+                    iniciar(seleccionada);
+                    evento.consume();
+                }
+            }
+        });
         listaPistas.getSelectionModel().selectedItemProperty()
                 .addListener((obs, anterior, actual) -> botonEliminarPista.setDisable(actual == null));
 
@@ -171,6 +189,8 @@ public class MusicaController implements Initializable, VistaConRefresco {
         listaPistas.setItems(FXCollections.observableArrayList(gestor.getDatos().getBibliotecaMusical()));
         etiquetaBiblioteca.setText(gestor.getDatos().getBibliotecaMusical().size()
                 + " pistas · .mp3, .wav, .m4a, .aac o enlaces");
+        // Duracion real (mm:ss) de las pistas locales que aun no la tienen, sin esperar a reproducirlas.
+        DuracionPistaService.completar(gestor.getDatos().getBibliotecaMusical(), listaPistas::refresh);
     }
 
     // ------------------------------------------------------------------
@@ -256,8 +276,9 @@ public class MusicaController implements Initializable, VistaConRefresco {
         if (activo) {
             botonAleatorio.getStyleClass().add("boton-media-activo");
         }
-        botonAleatorio.setTooltip(new Tooltip(
-                activo ? "Modo aleatorio activado" : "Modo aleatorio desactivado"));
+        botonAleatorio.setTooltip(new Tooltip(activo
+                ? "Aleatorio activado (pulsa para desactivar)" : "Activar modo aleatorio"));
+        actualizarEtiquetaModo();
     }
 
     private void actualizarBotonRepeticion() {
@@ -270,10 +291,22 @@ public class MusicaController implements Initializable, VistaConRefresco {
             botonRepeticion.getStyleClass().add("boton-media-activo");
         }
         botonRepeticion.setTooltip(new Tooltip(switch (modo) {
-            case DESACTIVADO -> "Repetición desactivada";
-            case TODAS -> "Repetir toda la lista";
-            case UNA -> "Repetir esta pista";
+            case DESACTIVADO -> "Repetición desactivada (pulsa para activar el bucle de lista)";
+            case TODAS -> "Bucle de lista activado (pulsa para repetir solo esta pista)";
+            case UNA -> "Repetir esta pista (pulsa para desactivar)";
         }));
+        actualizarEtiquetaModo();
+    }
+
+    /** Rotulo bajo los controles: el modo activo, siempre visible y coherente con el mini-reproductor. */
+    private void actualizarEtiquetaModo() {
+        etiquetaModoReproduccion.setText("Modo: " + servicio.descripcionModo());
+        boolean especial = servicio.isAleatorio()
+                || servicio.getModoRepeticion() != ReproductorService.ModoRepeticion.DESACTIVADO;
+        etiquetaModoReproduccion.getStyleClass().remove("etiqueta-modo-activo");
+        if (especial) {
+            etiquetaModoReproduccion.getStyleClass().add("etiqueta-modo-activo");
+        }
     }
 
     @FXML
@@ -623,7 +656,7 @@ public class MusicaController implements Initializable, VistaConRefresco {
                 error -> {
                     descargando = false;
                     mostrarPanelDescarga(false);
-                    Dialogos.error("Preparación de la descarga", error);
+                    mostrarFalloDescarga("No se pudo preparar la descarga", error);
                 });
     }
 
@@ -657,8 +690,64 @@ public class MusicaController implements Initializable, VistaConRefresco {
                 error -> {
                     descargando = false;
                     mostrarPanelDescarga(false);
-                    Dialogos.error("No se pudo descargar el enlace", error);
+                    mostrarFalloDescarga("No se pudo descargar el enlace", error);
                 });
+    }
+
+    /** Actualiza yt-dlp a su ultima version oficial bajo demanda. */
+    @FXML
+    private void actualizarMotor() {
+        if (descargando) {
+            Dialogos.info("Operación en curso", "Espera a que finalice la descarga actual.");
+            return;
+        }
+        descargando = true;
+        botonActualizarMotor.setDisable(true);
+        mostrarPanelDescarga(true);
+        progresoDescarga.setProgress(-1);
+        etiquetaDescarga.setText("Actualizando el motor de descarga…");
+        GestorHerramientasService.actualizarYtDlp(
+                (fraccion, mensaje) -> {
+                    etiquetaDescarga.setText(mensaje);
+                    progresoDescarga.setProgress(fraccion);
+                },
+                mensaje -> {
+                    terminarOperacionMotor();
+                    Dialogos.info("Motor de descarga", mensaje);
+                },
+                error -> {
+                    terminarOperacionMotor();
+                    mostrarFalloDescarga("No se pudo actualizar el motor", error);
+                });
+    }
+
+    private void terminarOperacionMotor() {
+        descargando = false;
+        botonActualizarMotor.setDisable(false);
+        mostrarPanelDescarga(false);
+    }
+
+    /**
+     * Muestra el fallo con salidas claras: reintentar tras actualizar el motor o seguir con
+     * archivos locales, de modo que el usuario nunca quede bloqueado por un servidor externo.
+     */
+    private void mostrarFalloDescarga(String titulo, String mensaje) {
+        ButtonType actualizar = new ButtonType("Actualizar motor", ButtonBar.ButtonData.LEFT);
+        ButtonType archivos = new ButtonType("Añadir archivos", ButtonBar.ButtonData.OTHER);
+        ButtonType cerrar = new ButtonType("Cerrar", ButtonBar.ButtonData.CANCEL_CLOSE);
+        Alert alerta = new Alert(Alert.AlertType.ERROR, mensaje, actualizar, archivos, cerrar);
+        alerta.setTitle(titulo);
+        alerta.setHeaderText(titulo);
+        alerta.initOwner(ventana());
+        Dialogos.aplicarEstilo(alerta.getDialogPane());
+        Optional<ButtonType> eleccion = alerta.showAndWait();
+        if (eleccion.isPresent()) {
+            if (eleccion.get() == actualizar) {
+                actualizarMotor();
+            } else if (eleccion.get() == archivos) {
+                agregarArchivos();
+            }
+        }
     }
 
     private void mostrarPanelDescarga(boolean mostrar) {

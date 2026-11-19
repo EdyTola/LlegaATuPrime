@@ -27,6 +27,8 @@
             <Button text="Añadir archivos" styleClass="boton-primario" onAction="#agregarArchivos"/>
             <Button text="Añadir carpeta" styleClass="boton-secundario" onAction="#agregarCarpeta"/>
             <Button text="Añadir enlace" styleClass="boton-secundario" onAction="#agregarEnlace"/>
+            <Button fx:id="botonActualizarMotor" text="Actualizar motor" styleClass="boton-secundario"
+                    onAction="#actualizarMotor"/>
             <Button fx:id="botonEliminarPista" text="Quitar de la lista" styleClass="boton-secundario"
                     onAction="#eliminarPista"/>
             <Button text="Vaciar biblioteca" styleClass="boton-peligro" onAction="#vaciarBiblioteca"/>
@@ -99,6 +101,9 @@
                     <Button fx:id="botonRepeticion" styleClass="boton-media" onAction="#cambiarRepeticion"/>
                 </children>
             </HBox>
+
+            <Label fx:id="etiquetaModoReproduccion" styleClass="etiqueta-modo" alignment="CENTER"
+                   maxWidth="Infinity"/>
 
             <HBox spacing="10" alignment="CENTER_LEFT">
                 <children>

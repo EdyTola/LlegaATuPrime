@@ -116,7 +116,22 @@ public enum PatronMovimiento {
     SUPERMAN("Superman", true, false, 3.6, 0.05, List.of(
             "Postura: boca abajo con el cuello neutro, mirando al suelo.",
             "Rango: eleva a la vez brazos y piernas unos centímetros y mantén un segundo.",
-            "Respiración: exhala al elevar e inspira al bajar sin dejar caer el cuerpo."));
+            "Respiración: exhala al elevar e inspira al bajar sin dejar caer el cuerpo.")),
+
+    APERTURA_PECHO("Aperturas en máquina (pec deck)", false, true, 3.6, 0.0, List.of(
+            "Postura: espalda y cabeza apoyadas en el respaldo, codos ligeramente semiflexionados y fijos a la altura del pecho, antebrazos sobre las almohadillas.",
+            "Rango: abre los brazos de forma controlada hasta notar el estiramiento del pecho, sin pasar la línea de los hombros, y júntalos al frente apretando el pecho.",
+            "Respiración: inspira al abrir y exhala al juntar los brazos; no cambies el ángulo de los codos ni encojas los hombros.")),
+
+    EXTENSION_CUADRICEPS("Extensión de cuádriceps", true, false, 3.6, 0.0, List.of(
+            "Postura: sentado con la espalda apoyada, rodillas alineadas con el eje de la máquina y el rodillo sobre la parte baja de las espinillas.",
+            "Rango: extiende las rodillas hasta casi bloquearlas, aprieta el cuádriceps un segundo y baja lento sin dejar caer la pila.",
+            "Respiración: exhala al extender e inspira al bajar controlando el peso (2-3 segundos).")),
+
+    BURPEE("Burpee", true, false, 5.0, 0.1, List.of(
+            "Postura: al bajar apoya las manos junto a los pies y lleva los pies atrás con el cuerpo en línea.",
+            "Rango: pecho cerca del suelo en la flexión y vuelta explosiva a la posición de pie.",
+            "Respiración: exhala al empujar el suelo y al incorporarte; no contengas el aire."));
 
     private final String titulo;
     private final boolean concentricaAlSubir;

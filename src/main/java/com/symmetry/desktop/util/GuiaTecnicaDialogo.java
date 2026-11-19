@@ -1,6 +1,7 @@
 package com.symmetry.desktop.util;
 
 import com.symmetry.desktop.model.Ejercicio;
+import com.symmetry.desktop.model.ModalidadEntrenamiento;
 import com.symmetry.desktop.model.PatronMovimiento;
 import com.symmetry.desktop.service.GuiaTecnicaService;
 import javafx.geometry.Insets;
@@ -45,8 +46,19 @@ public final class GuiaTecnicaDialogo {
      */
     public static void mostrar(Ejercicio ejercicio, String nombre, Window propietario,
                                Consumer<String> alAdjuntar) {
+        mostrar(ejercicio, nombre, null, propietario, alAdjuntar);
+    }
+
+    /**
+     * @param modalidad modalidad activa (con/sin equipo); {@code null} la infiere del ejercicio
+     */
+    public static void mostrar(Ejercicio ejercicio, String nombre, ModalidadEntrenamiento modalidad,
+                               Window propietario, Consumer<String> alAdjuntar) {
         String titulo = nombre == null || nombre.isBlank() ? ejercicio.getNombre() : nombre;
-        PatronMovimiento patron = GuiaTecnicaService.detectar(titulo, ejercicio.getGrupoMuscular());
+        ModalidadEntrenamiento modo = modalidad != null ? modalidad
+                : (ejercicio.getAdaptadoDe() != null ? ModalidadEntrenamiento.CASA : ModalidadEntrenamiento.GIMNASIO);
+        GuiaTecnicaService.Perfil perfil = GuiaTecnicaService.perfil(titulo, ejercicio.getGrupoMuscular(), modo);
+        PatronMovimiento patron = perfil.patron();
 
         Dialog<ButtonType> dialogo = new Dialog<>();
         dialogo.setTitle("Guía técnica");
@@ -60,18 +72,18 @@ public final class GuiaTecnicaDialogo {
 
         Label etiquetaTitulo = new Label(titulo);
         etiquetaTitulo.getStyleClass().add("titulo-seccion");
-        Label etiquetaPatron = new Label(patron.getTitulo()
+        Label etiquetaPatron = new Label(GuiaTecnicaService.titulo(perfil) + "  ·  " + perfil.implemento().getEtiqueta()
                 + (ejercicio.getGrupoMuscular() == null ? "" : "  ·  " + ejercicio.getGrupoMuscular().getEtiqueta())
                 + "  ·  " + ejercicio.getPrescripcion());
         etiquetaPatron.getStyleClass().add("texto-secundario");
 
         // ----- Pestana 1: modelo 2D animado -----
-        ExerciseAnimator2D animador = new ExerciseAnimator2D(patron, ejercicio.getGrupoMuscular());
+        ExerciseAnimator2D animador = new ExerciseAnimator2D(perfil, ejercicio.getGrupoMuscular());
         VBox.setVgrow(animador, Priority.ALWAYS);
         HBox controles = crearControles(animador);
         VBox izquierda = new VBox(10, animador, controles);
         HBox.setHgrow(izquierda, Priority.ALWAYS);
-        HBox cuerpo2d = new HBox(18, izquierda, crearPuntosClave(patron));
+        HBox cuerpo2d = new HBox(18, izquierda, crearPuntosClave(GuiaTecnicaService.puntosClave(perfil)));
         cuerpo2d.setPadding(new Insets(12, 4, 4, 4));
         Tab pestana2d = new Tab("Modelo 2D animado", cuerpo2d);
         pestana2d.setClosable(false);
@@ -158,12 +170,12 @@ public final class GuiaTecnicaDialogo {
     }
 
     /** Lista numerada con los 3 puntos clave de ejecucion del patron. */
-    private static VBox crearPuntosClave(PatronMovimiento patron) {
+    private static VBox crearPuntosClave(java.util.List<String> puntos) {
         Label titulo = new Label("Puntos clave de ejecución");
         titulo.getStyleClass().add("titulo-seccion");
         VBox lista = new VBox(12);
         int n = 1;
-        for (String punto : patron.getPuntosClave()) {
+        for (String punto : puntos) {
             Label numero = new Label(String.valueOf(n++));
             numero.getStyleClass().add("guia-numero");
             numero.setMinSize(24, 24);

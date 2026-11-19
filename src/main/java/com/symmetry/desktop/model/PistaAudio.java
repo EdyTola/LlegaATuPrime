@@ -53,7 +53,7 @@ public class PistaAudio {
             return "—";
         }
         int total = (int) Math.round(duracionSegundos);
-        return String.format("%d:%02d", total / 60, total % 60);
+        return String.format("%02d:%02d", total / 60, total % 60);
     }
 
     public String getId() {

@@ -32,7 +32,14 @@ import java.util.function.Consumer;
  */
 public final class ReproductorService {
 
-    /** Modos de repeticion, recorridos en ciclo al pulsar el boton correspondiente. */
+    /**
+     * Modos de repeticion, recorridos en ciclo al pulsar el boton correspondiente. {@code TODAS}
+     * es el bucle de la lista y {@code UNA} repite la pista actual.
+     *
+     * <p>Los modos de reproduccion son mutuamente excluyentes: normal (se detiene al final de la
+     * lista), aleatorio (continuo), bucle de lista y repetir pista. Activar uno desactiva los
+     * demas, por lo que al terminar una pista siempre hay una unica accion posible.</p>
+     */
     public enum ModoRepeticion { DESACTIVADO, TODAS, UNA }
 
     private static final ReproductorService INSTANCIA = new ReproductorService();
@@ -259,7 +266,7 @@ public final class ReproductorService {
         if (pistas.isEmpty()) {
             return;
         }
-        reproducir(pistas.get(indiceSiguiente()));
+        reproducirDesde(indiceSiguiente(), pistas);
     }
 
     public void anterior() {
@@ -269,7 +276,7 @@ public final class ReproductorService {
         }
         int indice = indiceDe(pistaActual.get());
         int anterior = indice <= 0 ? pistas.size() - 1 : indice - 1;
-        reproducir(pistas.get(anterior));
+        reproducirDesde(anterior, pistas);
     }
 
     /** Desplaza la reproduccion a un segundo concreto de la pista actual. */
@@ -291,18 +298,39 @@ public final class ReproductorService {
         reproduciendo.set(false);
     }
 
-    /** Activa o desactiva el modo aleatorio. */
+    /** Activa o desactiva el modo aleatorio; al activarlo se desactiva cualquier repeticion. */
     public void alternarAleatorio() {
-        aleatorio.set(!aleatorio.get());
+        boolean activar = !aleatorio.get();
+        if (activar) {
+            modoRepeticion.set(ModoRepeticion.DESACTIVADO);
+        }
+        aleatorio.set(activar);
     }
 
-    /** Recorre los modos de repeticion: desactivado, toda la lista y esta pista. */
+    /**
+     * Recorre los modos de repeticion: desactivado, bucle de lista y repetir pista. Elegir uno
+     * desactiva el modo aleatorio (si estaba activo, el primer pulso pasa a bucle de lista).
+     */
     public void ciclarRepeticion() {
-        modoRepeticion.set(switch (modoRepeticion.get()) {
+        ModoRepeticion actual = aleatorio.get() ? ModoRepeticion.DESACTIVADO : modoRepeticion.get();
+        aleatorio.set(false);
+        modoRepeticion.set(switch (actual) {
             case DESACTIVADO -> ModoRepeticion.TODAS;
             case TODAS -> ModoRepeticion.UNA;
             case UNA -> ModoRepeticion.DESACTIVADO;
         });
+    }
+
+    /** Descripcion corta del modo de reproduccion activo, para tooltips y rotulos. */
+    public String descripcionModo() {
+        if (aleatorio.get()) {
+            return "Aleatorio continuo";
+        }
+        return switch (modoRepeticion.get()) {
+            case TODAS -> "Bucle de lista";
+            case UNA -> "Repetir pista";
+            case DESACTIVADO -> "Normal (se detiene al final)";
+        };
     }
 
     // ------------------------------------------------------------------
@@ -338,30 +366,50 @@ public final class ReproductorService {
         return null;
     }
 
-    /** Avance automatico al terminar una pista, segun el modo de repeticion activo. */
+    /**
+     * Avance automatico al terminar una pista segun el modo activo (excluyentes):
+     * repetir pista reinicia la misma; aleatorio salta a otra al azar sin parar; bucle de lista
+     * sigue el orden y vuelve al inicio; normal se detiene al terminar la ultima.
+     */
     private void avanzarAutomaticamente() {
-        if (modoRepeticion.get() == ModoRepeticion.UNA && reproductor != null) {
+        List<PistaAudio> pistas = lista();
+        if (pistas.isEmpty() || reproductor == null) {
+            return;
+        }
+        if (modoRepeticion.get() == ModoRepeticion.UNA) {
             reproductor.seek(Duration.ZERO);
             reproductor.play();
             return;
         }
-        List<PistaAudio> pistas = lista();
-        if (pistas.isEmpty()) {
-            return;
-        }
         int indice = indiceDe(pistaActual.get());
-        if (aleatorio.get() && pistas.size() > 1) {
-            reproducir(pistas.get(indiceSiguiente()));
+        if (aleatorio.get()) {
+            if (pistas.size() == 1) {
+                reproductor.seek(Duration.ZERO);
+                reproductor.play();
+            } else {
+                reproducirDesde(indiceSiguiente(), pistas);
+            }
             return;
         }
-        if (indice >= 0 && indice < pistas.size() - 1) {
-            reproducir(pistas.get(indice + 1));
+        boolean hayMas = indice >= 0 && indice < pistas.size() - 1;
+        if (hayMas) {
+            reproducirDesde(indice + 1, pistas);
         } else if (modoRepeticion.get() == ModoRepeticion.TODAS) {
-            reproducir(pistas.get(0));
+            reproducirDesde(0, pistas);
         } else {
             reproduciendo.set(false);
             progresoSegundos.set(duracionSegundos.get());
         }
+    }
+
+    /** Reproduce desde el indice dado, saltando las pistas que ya no se pueden abrir. */
+    private void reproducirDesde(int inicio, List<PistaAudio> pistas) {
+        for (int i = 0; i < pistas.size(); i++) {
+            if (reproducir(pistas.get((inicio + i) % pistas.size()))) {
+                return;
+            }
+        }
+        reproduciendo.set(false);
     }
 
     /** Indice de la siguiente pista respetando el modo aleatorio. */

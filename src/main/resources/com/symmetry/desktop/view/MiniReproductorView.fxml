@@ -36,9 +36,11 @@
             </children>
         </VBox>
 
+        <Button fx:id="miniAleatorio" styleClass="boton-media-mini" onAction="#alternarAleatorio"/>
         <Button fx:id="miniAnterior" styleClass="boton-media-mini" onAction="#anterior"/>
         <Button fx:id="miniReproducir" styleClass="boton-media-mini-principal" onAction="#alternar"/>
         <Button fx:id="miniSiguiente" styleClass="boton-media-mini" onAction="#siguiente"/>
+        <Button fx:id="miniRepeticion" styleClass="boton-media-mini" onAction="#cambiarRepeticion"/>
 
         <Label fx:id="miniTiempo" styleClass="mini-tiempo" minWidth="96"/>
         <Slider fx:id="miniProgreso" min="0" max="100" value="0" HBox.hgrow="ALWAYS"/>
