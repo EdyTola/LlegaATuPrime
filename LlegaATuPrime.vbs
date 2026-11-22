@@ -90,8 +90,8 @@ Sub Compilar()
     Dim mvn, comando, codigo, env, q
     mvn = BuscarMaven()
     If mvn = "" Then
-        Salir "No se encontro Maven (mvn.cmd) y la aplicacion necesita compilarse." & vbCrLf & _
-              "Instala Maven y vuelve a abrir este archivo."
+        Salir "No se encontro Maven y la aplicacion necesita compilarse." & vbCrLf & _
+              "Asegurate de que el archivo mvnw.cmd exista en la carpeta del proyecto."
     End If
 
     Set env = sh.Environment("Process")
@@ -130,8 +130,13 @@ End Function
 
 Function BuscarMaven()
     Dim ruta
+    ' 1. Maven Wrapper del propio proyecto (descarga automaticamente si no existe)
+    ruta = raiz & "\mvnw.cmd"
+    If fso.FileExists(ruta) Then BuscarMaven = ruta: Exit Function
+    ' 2. mvn en el PATH del sistema
     BuscarMaven = BuscarEnPath("mvn.cmd")
     If BuscarMaven <> "" Then Exit Function
+    ' 3. Rutas de instalacion manual conocidas
     ruta = sh.ExpandEnvironmentStrings("%ProgramFiles%") & "\apache-maven-3.9.14\bin\mvn.cmd"
     If fso.FileExists(ruta) Then BuscarMaven = ruta: Exit Function
     ruta = sh.ExpandEnvironmentStrings("%TEMP%") & "\bey-buildtools\apache-maven-3.9.9\bin\mvn.cmd"
