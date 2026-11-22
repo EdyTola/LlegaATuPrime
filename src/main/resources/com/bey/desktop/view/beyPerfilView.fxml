@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bey.desktop.controller.beyPerfilController"
+      styleClass="contenido-vista" spacing="0">
+
+    <ScrollPane fitToWidth="true" styleClass="scroll-fondo" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="16">
+                <children>
+
+                    <HBox styleClass="toolbar-vista" spacing="12" alignment="CENTER_LEFT">
+                        <children>
+                            <VBox spacing="3" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Perfil de usuario" styleClass="titulo-seccion"/>
+                                    <Label text="Gestiona tus datos personales y cambia entre los distintos usuarios locales."
+                                           styleClass="texto-secundario" wrapText="true"/>
+                                </children>
+                            </VBox>
+                            <Button text="Guardar cambios" styleClass="boton-primario"
+                                    onAction="#beyGuardarCambios"/>
+                        </children>
+                    </HBox>
+
+                    <HBox spacing="16" alignment="TOP_LEFT">
+                        <children>
+
+                            <VBox styleClass="tarjeta" spacing="16" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label text="Datos personales" styleClass="titulo-seccion"/>
+                                    <HBox spacing="20" alignment="TOP_LEFT">
+                                        <children>
+                                            <StackPane fx:id="beyMarcoAvatar" styleClass="avatar-perfil"
+                                                       minWidth="104" minHeight="104"
+                                                       maxWidth="104" maxHeight="104">
+                                                <children>
+                                                    <ImageView fx:id="beyImagenAvatar" fitWidth="104" fitHeight="104"
+                                                               preserveRatio="true" visible="false"/>
+                                                    <Label fx:id="beyEtiquetaIniciales" styleClass="avatar-iniciales"/>
+                                                </children>
+                                            </StackPane>
+
+                                            <VBox spacing="10" HBox.hgrow="ALWAYS">
+                                                <children>
+                                                    <GridPane hgap="12" vgap="10">
+                                                        <columnConstraints>
+                                                            <ColumnConstraints minWidth="120" prefWidth="120"/>
+                                                            <ColumnConstraints hgrow="ALWAYS" minWidth="240"/>
+                                                        </columnConstraints>
+                                                        <children>
+                                                            <Label text="Nombre" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                                            <TextField fx:id="beyCampoNombre" promptText="Nombre completo"
+                                                                       GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                                                            <Label text="Edad" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                                                            <Spinner fx:id="beySpinnerEdad" editable="true" maxWidth="140"
+                                                                     GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                                                            <Label text="Objetivo general" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                                                            <TextArea fx:id="beyCampoObjetivo" prefRowCount="2" wrapText="true"
+                                                                      promptText="Ej. Ganar masa muscular manteniendo grasa controlada"
+                                                                      GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                                                            <Label text="Frase de poder" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                                                            <TextField fx:id="beyCampoFrase"
+                                                                       promptText="Tu frase u objetivo personal (máx. 140 caracteres)"
+                                                                       GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                                                        </children>
+                                                    </GridPane>
+
+                                                    <VBox styleClass="tarjeta-frase" spacing="4">
+                                                        <children>
+                                                            <Label fx:id="beyVistaFraseTexto" styleClass="frase-texto" wrapText="true"/>
+                                                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                                                <children>
+                                                                    <Label fx:id="beyVistaFraseAutor" styleClass="frase-autor"/>
+                                                                    <Region HBox.hgrow="ALWAYS"/>
+                                                                    <Label fx:id="beyContadorFrase" styleClass="texto-secundario"/>
+                                                                </children>
+                                                            </HBox>
+                                                        </children>
+                                                    </VBox>
+
+                                                    <HBox spacing="8" alignment="CENTER_LEFT">
+                                                        <children>
+                                                            <Button text="Seleccionar foto" styleClass="boton-secundario"
+                                                                    onAction="#beySeleccionarFoto"/>
+                                                            <Button fx:id="beyBotonQuitarFoto" text="Quitar foto"
+                                                                    styleClass="boton-secundario" onAction="#beyQuitarFoto"/>
+                                                            <Region HBox.hgrow="ALWAYS" minWidth="12"/>
+                                                            <Label fx:id="beyEtiquetaFechaRegistro" styleClass="texto-secundario"/>
+                                                        </children>
+                                                    </HBox>
+                                                </children>
+                                            </VBox>
+                                        </children>
+                                    </HBox>
+                                    <Label fx:id="beyEtiquetaErrorPerfil" styleClass="texto-error" wrapText="true"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta" spacing="12" prefWidth="330" minWidth="300">
+                                <children>
+                                    <Label text="Metas diarias" styleClass="titulo-seccion"/>
+                                    <Label text="Estos objetivos alimentan el panel de nutrición y descanso."
+                                           styleClass="texto-secundario" wrapText="true"/>
+                                    <GridPane hgap="12" vgap="10">
+                                        <columnConstraints>
+                                            <ColumnConstraints minWidth="150" prefWidth="160"/>
+                                            <ColumnConstraints hgrow="ALWAYS" minWidth="110"/>
+                                        </columnConstraints>
+                                        <children>
+                                            <Label text="Proteína (g)" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                                            <Spinner fx:id="beySpinnerProteina" editable="true"
+                                                     GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                                            <Label text="Calorías (kcal)" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                                            <Spinner fx:id="beySpinnerCalorias" editable="true"
+                                                     GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                                            <Label text="Agua (ml)" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                                            <Spinner fx:id="beySpinnerAgua" editable="true"
+                                                     GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+
+                                            <Label text="Creatina (g)" GridPane.columnIndex="0" GridPane.rowIndex="3"/>
+                                            <Spinner fx:id="beySpinnerCreatina" editable="true"
+                                                     GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+
+                                            <Label text="Sueño mínimo (h)" GridPane.columnIndex="0" GridPane.rowIndex="4"/>
+                                            <Spinner fx:id="beySpinnerSuenoMin" editable="true"
+                                                     GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+
+                                            <Label text="Sueño máximo (h)" GridPane.columnIndex="0" GridPane.rowIndex="5"/>
+                                            <Spinner fx:id="beySpinnerSuenoMax" editable="true"
+                                                     GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                                        </children>
+                                    </GridPane>
+
+                                    <Label text="Efectos de sonido" styleClass="titulo-seccion"/>
+                                    <CheckBox fx:id="beyCheckSfx" text="Sonidos de logro y celebración"/>
+                                    <HBox spacing="10" alignment="CENTER_LEFT">
+                                        <children>
+                                            <Label text="Volumen" styleClass="texto-secundario"/>
+                                            <Slider fx:id="beySliderSfx" min="0" max="1" value="0.6" HBox.hgrow="ALWAYS"/>
+                                            <Button fx:id="beyBotonProbarSfx" text="Probar" styleClass="boton-secundario"
+                                                    onAction="#beyProbarSfx"/>
+                                        </children>
+                                    </HBox>
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+
+                    <VBox styleClass="tarjeta" spacing="12">
+                        <children>
+                            <HBox spacing="12" alignment="CENTER_LEFT">
+                                <children>
+                                    <Label text="Perfiles locales" styleClass="titulo-seccion" HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="beyEtiquetaEstadoPerfiles" styleClass="texto-secundario"/>
+                                </children>
+                            </HBox>
+                            <Label text="Cada usuario dispone de su propio archivo de datos: rutinas, progreso y métricas quedan aislados por perfil."
+                                   styleClass="texto-secundario" wrapText="true"/>
+                            <ListView fx:id="beyListaPerfiles" prefHeight="170"/>
+                            <HBox spacing="8" alignment="CENTER_LEFT">
+                                <children>
+                                    <Button text="Nuevo perfil" styleClass="boton-primario" onAction="#beyNuevoPerfil"/>
+                                    <Button fx:id="beyBotonUsarPerfil" text="Usar este perfil" styleClass="boton-acento"
+                                            onAction="#beyUsarPerfil"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Button fx:id="beyBotonEliminarPerfil" text="Eliminar perfil" styleClass="boton-peligro"
+                                            onAction="#beyEliminarPerfil"/>
+                                </children>
+                            </HBox>
+                        </children>
+                    </VBox>
+
+                </children>
+            </VBox>
+        </content>
+    </ScrollPane>
+</VBox>

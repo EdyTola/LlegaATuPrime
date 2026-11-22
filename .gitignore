@@ -1,8 +1,6 @@
-# Compilados de Maven
 target/
 *.class
 
-# Entornos de desarrollo (IDE)
 .idea/
 *.iml
 .vscode/
@@ -10,6 +8,5 @@ target/
 .classpath
 .project
 
-# Sistema operativo
 .DS_Store
 Thumbs.db

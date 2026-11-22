@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bey.desktop.controller.beyMusicaController"
+      styleClass="contenido-vista" spacing="16">
+
+    <HBox styleClass="toolbar-vista" spacing="10" alignment="CENTER_LEFT">
+        <children>
+            <Button text="Añadir archivos" styleClass="boton-primario" onAction="#beyAgregarArchivos"/>
+            <Button text="Añadir carpeta" styleClass="boton-secundario" onAction="#beyAgregarCarpeta"/>
+            <Button text="Añadir enlace" styleClass="boton-secundario" onAction="#beyAgregarEnlace"/>
+            <Button fx:id="beyBotonActualizarMotor" text="Actualizar motor" styleClass="boton-secundario"
+                    onAction="#beyActualizarMotor"/>
+            <Button fx:id="beyBotonEliminarPista" text="Quitar de la lista" styleClass="boton-secundario"
+                    onAction="#beyEliminarPista"/>
+            <Button text="Vaciar biblioteca" styleClass="boton-peligro" onAction="#beyVaciarBiblioteca"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="beyEtiquetaBiblioteca" styleClass="texto-secundario"/>
+        </children>
+    </HBox>
+
+    <Label text="Haz doble clic en una pista para reproducirla, arrastra las filas para reordenar la lista o suelta archivos MP3/WAV desde el explorador."
+           styleClass="texto-secundario"/>
+
+    <HBox fx:id="beyPanelDescarga" styleClass="panel-descarga" spacing="12" alignment="CENTER_LEFT"
+          visible="false" managed="false">
+        <children>
+            <ProgressBar fx:id="beyProgresoDescarga" progress="0" prefWidth="220"/>
+            <Label fx:id="beyEtiquetaDescarga" styleClass="texto-secundario"/>
+        </children>
+    </HBox>
+
+    <TableView fx:id="beyListaPistas" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="beyColumnaPortada" text="" prefWidth="96"
+                         sortable="false" resizable="false"/>
+            <TableColumn fx:id="beyColumnaTitulo" text="Título" prefWidth="330"/>
+            <TableColumn fx:id="beyColumnaArtista" text="Artista" prefWidth="180"/>
+            <TableColumn fx:id="beyColumnaOrigen" text="Origen" prefWidth="130"/>
+            <TableColumn fx:id="beyColumnaDuracion" text="Duración" prefWidth="100"/>
+            <TableColumn fx:id="beyColumnaAcciones" text="Acciones" prefWidth="90"
+                         minWidth="70" sortable="false" resizable="false"/>
+        </columns>
+    </TableView>
+
+    <VBox styleClass="reproductor-tarjeta" spacing="12">
+        <children>
+
+            <HBox fx:id="beyZonaEspectro" alignment="CENTER" minHeight="84"/>
+
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <children>
+                    <StackPane fx:id="beyMarcoPortada" styleClass="portada-reproductor"
+                               minWidth="76" minHeight="76" prefWidth="76" prefHeight="76"
+                               maxWidth="76" maxHeight="76">
+                        <children>
+                            <Label fx:id="beySimboloPortada" text="&#9835;" styleClass="portada-simbolo"/>
+                            <ImageView fx:id="beyPortadaActual" fitWidth="76" fitHeight="76"
+                                       preserveRatio="true" smooth="true"/>
+                        </children>
+                    </StackPane>
+                    <VBox spacing="3" HBox.hgrow="ALWAYS">
+                        <children>
+                            <Label fx:id="beyEtiquetaTituloPista" text="Sin pista en reproducción"
+                                   styleClass="reproductor-titulo"/>
+                            <Label fx:id="beyEtiquetaArtista" styleClass="texto-secundario"/>
+                        </children>
+                    </VBox>
+                </children>
+            </HBox>
+
+            <HBox spacing="12" alignment="CENTER">
+                <children>
+                    <Button fx:id="beyBotonAleatorio" styleClass="boton-media" onAction="#beyAlternarAleatorio"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="beyBotonAnterior" styleClass="boton-media" onAction="#beyAnterior"/>
+                    <Button fx:id="beyBotonReproducir" styleClass="boton-media-principal"
+                            onAction="#beyAlternarReproduccion"/>
+                    <Button fx:id="beyBotonSiguiente" styleClass="boton-media" onAction="#beySiguiente"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button fx:id="beyBotonRepeticion" styleClass="boton-media" onAction="#beyCambiarRepeticion"/>
+                </children>
+            </HBox>
+
+            <Label fx:id="beyEtiquetaModoReproduccion" styleClass="etiqueta-modo" alignment="CENTER"
+                   maxWidth="Infinity"/>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <children>
+                    <Label fx:id="beyEtiquetaTiempoActual" text="00:00" styleClass="texto-secundario"
+                           minWidth="48"/>
+                    <Slider fx:id="beySliderProgreso" min="0" max="100" value="0" HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="beyEtiquetaTiempoTotal" text="00:00" styleClass="texto-secundario"
+                           minWidth="48"/>
+                </children>
+            </HBox>
+
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <children>
+                    <Label text="Volumen" styleClass="texto-secundario"/>
+                    <Slider fx:id="beySliderVolumen" min="0" max="1" value="0.8" prefWidth="220"/>
+                    <Label fx:id="beyEtiquetaVolumen" styleClass="texto-secundario" minWidth="48"/>
+                </children>
+            </HBox>
+        </children>
+    </VBox>
+</VBox>

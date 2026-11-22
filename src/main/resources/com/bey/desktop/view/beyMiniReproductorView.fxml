@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<HBox fx:id="beyRaizMini" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bey.desktop.controller.beyMiniReproductorController"
+      styleClass="mini-reproductor" alignment="CENTER_LEFT" spacing="14"
+      visible="false" managed="false">
+    <children>
+        <StackPane fx:id="beyMarcoMiniPortada" styleClass="mini-portada"
+                   minWidth="44" minHeight="44" prefWidth="44" prefHeight="44"
+                   maxWidth="44" maxHeight="44">
+            <children>
+                <Label fx:id="beySimboloMiniPortada" text="&#9835;" styleClass="mini-portada-simbolo"/>
+                <ImageView fx:id="beyMiniPortada" fitWidth="44" fitHeight="44"
+                           preserveRatio="true" smooth="true"/>
+            </children>
+        </StackPane>
+
+        <VBox spacing="2" minWidth="170" prefWidth="230" maxWidth="270">
+            <children>
+                <Label fx:id="beyMiniTitulo" styleClass="mini-titulo" maxWidth="Infinity"/>
+                <Label fx:id="beyMiniArtista" styleClass="mini-artista" maxWidth="Infinity"/>
+            </children>
+        </VBox>
+
+        <Button fx:id="beyMiniAleatorio" styleClass="boton-media-mini" onAction="#beyAlternarAleatorio"/>
+        <Button fx:id="beyMiniAnterior" styleClass="boton-media-mini" onAction="#beyAnterior"/>
+        <Button fx:id="beyMiniReproducir" styleClass="boton-media-mini-principal" onAction="#beyAlternar"/>
+        <Button fx:id="beyMiniSiguiente" styleClass="boton-media-mini" onAction="#beySiguiente"/>
+        <Button fx:id="beyMiniRepeticion" styleClass="boton-media-mini" onAction="#beyCambiarRepeticion"/>
+
+        <Label fx:id="beyMiniTiempo" styleClass="mini-tiempo" minWidth="96"/>
+        <Slider fx:id="beyMiniProgreso" min="0" max="100" value="0" HBox.hgrow="ALWAYS"/>
+
+        <Region minWidth="10"/>
+        <Label text="&#128266;" styleClass="mini-volumen-icono"/>
+        <Slider fx:id="beyMiniVolumen" min="0" max="1" value="0.8" prefWidth="110"/>
+        <Button fx:id="beyMiniCerrar" styleClass="boton-media-mini" onAction="#beyCerrar"/>
+    </children>
+</HBox>

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.bey.desktop.controller.beyMainController"
+            styleClass="raiz">
+
+    <left>
+        <VBox fx:id="beyMenuLateral" styleClass="nav-lateral" prefWidth="250">
+            <children>
+                <HBox styleClass="nav-marca" spacing="12" alignment="CENTER_LEFT">
+                    <padding>
+                        <Insets top="22" right="18" bottom="16" left="18"/>
+                    </padding>
+                    <children>
+
+                        <StackPane fx:id="beyLogoMarca" minWidth="44" minHeight="44"
+                                   maxWidth="44" maxHeight="44"/>
+                        <VBox spacing="2">
+                            <children>
+                                <HBox alignment="BASELINE_LEFT" spacing="5">
+                                    <children>
+                                        <Label text="Llega a tu" styleClass="nav-marca-titulo"/>
+                                        <Label text="Prime" styleClass="nav-marca-acento"/>
+                                    </children>
+                                </HBox>
+                                <Label text="Rendimiento · Salud" styleClass="nav-marca-subtitulo"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </HBox>
+
+                <VBox styleClass="nav-items" spacing="4" VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets top="4" right="12" bottom="12" left="12"/>
+                    </padding>
+                    <children>
+                        <ToggleButton fx:id="beyBotonInicio" styleClass="nav-boton" text="Inicio"
+                                      maxWidth="Infinity" selected="true" contentDisplay="LEFT"
+                                      onAction="#beyMostrarInicio">
+                            <graphic>
+                                <Label text="&#8962;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="beyBotonEntrenamiento" styleClass="nav-boton" text="Entrenamiento"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarEntrenamiento">
+                            <graphic>
+                                <Label text="&#9635;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="beyBotonNutricion" styleClass="nav-boton" text="Nutricion e hidratacion"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarNutricion">
+                            <graphic>
+                                <Label text="&#9680;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="beyBotonMusica" styleClass="nav-boton" text="Musica local"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarMusica">
+                            <graphic>
+                                <Label text="&#9834;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="beyBotonProgreso" styleClass="nav-boton" text="Progreso y analiticas"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarProgreso">
+                            <graphic>
+                                <Label text="&#9650;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <ToggleButton fx:id="beyBotonPerfil" styleClass="nav-boton" text="Mi perfil"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarPerfil">
+                            <graphic>
+                                <SVGPath styleClass="nav-icono-svg"
+                                         content="M12,12 a4,4 0 1,0 0,-8 a4,4 0 1,0 0,8 Z M20,20 c0,-3.3 -3.6,-6 -8,-6 s-8,2.7 -8,6 Z"/>
+                            </graphic>
+                        </ToggleButton>
+                    </children>
+                </VBox>
+
+                <VBox styleClass="nav-pie" spacing="10">
+                    <padding>
+                        <Insets top="12" right="16" bottom="16" left="16"/>
+                    </padding>
+                    <children>
+
+                        <VBox fx:id="beyTarjetaNivelNav" styleClass="nav-nivel" spacing="6" onMouseClicked="#beyMostrarInicio">
+                            <children>
+                                <HBox spacing="8" alignment="CENTER_LEFT">
+                                    <children>
+                                        <Label fx:id="beyEtiquetaNivelNav" styleClass="nav-nivel-insignia"/>
+                                        <Label fx:id="beyEtiquetaTituloNav" styleClass="nav-nivel-titulo" HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                </HBox>
+                                <ProgressBar fx:id="beyBarraXpNav" styleClass="barra-xp" maxWidth="Infinity" progress="0"/>
+                                <Label fx:id="beyEtiquetaXpNav" styleClass="nav-pie-texto"/>
+                            </children>
+                        </VBox>
+                        <ToggleButton fx:id="beyBotonTema" styleClass="nav-tema" text="Modo oscuro"
+                                      maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyAlternarTema">
+                            <graphic>
+                                <Label fx:id="beyIconoTema" text="&#9789;" styleClass="nav-icono"/>
+                            </graphic>
+                        </ToggleButton>
+                        <VBox spacing="3">
+                            <children>
+                                <Label text="100% offline - datos locales" styleClass="nav-pie-texto"/>
+                                <Label fx:id="beyEtiquetaRutaDatos" styleClass="nav-pie-texto" wrapText="true"/>
+                            </children>
+                        </VBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <BorderPane styleClass="area-contenido">
+            <top>
+                <HBox styleClass="cabecera" alignment="CENTER_LEFT" spacing="12">
+                    <padding>
+                        <Insets top="18" right="26" bottom="18" left="26"/>
+                    </padding>
+                    <children>
+                        <Label fx:id="beyEtiquetaTituloSeccion" text="Inicio" styleClass="cabecera-titulo"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="beyEtiquetaFechaCabecera" styleClass="cabecera-fecha"/>
+                    </children>
+                </HBox>
+            </top>
+            <center>
+                <StackPane>
+                    <children>
+                        <StackPane fx:id="beyContenedorVistas" styleClass="contenedor-vistas"/>
+
+                        <StackPane fx:id="beyCapaCelebracion" pickOnBounds="false">
+                            <children>
+                                <Pane fx:id="beyCapaConfeti" mouseTransparent="true"/>
+                                <VBox fx:id="beyContenedorToasts" spacing="8" alignment="BOTTOM_RIGHT"
+                                      mouseTransparent="true" maxWidth="-Infinity" maxHeight="-Infinity"
+                                      StackPane.alignment="BOTTOM_RIGHT">
+                                    <padding>
+                                        <Insets top="0" right="22" bottom="22" left="0"/>
+                                    </padding>
+                                </VBox>
+                            </children>
+                        </StackPane>
+                    </children>
+                </StackPane>
+            </center>
+        </BorderPane>
+    </center>
+
+    <bottom>
+        <fx:include source="beyMiniReproductorView.fxml"/>
+    </bottom>
+
+</BorderPane>

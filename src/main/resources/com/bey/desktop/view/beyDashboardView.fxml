@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.bey.desktop.controller.beyDashboardController"
+      styleClass="contenido-vista" spacing="0">
+
+    <ScrollPane fitToWidth="true" styleClass="scroll-fondo" VBox.vgrow="ALWAYS">
+        <content>
+            <VBox spacing="18">
+                <children>
+
+                    <HBox styleClass="dash-hero" alignment="CENTER_LEFT" spacing="16">
+                        <children>
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label fx:id="beyEtiquetaSaludo" styleClass="titulo-principal"
+                                           text="Tu resumen de hoy"/>
+                                    <Label fx:id="beyEtiquetaFecha" styleClass="subtitulo"/>
+                                </children>
+                            </VBox>
+                            <Label fx:id="beyEtiquetaEstadoDia" styleClass="dash-hero-badge"/>
+                        </children>
+                    </HBox>
+
+                    <HBox styleClass="tarjeta-frase" spacing="14" alignment="CENTER_LEFT">
+                        <children>
+                            <Label text="&#8220;" styleClass="frase-comillas"/>
+                            <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <Label fx:id="beyEtiquetaFrase" styleClass="frase-texto" wrapText="true"/>
+                                    <Label fx:id="beyEtiquetaAutorFrase" styleClass="frase-autor"/>
+                                </children>
+                            </VBox>
+                            <Button text="&#8635;" styleClass="boton-icono" onAction="#beyOtraFrase">
+                                <tooltip>
+                                    <Tooltip text="Mostrar otra frase"/>
+                                </tooltip>
+                            </Button>
+                        </children>
+                    </HBox>
+
+                    <HBox styleClass="rpg-panel" spacing="24" alignment="CENTER_LEFT">
+                        <children>
+                            <HBox spacing="16" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS">
+                                <children>
+                                    <StackPane styleClass="rpg-medalla" minWidth="80" minHeight="80"
+                                               maxWidth="80" maxHeight="80">
+                                        <children>
+                                            <Label fx:id="beyEtiquetaNivelNumero" styleClass="rpg-medalla-numero"/>
+                                        </children>
+                                    </StackPane>
+                                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                        <children>
+                                            <Label fx:id="beyEtiquetaNivelTitulo" styleClass="rpg-titulo"/>
+                                            <ProgressBar fx:id="beyBarraXp" styleClass="barra-xp, barra-xp-grande"
+                                                         maxWidth="Infinity" progress="0"/>
+                                            <Label fx:id="beyEtiquetaXp" styleClass="texto-secundario"/>
+                                            <Label fx:id="beyEtiquetaXpResumen" styleClass="texto-secundario"/>
+                                        </children>
+                                    </VBox>
+                                </children>
+                            </HBox>
+                            <VBox spacing="2" minWidth="300" prefWidth="320">
+                                <children>
+                                    <Label text="Metas del día · XP" styleClass="rpg-subtitulo-meta"/>
+                                    <VBox fx:id="beyListaMetas" spacing="0"/>
+                                </children>
+                            </VBox>
+                        </children>
+                    </HBox>
+
+                    <VBox spacing="4">
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="10">
+                                <children>
+                                    <Label text="Retos flash y diarios" styleClass="titulo-seccion"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="beyEtiquetaRetosEstado" styleClass="texto-secundario"/>
+                                </children>
+                            </HBox>
+                            <Label text="Se sincronizan con tu entrenamiento del día: proponen movilidad, estiramientos y micro-hábitos de recuperación para la zona que trabajas, sin sumar más fatiga. Confírmalos al completarlos; los flash se renuevan cada 12 h y los diarios cada 24 h."
+                                   styleClass="texto-secundario" wrapText="true"/>
+                        </children>
+                    </VBox>
+
+                    <FlowPane fx:id="beyRejillaRetos" hgap="14" vgap="14" prefWrapLength="1000"/>
+
+                    <GridPane hgap="14" vgap="14">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="33.34" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                            <ColumnConstraints percentWidth="33.33" hgrow="ALWAYS"/>
+                        </columnConstraints>
+                        <children>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <children>
+                                    <Label text="Rutina de hoy" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="beyValorRutina" styleClass="valor-acento" wrapText="true"/>
+                                    <Label fx:id="beyDetalleRutina" styleClass="texto-secundario" wrapText="true"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                <children>
+                                    <Label text="Proteína" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="beyValorProteina" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="beyBarraProteina" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="beyDetalleProteina" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                <children>
+                                    <Label text="Calorías" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="beyValorCalorias" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="beyBarraCalorias" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="beyDetalleCalorias" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <children>
+                                    <Label text="Hidratación" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="beyValorHidratacion" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="beyBarraHidratacion" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="beyDetalleHidratacion" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                <children>
+                                    <Label text="Creatina" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="beyValorCreatina" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="beyBarraCreatina" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="beyDetalleCreatina" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                            <VBox styleClass="tarjeta-metrica" spacing="6" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                <children>
+                                    <Label text="Descanso" styleClass="etiqueta-metrica"/>
+                                    <Label fx:id="beyValorSueno" styleClass="valor-metrica"/>
+                                    <ProgressBar fx:id="beyBarraSueno" maxWidth="Infinity" progress="0"/>
+                                    <Label fx:id="beyDetalleSueno" styleClass="texto-secundario"/>
+                                </children>
+                            </VBox>
+
+                        </children>
+                    </GridPane>
+
+                    <VBox spacing="4">
+                        <children>
+                            <Label text="Recomendaciones basadas en evidencia" styleClass="titulo-seccion"/>
+                            <Label text="Consejos accionables sobre sobrecarga progresiva, descanso, hidratación y esfuerzo. Toca una tarjeta para ver el detalle."
+                                   styleClass="texto-secundario" wrapText="true"/>
+                        </children>
+                    </VBox>
+
+                    <FlowPane fx:id="beyRejillaConsejos" hgap="14" vgap="14" prefWrapLength="1000"/>
+
+                </children>
+            </VBox>
+        </content>
+    </ScrollPane>
+</VBox>

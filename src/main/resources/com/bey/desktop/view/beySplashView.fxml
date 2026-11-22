@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.bey.desktop.controller.beySplashController"
+           styleClass="splash-raiz">
+    <children>
+        <VBox styleClass="splash-panel" spacing="16" alignment="CENTER"
+              maxWidth="460" maxHeight="440">
+            <children>
+                <StackPane fx:id="beyMarcaSplash"/>
+
+                <HBox alignment="BASELINE_CENTER" spacing="10">
+                    <children>
+                        <Label text="Llega a tu" styleClass="splash-titulo-base"/>
+                        <Label text="Prime" styleClass="splash-titulo-acento"/>
+                    </children>
+                </HBox>
+
+                <Label text="ENTRENAMIENTO  ·  NUTRICIÓN  ·  HÁBITOS" styleClass="splash-lema"/>
+
+                <VBox spacing="10" alignment="CENTER">
+                    <VBox.margin>
+                        <Insets top="10"/>
+                    </VBox.margin>
+                    <children>
+                        <ProgressBar progress="-1" maxWidth="240" styleClass="splash-progreso"/>
+                        <Label text="Preparando tu mejor versión…" styleClass="splash-carga"/>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </children>
+</StackPane>

@@ -5,8 +5,8 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.symmetry</groupId>
-    <artifactId>symmetry-desktop</artifactId>
+    <groupId>com.bey</groupId>
+    <artifactId>bey-desktop</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
@@ -21,11 +21,11 @@
         <javafx.version>21.0.4</javafx.version>
         <jackson.version>2.17.2</jackson.version>
 
-        <main.class>com.symmetry.desktop.MainApp</main.class>
+        <main.class>com.bey.desktop.beyMainApp</main.class>
     </properties>
 
     <dependencies>
-        <!-- JavaFX: UI, FXML, graficos y multimedia (imagen, video y audio) -->
+
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -42,7 +42,6 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- Persistencia local en JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

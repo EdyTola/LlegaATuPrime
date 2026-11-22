@@ -1,20 +1,6 @@
-' ============================================================================
-'  Llega a tu Prime - lanzador SIN consola
-'
-'  Haz doble clic en este archivo para abrir la aplicacion. No se abre ninguna
-'  ventana de CMD: la app se inicia con javaw.exe y, si hace falta compilar
-'  (primera vez o tras cambiar el codigo), Maven se ejecuta oculto.
-'
-'  Opciones:
-'    LlegaATuPrime.vbs           inicia la app
-'    LlegaATuPrime.vbs /acceso   crea un acceso directo en el Escritorio
-'    LlegaATuPrime.vbs /build    fuerza recompilar antes de iniciar
-'
-'  Si algo falla, los detalles quedan en target\lanzador.log
-' ============================================================================
 Option Explicit
 
-Const CLASE_PRINCIPAL = "com.symmetry.desktop.MainApp"
+Const CLASE_PRINCIPAL = "com.bey.desktop.beyMainApp"
 
 Dim sh, fso, raiz, objetivo, archivoCp, archivoClase, registro
 Set sh = CreateObject("WScript.Shell")
@@ -24,7 +10,7 @@ raiz = fso.GetParentFolderName(WScript.ScriptFullName)
 sh.CurrentDirectory = raiz
 objetivo = raiz & "\target"
 archivoCp = objetivo & "\classpath.txt"
-archivoClase = objetivo & "\classes\com\symmetry\desktop\MainApp.class"
+archivoClase = objetivo & "\classes\com\bey\desktop\beyMainApp.class"
 registro = objetivo & "\lanzador.log"
 
 Dim javaw, forzar, opcion
@@ -51,8 +37,6 @@ End If
 Iniciar
 WScript.Quit 0
 
-' ----------------------------------------------------------------------------
-
 Sub Iniciar()
     Dim cp, partes, i, rutaModulos, rutaClases, argumentos
     cp = LeerArchivo(archivoCp)
@@ -73,9 +57,7 @@ Sub Iniciar()
         & " --module-path """ & rutaModulos & """" _
         & " --add-modules javafx.controls,javafx.fxml,javafx.media" _
         & " -cp """ & rutaClases & """ " & CLASE_PRINCIPAL
-    ' ShellExecute con ventana normal (1): javaw no tiene consola, asi que no se abre ningun CMD,
-    ' y la ventana principal de la app aparece visible y en primer plano (con WshShell.Run la
-    ' ventana podia quedar oculta o minimizada al heredar el estado de arranque).
+
     CreateObject("Shell.Application").ShellExecute javaw, argumentos, raiz, "open", 1
 End Sub
 
@@ -111,14 +93,14 @@ Sub Compilar()
         Salir "No se encontro Maven (mvn.cmd) y la aplicacion necesita compilarse." & vbCrLf & _
               "Instala Maven y vuelve a abrir este archivo."
     End If
-    ' Maven necesita JAVA_HOME: se deduce de la ruta de javaw.exe (...\bin\javaw.exe).
+
     Set env = sh.Environment("Process")
     If env("JAVA_HOME") = "" Then env("JAVA_HOME") = fso.GetParentFolderName(fso.GetParentFolderName(javaw))
     If fso.FileExists(archivoCp) Then fso.DeleteFile archivoCp, True
     q = Chr(34)
     comando = "cmd.exe /c " & q & q & mvn & q & " -q compile dependency:build-classpath" & _
               " -Dmdep.outputFile=" & q & archivoCp & q & " > " & q & registro & q & " 2>&1" & q
-    ' Oculto y esperando: el usuario no ve ninguna ventana.
+
     codigo = sh.Run(comando, 0, True)
     If codigo <> 0 Or Not fso.FileExists(archivoCp) Or Not fso.FileExists(archivoClase) Then
         Salir "No se pudo compilar la aplicacion (codigo " & codigo & ")." & vbCrLf & _
@@ -152,7 +134,7 @@ Function BuscarMaven()
     If BuscarMaven <> "" Then Exit Function
     ruta = sh.ExpandEnvironmentStrings("%ProgramFiles%") & "\apache-maven-3.9.14\bin\mvn.cmd"
     If fso.FileExists(ruta) Then BuscarMaven = ruta: Exit Function
-    ruta = sh.ExpandEnvironmentStrings("%TEMP%") & "\symmetry-buildtools\apache-maven-3.9.9\bin\mvn.cmd"
+    ruta = sh.ExpandEnvironmentStrings("%TEMP%") & "\bey-buildtools\apache-maven-3.9.9\bin\mvn.cmd"
     If fso.FileExists(ruta) Then BuscarMaven = ruta
 End Function
 

@@ -1,0 +1,2224 @@
+.root {
+    -color-fondo: #F3F3F3;
+    -color-superficie: #FFFFFF;
+    -color-superficie-alt: #FAFAFA;
+    -color-superficie-hover: #F5F4F3;
+    -color-tabla-cabecera: #FAF9F8;
+    -color-tabla-fila-hover: #F7F7F7;
+    -color-borde: #E1DFDD;
+    -color-borde-fuerte: #D2D0CE;
+    -color-separador: #F0EFEE;
+    -color-texto: #242424;
+    -color-texto-secundario: #605E5C;
+    -color-texto-deshabilitado: #9A9A9A;
+    -color-acento: #0078D4;
+    -color-acento-hover: #106EBE;
+    -color-acento-suave: #EFF6FC;
+    -color-acento-suave-hover: #DCEBF8;
+    -color-acento-borde: #CFE4F5;
+    -color-verde: #107C10;
+    -color-naranja: #CA5010;
+    -color-morado: #8764B8;
+    -color-teal: #038387;
+    -color-gris: #8A8886;
+    -color-rojo: #C42B1C;
+    -color-cian: #0A6EBD;
+    -color-menta: #0E8F6E;
+    -color-peligro-borde: #E8BFB9;
+    -color-peligro-suave: #FDF3F2;
+    -color-pista: #EDEBE9;
+    -color-grafico-fondo: #FCFCFC;
+    -color-grid: #EDEBE9;
+    -color-deshabilitado: #C7C7C7;
+    -color-sombra: rgba(0, 0, 0, 0.06);
+    -color-oro: #B7791F;
+    -color-oro-suave: #FFF6DD;
+    -color-oro-borde: #F1D58A;
+
+    -fx-font-family: "Inter", "Segoe UI Variable Text", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: -color-fondo;
+    -fx-text-fill: -color-texto;
+}
+
+.root.tema-oscuro {
+    -color-fondo: #0F0F0F;
+    -color-superficie: #181818;
+    -color-superficie-alt: #141414;
+    -color-superficie-hover: #232323;
+    -color-tabla-cabecera: #242424;
+    -color-tabla-fila-hover: #262626;
+    -color-borde: #333333;
+    -color-borde-fuerte: #3D3D3D;
+    -color-separador: #2A2A2A;
+    -color-texto: #F0F0F0;
+    -color-texto-secundario: #A8A8A8;
+    -color-texto-deshabilitado: #6E6E6E;
+    -color-acento: #0078D4;
+    -color-acento-hover: #2B88D8;
+    -color-acento-suave: #11293D;
+    -color-acento-suave-hover: #16354E;
+    -color-acento-borde: #1E4A6E;
+    -color-verde: #4CC265;
+    -color-naranja: #E8A33D;
+    -color-morado: #B79CE8;
+    -color-teal: #2AA0A4;
+    -color-gris: #9A9A9A;
+    -color-rojo: #F1707B;
+    -color-cian: #38BDF8;
+    -color-menta: #5EE2A6;
+    -color-peligro-borde: #5A2A2A;
+    -color-peligro-suave: #2A1616;
+    -color-pista: #2A2A2A;
+    -color-grafico-fondo: #191919;
+    -color-grid: #2A2A2A;
+    -color-deshabilitado: #4A4A4A;
+    -color-sombra: rgba(0, 0, 0, 0.5);
+    -color-oro: #F5B301;
+    -color-oro-suave: #2E2510;
+    -color-oro-borde: #5C4915;
+}
+
+.label {
+    -fx-text-fill: -color-texto;
+}
+
+.raiz {
+    -fx-background-color: -color-fondo;
+}
+
+.nav-lateral {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: transparent -color-borde transparent transparent;
+    -fx-border-width: 0 1 0 0;
+}
+
+.nav-marca-titulo {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+}
+
+.nav-marca-acento {
+    -fx-font-size: 19px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-menta;
+}
+
+.nav-marca-subtitulo {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.nav-boton {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-width: 0 0 0 3;
+    -fx-border-color: transparent;
+    -fx-text-fill: -color-texto;
+    -fx-font-size: 14px;
+    -fx-padding: 10 12 10 12;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+}
+
+.nav-boton:hover {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.nav-boton:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: transparent transparent transparent -color-acento;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.nav-boton:selected .nav-icono {
+    -fx-text-fill: -color-acento;
+}
+
+.nav-icono {
+    -fx-text-fill: -color-texto-secundario;
+    -fx-font-size: 15px;
+    -fx-min-width: 22px;
+}
+
+.nav-pie {
+    -fx-background-color: -color-superficie-alt;
+    -fx-border-color: -color-borde transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.nav-pie-texto {
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.nav-tema {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-width: 1px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-padding: 8 12 8 12;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-font-size: 12px;
+    -fx-alignment: center-left;
+    -fx-cursor: hand;
+}
+
+.nav-tema:hover {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.nav-tema:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.nav-tema:selected .nav-icono {
+    -fx-text-fill: -color-acento;
+}
+
+.area-contenido {
+    -fx-background-color: -color-fondo;
+}
+
+.cabecera {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: transparent transparent -color-borde transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.cabecera-titulo {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+}
+
+.cabecera-fecha {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.contenedor-vistas {
+    -fx-background-color: -color-fondo;
+}
+
+.scroll-fondo,
+.scroll-fondo .viewport {
+    -fx-background-color: transparent;
+}
+
+.contenido-vista {
+    -fx-padding: 22 24 28 24;
+    -fx-background-color: transparent;
+}
+
+.tarjeta {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 18px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
+}
+
+.tarjeta-compacta {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 14px;
+}
+
+.tarjeta-metrica {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
+}
+
+.tarjeta-acento {
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+}
+
+.panel-lista {
+    -fx-padding: 16px;
+}
+
+.titulo-principal {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+.titulo-seccion {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.subtitulo {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.texto-secundario {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.etiqueta-metrica {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.valor-metrica {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.valor-acento {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+}
+
+.cronometro {
+    -fx-font-family: "Consolas", "Segoe UI", monospace;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+}
+
+.etiqueta-descanso {
+    -fx-font-family: "Consolas", "Segoe UI", monospace;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-naranja;
+}
+
+.texto-error {
+    -fx-text-fill: -color-rojo;
+}
+
+.texto-exito {
+    -fx-text-fill: -color-verde;
+}
+
+.valor-exceso {
+    -fx-text-fill: -color-naranja;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 5px;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+    -fx-text-fill: -color-texto;
+    -fx-padding: 7 16 7 16;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.button:focused {
+    -fx-border-color: -color-acento;
+}
+
+.button:disabled {
+    -fx-opacity: 0.45;
+}
+
+.boton-primario {
+    -fx-background-color: -color-acento;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.boton-primario:hover {
+    -fx-background-color: -color-acento-hover;
+    -fx-border-color: -color-acento-hover;
+}
+
+.boton-primario:disabled {
+    -fx-background-color: -color-deshabilitado;
+    -fx-border-color: -color-deshabilitado;
+}
+
+.boton-acento {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.boton-acento:hover {
+    -fx-background-color: -color-acento-suave-hover;
+}
+
+.boton-secundario {
+    -fx-background-color: transparent;
+    -fx-border-color: -color-borde-fuerte;
+}
+
+.boton-secundario:hover {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.boton-peligro {
+    -fx-text-fill: -color-rojo;
+    -fx-border-color: -color-peligro-borde;
+    -fx-background-color: transparent;
+}
+
+.boton-peligro:hover {
+    -fx-background-color: -color-peligro-suave;
+}
+
+.boton-envase {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-font-size: 12px;
+    -fx-padding: 10 14 10 14;
+    -fx-text-alignment: center;
+}
+
+.boton-envase:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+}
+
+.boton-chip {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-background-radius: 14px;
+    -fx-border-radius: 14px;
+    -fx-padding: 4 14 4 14;
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-cursor: hand;
+}
+
+.boton-chip:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+}
+
+.boton-icono {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-font-size: 12px;
+    -fx-min-width: 28px;
+    -fx-min-height: 24px;
+    -fx-padding: 1 6 1 6;
+    -fx-cursor: hand;
+}
+
+.boton-icono:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+}
+
+.boton-icono-peligro {
+    -fx-text-fill: -color-rojo;
+}
+
+.boton-icono-peligro:hover {
+    -fx-background-color: -color-peligro-suave;
+    -fx-text-fill: -color-rojo;
+}
+
+.text-field,
+.text-area,
+.password-field {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 5px;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+    -fx-padding: 7 10 7 10;
+    -fx-text-fill: -color-texto;
+    -fx-prompt-text-fill: -color-texto-deshabilitado;
+}
+
+.text-field:focused,
+.text-area:focused {
+    -fx-border-color: -color-acento;
+}
+
+.text-area .content {
+    -fx-background-color: -color-superficie;
+}
+
+.combo-box,
+.choice-box,
+.spinner {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 5px;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1px;
+}
+
+.combo-box:focused,
+.spinner:focused {
+    -fx-border-color: -color-acento;
+}
+
+.combo-box .list-cell {
+    -fx-padding: 6 8 6 8;
+    -fx-text-fill: -color-texto;
+}
+
+.combo-box .list-view,
+.combo-box-popup .list-view {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde;
+}
+
+.spinner .text-field {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.spinner .increment-arrow-button,
+.spinner .decrement-arrow-button {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.date-picker .text-field {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.date-picker-popup {
+    -fx-background-color: -color-superficie;
+}
+
+.date-picker-popup .month-year-pane {
+    -fx-background-color: -color-superficie;
+}
+
+.check-box {
+    -fx-text-fill: -color-texto;
+}
+
+.check-box .box {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+    -fx-padding: 3px;
+}
+
+.check-box:selected .box {
+    -fx-background-color: -color-acento;
+    -fx-border-color: -color-acento;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.progress-bar {
+    -fx-pref-height: 8px;
+}
+
+.progress-bar > .track {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 4px;
+    -fx-background-insets: 0;
+}
+
+.progress-bar > .bar {
+    -fx-background-color: -color-acento;
+    -fx-background-radius: 4px;
+    -fx-background-insets: 0;
+    -fx-padding: 4px;
+}
+
+.progreso-verde > .bar {
+    -fx-background-color: -color-verde;
+}
+
+.progreso-naranja > .bar {
+    -fx-background-color: -color-naranja;
+}
+
+.progreso-azul > .bar {
+    -fx-background-color: -color-acento;
+}
+
+.progreso-completo > .bar {
+    -fx-background-color: -color-verde;
+}
+
+.progreso-exceso > .bar {
+    -fx-background-color: -color-naranja;
+}
+
+.progreso-exceso > .track {
+    -fx-background-color: -color-pista;
+}
+
+.tarjeta-indicador {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 14 10 12 10;
+}
+
+.tarjeta-indicador.indicador-cumplido {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+}
+
+.indicador-nombre {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.indicador-valor {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.indicador-meta {
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.indicador-meta-exceso {
+    -fx-text-fill: -color-naranja;
+    -fx-font-weight: bold;
+}
+
+.icono-silueta {
+    -fx-fill: -color-pista;
+    -fx-stroke: -color-borde-fuerte;
+    -fx-stroke-width: 0.5;
+}
+
+.liquido-agua { -fx-fill: -color-acento; }
+.liquido-proteina { -fx-fill: -color-verde; }
+.liquido-calorias { -fx-fill: -color-naranja; }
+.liquido-creatina { -fx-fill: -color-acento; }
+.liquido-descanso { -fx-fill: -color-morado; }
+.liquido-exceso { -fx-fill: -color-naranja; }
+
+.tarjeta-racha {
+    -fx-border-color: -color-naranja;
+}
+
+.valor-racha {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-naranja;
+}
+
+.tarjeta-foto {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+}
+
+.marco-foto {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 6px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+}
+
+.foto-fecha {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.chip-pose {
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 2 10 2 10;
+    -fx-font-size: 11px;
+    -fx-text-fill: -color-acento;
+}
+
+.chart-legend-item {
+    -fx-text-fill: -color-texto;
+}
+
+.chart-legend {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+    -fx-padding: 8 0 0 0;
+}
+
+.default-color0.chart-pie { -fx-pie-color: -color-acento; }
+.default-color1.chart-pie { -fx-pie-color: -color-verde; }
+.default-color2.chart-pie { -fx-pie-color: -color-naranja; }
+.default-color3.chart-pie { -fx-pie-color: -color-morado; }
+.default-color4.chart-pie { -fx-pie-color: -color-teal; }
+.default-color5.chart-pie { -fx-pie-color: -color-rojo; }
+.default-color6.chart-pie { -fx-pie-color: -color-gris; }
+
+.table-view,
+.list-view {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 0;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: -color-tabla-cabecera;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-border-color: transparent transparent -color-borde transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header,
+.table-view .filler {
+    -fx-background-color: transparent;
+    -fx-size: 36px;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-alignment: center-left;
+    -fx-padding: 0 8 0 8;
+}
+
+.table-row-cell {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: transparent transparent -color-separador transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-cell-size: 34px;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: -color-superficie;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: -color-tabla-fila-hover;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-texto;
+}
+
+.table-cell {
+    -fx-text-fill: -color-texto;
+    -fx-alignment: center-left;
+    -fx-padding: 0 8 0 8;
+}
+
+.table-row-cell:selected .table-cell {
+    -fx-text-fill: -color-texto;
+}
+
+.table-view .placeholder .label {
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.tabla-series {
+    -fx-border-color: -color-borde;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 9 10 9 10;
+    -fx-text-fill: -color-texto;
+}
+
+.list-cell:filled:hover {
+    -fx-background-color: -color-tabla-fila-hover;
+}
+
+.list-cell:filled:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.list-view .placeholder .label {
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.chart {
+    -fx-background-color: transparent;
+    -fx-padding: 8px;
+}
+
+.chart-plot-background {
+    -fx-background-color: -color-grafico-fondo;
+    -fx-border-color: -color-separador;
+}
+
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: -color-grid;
+}
+
+.chart-alternative-row-fill {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
+}
+
+.axis {
+    -fx-tick-label-fill: -color-texto-secundario;
+    -fx-font-size: 11px;
+}
+
+.axis-label {
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.chart-title,
+.chart-subtitle {
+    -fx-text-fill: -color-texto;
+}
+
+.chart-pie-label {
+    -fx-fill: -color-texto;
+}
+
+.chart-pie-label-line {
+    -fx-stroke: -color-borde-fuerte;
+}
+
+.default-color0.chart-series-line {
+    -fx-stroke: -color-acento;
+    -fx-stroke-width: 2.5px;
+}
+
+.default-color0.chart-line-symbol {
+    -fx-background-color: -color-acento, -color-superficie;
+    -fx-background-radius: 5px;
+    -fx-padding: 4px;
+}
+
+.root.tema-claro .chart .chart-legend-item,
+.root.tema-claro .chart-legend-item,
+.root.tema-claro .chart-title,
+.root.tema-claro .chart-subtitle,
+.root.tema-claro .axis-label {
+    -fx-text-fill: #242424;
+}
+
+.root.tema-claro .axis {
+    -fx-tick-label-fill: #333333;
+}
+
+.root.tema-claro .chart-pie-label {
+    -fx-fill: #242424;
+}
+
+.root.tema-oscuro .chart .chart-legend-item,
+.root.tema-oscuro .chart-legend-item,
+.root.tema-oscuro .chart-title,
+.root.tema-oscuro .chart-subtitle,
+.root.tema-oscuro .axis-label {
+    -fx-text-fill: #E1DFDD;
+}
+
+.root.tema-oscuro .axis {
+    -fx-tick-label-fill: #E1DFDD;
+}
+
+.root.tema-oscuro .chart-pie-label {
+    -fx-fill: #FFFFFF;
+}
+
+.visor-media {
+    -fx-background-color: #1B1B1B;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-padding: 12px;
+}
+
+.visor-media .label {
+    -fx-text-fill: #E8E8E8;
+}
+
+.dialogo-aplicacion {
+    -fx-background-color: -color-fondo;
+}
+
+.dialogo-aplicacion .header-panel {
+    -fx-background-color: -color-superficie;
+}
+
+.dialogo-aplicacion .header-panel .label {
+    -fx-text-fill: -color-texto;
+}
+
+.dialogo-aplicacion .content {
+    -fx-padding: 8px;
+}
+
+.dialogo-aplicacion .button {
+    -fx-min-width: 96px;
+}
+
+.reproductor-titulo {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+}
+
+.slider .track {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 3px;
+}
+
+.slider .thumb {
+    -fx-background-color: -color-acento;
+}
+
+.slider:disabled .thumb {
+    -fx-background-color: -color-deshabilitado;
+}
+
+.toolbar-vista {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 12px;
+}
+
+.separador-vertical {
+    -fx-background-color: -color-borde;
+    -fx-min-width: 1px;
+    -fx-max-width: 1px;
+}
+
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: -color-borde-fuerte;
+    -fx-background-radius: 6px;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-background-color: -color-texto-secundario;
+}
+
+.modal-scrim {
+    -fx-background-color: rgba(0, 0, 0, 0.55);
+    -fx-cursor: hand;
+}
+
+.modal-biblioteca {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 14px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 14px;
+    -fx-border-width: 1px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 32, 0.1, 0, 8);
+}
+
+.tarjeta-ejercicio {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 12px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-padding: 14px;
+    -fx-cursor: hand;
+}
+
+.tarjeta-ejercicio:hover {
+    -fx-background-color: -color-superficie-hover;
+    -fx-border-color: -color-borde-fuerte;
+}
+
+.tarjeta-ejercicio-seleccionada,
+.tarjeta-ejercicio-seleccionada:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-border-width: 2px;
+    -fx-padding: 13px;
+}
+
+.tarjeta-ejercicio-nombre {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.tarjeta-ejercicio-descripcion {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.tarjeta-ejercicio-marca {
+    -fx-background-color: -color-acento;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 11px;
+    -fx-min-width: 22px;
+    -fx-min-height: 22px;
+    -fx-alignment: center;
+}
+
+.chip-grupo {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-width: 1px;
+    -fx-background-radius: 9px;
+    -fx-border-radius: 9px;
+    -fx-padding: 1 8 1 8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.chip-prescripcion {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.dash-hero {
+    -fx-background-color: linear-gradient(to right, -color-acento-suave, transparent);
+    -fx-background-radius: 12px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-padding: 18 22 18 22;
+}
+
+.dash-hero-badge {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 6 12 6 12;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+}
+
+.tarjeta-consejo {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
+    -fx-cursor: hand;
+}
+
+.tarjeta-consejo:hover {
+    -fx-border-color: -color-acento;
+    -fx-background-color: -color-superficie-hover;
+}
+
+.tarjeta-consejo.consejo-abierto {
+    -fx-border-color: -color-acento;
+    -fx-background-color: -color-acento-suave;
+}
+
+.consejo-icono-marco {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 10px;
+    -fx-padding: 9px;
+}
+
+.consejo-titulo {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.consejo-texto {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.consejo-detalle {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-padding: 6 0 0 0;
+    -fx-border-color: -color-borde transparent transparent transparent;
+    -fx-border-width: 1 0 0 0;
+}
+
+.icono-consejo-cian { -fx-fill: -color-cian; }
+.icono-consejo-menta { -fx-fill: -color-menta; }
+.icono-consejo-morado { -fx-fill: -color-morado; }
+.icono-consejo-naranja { -fx-fill: -color-naranja; }
+.icono-consejo-teal { -fx-fill: -color-teal; }
+.icono-consejo-acento { -fx-fill: -color-acento; }
+
+.icono-consejo-arco {
+    -fx-fill: transparent;
+    -fx-stroke: -color-borde-fuerte;
+    -fx-stroke-width: 4px;
+    -fx-stroke-line-cap: round;
+}
+
+.icono-consejo-aguja {
+    -fx-fill: transparent;
+    -fx-stroke: -color-naranja;
+    -fx-stroke-width: 4px;
+    -fx-stroke-line-cap: round;
+}
+
+.icono-accion {
+    -fx-fill: -color-texto-secundario;
+}
+
+.boton-icono:hover .icono-accion {
+    -fx-fill: -color-acento;
+}
+
+.boton-icono-peligro .icono-accion {
+    -fx-fill: -color-rojo;
+}
+
+.boton-icono-peligro:hover .icono-accion {
+    -fx-fill: -color-rojo;
+}
+
+.nav-icono-svg {
+    -fx-fill: -color-texto-secundario;
+}
+
+.nav-boton:selected .nav-icono-svg {
+    -fx-fill: -color-acento;
+}
+
+.chip-hoy {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-width: 1px;
+    -fx-background-radius: 11px;
+    -fx-border-radius: 11px;
+    -fx-padding: 3 10 3 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.chip-activo {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-width: 1px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-padding: 2 9 2 9;
+    -fx-font-size: 10.5px;
+    -fx-font-weight: bold;
+}
+
+.avatar-perfil {
+    -fx-background-color: linear-gradient(to bottom right, -color-acento-suave, -color-superficie);
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+}
+
+.avatar-iniciales {
+    -fx-text-fill: -color-acento;
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+}
+
+.avatar-mini {
+    -fx-min-width: 34px;
+    -fx-min-height: 34px;
+    -fx-pref-width: 34px;
+    -fx-pref-height: 34px;
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+}
+
+.avatar-iniciales-mini {
+    -fx-text-fill: -color-acento;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
+.perfil-nombre {
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.tarjeta-anatomia {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+}
+
+.diagrama-anatomico {
+    -fx-padding: 2 0 2 0;
+}
+
+.diagrama-vista {
+    -fx-font-size: 10.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.cuerpo-silueta {
+    -fx-fill: -color-pista;
+    -fx-stroke: -color-borde-fuerte;
+    -fx-stroke-width: 0.5;
+}
+
+.cuerpo-miembro {
+    -fx-stroke: -color-pista;
+}
+
+.musculo-region {
+    -fx-fill: -color-acento;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 0;
+}
+
+.musculo-principal {
+    -fx-fill: -color-acento;
+    -fx-stroke: -color-acento-hover;
+    -fx-stroke-width: 1;
+    -fx-effect: dropshadow(gaussian, -color-acento, 8, 0.45, 0, 0);
+}
+
+.musculo-secundario {
+    -fx-fill: -color-verde;
+    -fx-stroke: transparent;
+}
+
+.icono-musculo {
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 7px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 7px;
+    -fx-border-width: 1px;
+    -fx-padding: 1px;
+}
+
+.sugerencia-nombre {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.sugerencia-detalle {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.indicador-insignia {
+    -fx-text-fill: -color-verde;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-verde;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+    -fx-padding: 1 4 1 4;
+    -fx-effect: dropshadow(gaussian, -color-verde, 6, 0.35, 0, 0);
+}
+
+.toast-logro {
+    -fx-background-color: rgba(32, 32, 32, 0.92);
+    -fx-background-radius: 12px;
+    -fx-border-color: rgba(58, 160, 255, 0.55);
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-padding: 10 16 10 14;
+    -fx-effect: dropshadow(gaussian, rgba(0, 120, 212, 0.55), 12, 0.15, 0, 2);
+}
+
+.toast-logro-simbolo {
+    -fx-font-size: 22px;
+    -fx-text-fill: #F5B301;
+}
+
+.toast-logro-titulo {
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFFFFF;
+}
+
+.toast-logro-detalle {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: #C8CDD6;
+}
+
+.reproductor-tarjeta {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 12px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 14, 0.20, 0, 4);
+}
+
+.espectro-audio {
+    -fx-padding: 4 0 4 0;
+}
+
+.espectro-barra {
+    -fx-fill: linear-gradient(to top, -color-acento, -color-cian);
+}
+
+.portada-reproductor {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 12px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 12px;
+    -fx-border-width: 1px;
+}
+
+.portada-simbolo {
+    -fx-font-size: 30px;
+    -fx-text-fill: -color-texto-deshabilitado;
+}
+
+.portada-miniatura {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 6px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+}
+
+.boton-media {
+    -fx-background-color: transparent;
+    -fx-background-radius: 999px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 999px;
+    -fx-border-width: 1px;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-pref-width: 40px;
+    -fx-pref-height: 40px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.boton-media:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento-borde;
+}
+
+.boton-media-activo,
+.boton-media-activo:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, -color-acento, 10, 0.35, 0, 0);
+}
+
+.etiqueta-modo {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.etiqueta-modo-activo {
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.boton-media-mini-activo,
+.boton-media-mini-activo:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-border-radius: 999px;
+    -fx-border-width: 2px;
+}
+
+.boton-media-mini-activo .icono-media {
+    -fx-fill: -color-acento;
+}
+
+.boton-media-principal {
+    -fx-background-color: -color-acento;
+    -fx-background-radius: 999px;
+    -fx-border-color: transparent;
+    -fx-min-width: 56px;
+    -fx-min-height: 56px;
+    -fx-pref-width: 56px;
+    -fx-pref-height: 56px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, -color-acento, 14, 0.40, 0, 3);
+}
+
+.boton-media-principal:hover {
+    -fx-background-color: -color-acento-hover;
+}
+
+.icono-media {
+    -fx-fill: -color-texto;
+}
+
+.boton-media:hover .icono-media,
+.boton-media-activo .icono-media {
+    -fx-fill: -color-acento;
+}
+
+.boton-media-principal .icono-media {
+    -fx-fill: white;
+}
+
+.table-row-cell.fila-arrastrando {
+    -fx-background-color: -color-acento-suave;
+    -fx-opacity: 0.55;
+}
+
+.table-row-cell.fila-destino {
+    -fx-border-color: -color-acento transparent -color-separador transparent;
+    -fx-border-width: 2 0 1 0;
+}
+
+.boton-accion-eliminar {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 6px;
+    -fx-border-width: 1px;
+    -fx-min-width: 28px;
+    -fx-min-height: 28px;
+    -fx-pref-width: 28px;
+    -fx-pref-height: 28px;
+    -fx-padding: 0;
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-cursor: hand;
+}
+
+.boton-accion-eliminar:hover {
+    -fx-background-color: -color-peligro-suave;
+    -fx-border-color: -color-peligro-borde;
+    -fx-text-fill: -color-rojo;
+}
+
+.boton-accion-eliminar:pressed {
+    -fx-background-color: -color-peligro-borde;
+}
+
+.panel-descarga {
+    -fx-background-color: -color-acento-suave;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 10px 14px;
+}
+
+.mini-reproductor {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde transparent transparent transparent;
+    -fx-border-width: 1px 0 0 0;
+    -fx-padding: 8px 18px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 16, 0.20, 0, -3);
+}
+
+.mini-portada {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.mini-portada-simbolo {
+    -fx-font-size: 18px;
+    -fx-text-fill: -color-texto-deshabilitado;
+}
+
+.mini-titulo {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.mini-artista {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.mini-tiempo {
+    -fx-font-size: 11.5px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.mini-volumen-icono {
+    -fx-font-size: 14px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.boton-media-mini {
+    -fx-background-color: transparent;
+    -fx-background-radius: 999px;
+    -fx-border-color: transparent;
+    -fx-min-width: 32px;
+    -fx-min-height: 32px;
+    -fx-pref-width: 32px;
+    -fx-pref-height: 32px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.boton-media-mini:hover {
+    -fx-background-color: -color-acento-suave;
+}
+
+.boton-media-mini .icono-media {
+    -fx-fill: -color-texto-secundario;
+}
+
+.boton-media-mini:hover .icono-media {
+    -fx-fill: -color-acento;
+}
+
+.boton-media-mini-principal {
+    -fx-background-color: -color-acento;
+    -fx-background-radius: 999px;
+    -fx-border-color: transparent;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-pref-width: 40px;
+    -fx-pref-height: 40px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, -color-acento, 12, 0.35, 0, 3);
+}
+
+.boton-media-mini-principal:hover {
+    -fx-background-color: -color-acento-hover;
+}
+
+.boton-media-mini-principal .icono-media {
+    -fx-fill: white;
+}
+
+.barra-xp > .track {
+    -fx-background-color: -color-pista;
+    -fx-background-radius: 5px;
+    -fx-background-insets: 0;
+    -fx-pref-height: 8px;
+    -fx-min-height: 8px;
+}
+
+.barra-xp > .bar {
+    -fx-background-color: linear-gradient(to right, -color-oro, #FFD866);
+    -fx-background-radius: 5px;
+    -fx-background-insets: 0;
+    -fx-padding: 4px;
+}
+
+.barra-xp-grande > .track {
+    -fx-pref-height: 14px;
+    -fx-min-height: 14px;
+    -fx-background-radius: 8px;
+}
+
+.barra-xp-grande > .bar {
+    -fx-background-radius: 8px;
+    -fx-padding: 7px;
+}
+
+.nav-nivel {
+    -fx-background-color: -color-oro-suave;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-oro-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-cursor: hand;
+}
+
+.nav-nivel-insignia {
+    -fx-background-color: -color-oro;
+    -fx-text-fill: #1B1B1B;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 9px;
+    -fx-padding: 2 8 2 8;
+}
+
+.nav-nivel-titulo {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.rpg-panel {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-oro-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 18px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
+}
+
+.rpg-medalla {
+    -fx-background-color: radial-gradient(center 50% 35%, radius 80%, #FFE08A, -color-oro);
+    -fx-background-radius: 40px;
+    -fx-border-color: #FFF1C2;
+    -fx-border-radius: 40px;
+    -fx-border-width: 3px;
+    -fx-effect: dropshadow(gaussian, rgba(245, 179, 1, 0.55), 14, 0.2, 0, 0);
+}
+
+.rpg-medalla-numero {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3A2A00;
+}
+
+.rpg-titulo {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-oro;
+}
+
+.rpg-subtitulo-meta {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.meta-fila {
+    -fx-padding: 4 0 4 0;
+}
+
+.meta-icono {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto-deshabilitado;
+    -fx-min-width: 16px;
+}
+
+.meta-icono-hecha {
+    -fx-text-fill: -color-verde;
+}
+
+.meta-texto {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -color-texto;
+}
+
+.meta-texto-hecha {
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.chip-xp {
+    -fx-background-color: -color-oro-suave;
+    -fx-text-fill: -color-oro;
+    -fx-border-color: -color-oro-borde;
+    -fx-border-width: 1px;
+    -fx-background-radius: 9px;
+    -fx-border-radius: 9px;
+    -fx-padding: 1 8 1 8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.chip-xp-hecho {
+    -fx-opacity: 0.6;
+}
+
+.tarjeta-reto {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
+}
+
+.tarjeta-reto-flash {
+    -fx-border-color: -color-naranja;
+}
+
+.tarjeta-reto-recuperacion {
+    -fx-border-color: -color-menta;
+}
+
+.boton-reto-completar {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-padding: 6 14 6 14;
+}
+
+.boton-reto-completar:hover {
+    -fx-background-color: -color-acento-suave-hover;
+}
+
+.tarjeta-reto-completo {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-verde;
+}
+
+.reto-tipo {
+    -fx-font-size: 10.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+}
+
+.reto-tipo-flash {
+    -fx-text-fill: -color-naranja;
+}
+
+.reto-titulo {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.reto-descripcion {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.reto-completado {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-verde;
+}
+
+.segmento-contenedor {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-padding: 2px;
+}
+
+.segmento-boton {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-font-size: 12px;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.segmento-boton:hover {
+    -fx-background-color: -color-superficie-hover;
+}
+
+.segmento-boton:selected {
+    -fx-background-color: -color-acento;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.chip-modalidad {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.texto-variante {
+    -fx-font-size: 10.5px;
+    -fx-text-fill: -color-menta;
+}
+
+.levelup-velo {
+    -fx-background-color: rgba(8, 10, 16, 0.72);
+}
+
+.levelup-tarjeta {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 16px;
+    -fx-border-color: -color-oro;
+    -fx-border-radius: 16px;
+    -fx-border-width: 2px;
+    -fx-padding: 26px 30px 26px 30px;
+    -fx-effect: dropshadow(gaussian, rgba(245, 179, 1, 0.45), 40, 0.15, 0, 0);
+}
+
+.levelup-etiqueta {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-oro;
+}
+
+.levelup-medalla {
+    -fx-background-color: radial-gradient(center 50% 35%, radius 80%, #FFE08A, #E0A000);
+    -fx-background-radius: 66px;
+    -fx-border-color: #FFF1C2;
+    -fx-border-radius: 66px;
+    -fx-border-width: 4px;
+}
+
+.levelup-numero {
+    -fx-font-size: 58px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3A2A00;
+}
+
+.levelup-titulo {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.levelup-detalle {
+    -fx-font-size: 13px;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-text-alignment: center;
+}
+
+.toast-xp {
+    -fx-background-color: -color-superficie;
+    -fx-text-fill: -color-oro;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-border-color: -color-oro-borde;
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-background-radius: 8px;
+    -fx-padding: 8 14 8 14;
+    -fx-effect: dropshadow(gaussian, -color-sombra, 10, 0, 0, 3);
+}
+
+.animador-2d {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+}
+
+.guia-panel {
+    -fx-background-color: -color-superficie-alt;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 16px;
+}
+
+.guia-numero {
+    -fx-background-color: -color-acento;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-background-radius: 12px;
+}
+
+.guia-punto {
+    -fx-font-size: 12.5px;
+    -fx-text-fill: -color-texto;
+}
+
+.guia-pestanas > .tab-header-area > .tab-header-background {
+    -fx-background-color: -color-superficie-alt;
+}
+
+.guia-pestanas .tab {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px 6px 0 0;
+    -fx-padding: 6 14 6 14;
+}
+
+.guia-pestanas .tab .tab-label {
+    -fx-text-fill: -color-texto-secundario;
+    -fx-font-size: 12.5px;
+}
+
+.guia-pestanas .tab:selected {
+    -fx-background-color: -color-acento-suave;
+}
+
+.guia-pestanas .tab:selected .tab-label {
+    -fx-text-fill: -color-acento;
+    -fx-font-weight: bold;
+}
+
+.guia-pestanas > .tab-content-area {
+    -fx-background-color: transparent;
+}
+
+.tarjeta-frase {
+    -fx-background-color: linear-gradient(to right, -color-acento-suave, -color-superficie);
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-acento-borde;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 14 18 14 18;
+}
+
+.frase-comillas {
+    -fx-font-size: 46px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-acento;
+    -fx-opacity: 0.55;
+    -fx-min-width: 28px;
+    -fx-alignment: top-center;
+}
+
+.frase-texto {
+    -fx-font-size: 16px;
+    -fx-font-style: italic;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.frase-autor {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.frase-autor-personal {
+    -fx-text-fill: -color-oro;
+    -fx-font-weight: bold;
+}
+
+.vfx-texto-flotante {
+    -fx-background-color: -color-superficie;
+    -fx-text-fill: -color-acento;
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-padding: 4 12 4 12;
+    -fx-background-radius: 14px;
+    -fx-border-color: -color-acento;
+    -fx-border-radius: 14px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, -color-acento, 14, 0.25, 0, 0);
+}
+
+.levelup-escudo {
+    -fx-fill: linear-gradient(to bottom, #FFE08A, #E0A000);
+    -fx-stroke: #FFF1C2;
+    -fx-stroke-width: 3px;
+}
+
+.levelup-xp {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-oro;
+}
+
+.levelup-boton {
+    -fx-font-size: 14px;
+    -fx-padding: 9 28 9 28;
+    -fx-background-color: linear-gradient(to bottom, #FFD866, #F5B301);
+    -fx-text-fill: #3A2A00;
+    -fx-border-color: #FFF1C2;
+    -fx-effect: dropshadow(gaussian, rgba(245, 179, 1, 0.6), 18, 0.2, 0, 0);
+}
+
+.levelup-boton:hover {
+    -fx-background-color: linear-gradient(to bottom, #FFE08A, #FFB800);
+}
+
+.table-row-cell:empty {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+}
+
+.table-row-cell:empty:hover {
+    -fx-background-color: transparent;
+}
+
+.table-row-cell:empty .table-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.boton-iniciar {
+    -fx-background-color: linear-gradient(to bottom, -color-acento, -color-acento-hover);
+    -fx-border-color: transparent;
+    -fx-background-radius: 7px;
+    -fx-border-radius: 7px;
+    -fx-text-fill: white;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-padding: 10 22 10 18;
+    -fx-graphic-text-gap: 8px;
+    -fx-effect: dropshadow(gaussian, -color-acento, 16, 0.38, 0, 3);
+    -fx-cursor: hand;
+}
+
+.boton-iniciar:hover {
+    -fx-background-color: linear-gradient(to bottom, -color-acento-hover, -color-acento-hover);
+}
+
+.boton-iniciar:disabled {
+    -fx-background-color: -color-deshabilitado;
+    -fx-effect: none;
+}
+
+.boton-iniciar .icono-iniciar {
+    -fx-fill: white;
+}
+
+.boton-icono-borde,
+.boton-icono-borde-peligro {
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-width: 1px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-min-width: 30px;
+    -fx-min-height: 28px;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 28px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+
+.boton-icono-borde:hover {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento;
+}
+
+.boton-icono-borde:hover .icono-accion {
+    -fx-fill: -color-acento;
+}
+
+.boton-icono-borde-peligro:hover {
+    -fx-background-color: -color-peligro-suave;
+    -fx-border-color: -color-peligro-borde;
+}
+
+.boton-icono-borde-peligro .icono-accion {
+    -fx-fill: -color-rojo;
+}
+
+.lista-rutinas {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 2px;
+}
+
+.lista-rutinas .list-cell {
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-background-insets: 3 3 3 3;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 8px;
+    -fx-border-insets: 3 3 3 3;
+    -fx-border-width: 1px;
+    -fx-padding: 9 12 9 9;
+    -fx-text-fill: -color-texto;
+}
+
+.lista-rutinas .list-cell:filled:hover {
+    -fx-background-color: -color-superficie-hover;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-text-fill: -color-texto;
+    -fx-font-weight: normal;
+}
+
+.lista-rutinas .list-cell:filled:selected {
+    -fx-background-color: -color-acento-suave;
+    -fx-border-color: -color-acento-borde;
+    -fx-text-fill: -color-texto;
+    -fx-font-weight: normal;
+}
+
+.rutina-item-titulo {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -color-texto;
+}
+
+.lista-rutinas .list-cell:filled:selected .rutina-item-titulo {
+    -fx-text-fill: -color-acento;
+}
+
+.rutina-item-subtitulo {
+    -fx-font-size: 11px;
+    -fx-font-weight: normal;
+    -fx-text-fill: -color-texto-secundario;
+}
+
+.rutina-item-hoy {
+    -fx-background-color: -color-acento;
+    -fx-text-fill: white;
+    -fx-font-size: 9.5px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-padding: 1 7 1 7;
+}
+
+.rutina-item-indicador {
+    -fx-background-color: transparent;
+    -fx-background-radius: 2px;
+    -fx-min-width: 3px;
+    -fx-pref-width: 3px;
+    -fx-max-width: 3px;
+    -fx-min-height: 26px;
+    -fx-pref-height: 26px;
+}
+
+.lista-rutinas .list-cell:filled:selected .rutina-item-indicador {
+    -fx-background-color: -color-acento;
+}
+
+.chip-rir {
+    -fx-border-width: 1px;
+    -fx-background-radius: 9px;
+    -fx-border-radius: 9px;
+    -fx-padding: 1 8 1 8;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
+.chip-rir-duro {
+    -fx-background-color: -color-peligro-suave;
+    -fx-text-fill: -color-naranja;
+    -fx-border-color: -color-naranja;
+}
+
+.chip-rir-medio {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-acento;
+    -fx-border-color: -color-acento-borde;
+}
+
+.chip-rir-suave {
+    -fx-background-color: -color-acento-suave;
+    -fx-text-fill: -color-verde;
+    -fx-border-color: -color-acento-borde;
+}
+
+.icono-media-ok {
+    -fx-fill: -color-acento;
+}
+
+.icono-media-vacio {
+    -fx-fill: -color-texto-deshabilitado;
+}
+
+.media-etiqueta-ok {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto;
+}
+
+.media-etiqueta-vacio {
+    -fx-font-size: 12px;
+    -fx-text-fill: -color-texto-deshabilitado;
+}
+
+.splash-raiz {
+    -fx-background-color: transparent;
+}
+
+.splash-panel {
+    -fx-background-color: linear-gradient(to bottom, #10141C, #0A0D14);
+    -fx-background-radius: 20px;
+    -fx-border-color: rgba(42, 169, 240, 0.35);
+    -fx-border-radius: 20px;
+    -fx-border-width: 1px;
+    -fx-padding: 46 56 40 56;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.65), 46, 0.35, 0, 16);
+}
+
+.splash-titulo-base {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #F5F8FC;
+}
+
+.splash-titulo-acento {
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2AA9F0;
+}
+
+.splash-lema {
+    -fx-font-size: 11.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #7E8CA0;
+}
+
+.splash-progreso {
+    -fx-pref-height: 5px;
+}
+
+.splash-progreso > .track {
+    -fx-background-color: rgba(255, 255, 255, 0.10);
+    -fx-background-radius: 3px;
+    -fx-background-insets: 0;
+}
+
+.splash-progreso > .bar {
+    -fx-background-color: linear-gradient(to right, #2AA9F0, #0078D4);
+    -fx-background-radius: 3px;
+    -fx-background-insets: 0;
+    -fx-padding: 3px;
+}
+
+.splash-carga {
+    -fx-font-size: 12px;
+    -fx-text-fill: #9AA7B8;
+}

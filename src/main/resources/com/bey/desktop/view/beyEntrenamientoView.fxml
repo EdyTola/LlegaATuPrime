@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<StackPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.bey.desktop.controller.beyEntrenamientoController"
+           styleClass="contenido-vista">
+
+    <children>
+
+        <HBox spacing="16" alignment="TOP_LEFT">
+            <children>
+                <VBox spacing="10" prefWidth="252" minWidth="222">
+                    <children>
+
+                        <HBox alignment="CENTER_LEFT" spacing="6">
+                            <children>
+                                <Label text="Rutinas semanales" styleClass="titulo-seccion" HBox.hgrow="ALWAYS"/>
+                                <Button fx:id="beyBotonEditarRutina" onAction="#beyEditarRutina"
+                                        styleClass="boton-icono-borde" focusTraversable="false">
+                                    <graphic>
+                                        <SVGPath styleClass="icono-accion" scaleX="0.72" scaleY="0.72"
+                                                 content="M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25zM20.71,7.04c0.39,-0.39 0.39,-1.02 0,-1.41l-2.34,-2.34c-0.39,-0.39 -1.02,-0.39 -1.41,0l-1.83,1.83 3.75,3.75 1.83,-1.83z"/>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Editar la rutina seleccionada"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="beyBotonEliminarRutina" onAction="#beyEliminarRutina"
+                                        styleClass="boton-icono-borde-peligro" focusTraversable="false">
+                                    <graphic>
+                                        <SVGPath styleClass="icono-accion" scaleX="0.72" scaleY="0.72"
+                                                 content="M6,19c0,1.1 0.9,2 2,2h8c1.1,0 2,-0.9 2,-2V7H6v12zM19,4h-3.5l-1,-1h-5l-1,1H5v2h14V4z"/>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Eliminar la rutina seleccionada"/>
+                                    </tooltip>
+                                </Button>
+                            </children>
+                        </HBox>
+                        <Label text="Selecciona una rutina para ver y editar sus ejercicios."
+                               styleClass="texto-secundario" wrapText="true"/>
+                        <ListView fx:id="beyListaRutinas" styleClass="lista-rutinas" VBox.vgrow="ALWAYS"/>
+                        <Button fx:id="botonNuevaRutina" text="＋  Nueva rutina" styleClass="boton-primario"
+                                onAction="#beyNuevaRutina" maxWidth="Infinity"/>
+                    </children>
+                </VBox>
+
+                <VBox styleClass="tarjeta" spacing="14" HBox.hgrow="ALWAYS">
+                    <children>
+
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <children>
+                                <VBox spacing="3" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <HBox spacing="8" alignment="CENTER_LEFT">
+                                            <children>
+                                                <Label fx:id="beyEtiquetaNombreRutina" text="Sin rutina seleccionada"
+                                                       styleClass="titulo-seccion"/>
+                                                <Label fx:id="beyEtiquetaRutinaHoy" text="Programada para hoy"
+                                                       styleClass="chip-hoy" visible="false" managed="false"/>
+                                            </children>
+                                        </HBox>
+                                        <Label fx:id="beyEtiquetaDetalleRutina" styleClass="texto-secundario"/>
+                                        <Label fx:id="beyEtiquetaNotasRutina" styleClass="subtitulo"
+                                               wrapText="true"/>
+                                    </children>
+                                </VBox>
+                                <Button fx:id="beyBotonIniciarEntrenamiento" text="Iniciar entrenamiento"
+                                        styleClass="boton-iniciar" onAction="#beyIniciarEntrenamiento">
+                                    <graphic>
+                                        <SVGPath styleClass="icono-iniciar" scaleX="0.72" scaleY="0.72"
+                                                 content="M8,5 L19,12 L8,19 Z"/>
+                                    </graphic>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <children>
+                                <Button fx:id="beyBotonAgregarEjercicio" text="＋  Añadir ejercicio"
+                                        styleClass="boton-secundario" onAction="#beyAgregarEjercicio"/>
+                                <Button fx:id="beyBotonAbrirSugerencias" text="＋  Añadir desde biblioteca"
+                                        styleClass="boton-secundario" onAction="#beyAlternarSugerencias"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <HBox styleClass="segmento-contenedor" alignment="CENTER">
+                                    <children>
+                                        <ToggleButton fx:id="beyBotonModoGimnasio" text="Con equipo"
+                                                      styleClass="segmento-boton" onAction="#beyUsarModoGimnasio"/>
+                                        <ToggleButton fx:id="beyBotonModoCasa" text="Sin equipo"
+                                                      styleClass="segmento-boton" onAction="#beyUsarModoCasa"/>
+                                    </children>
+                                </HBox>
+                            </children>
+                        </HBox>
+
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <children>
+                                <Label fx:id="beyEtiquetaModalidad" styleClass="chip-modalidad"/>
+                                <Region HBox.hgrow="ALWAYS"/>
+                                <Label fx:id="beyEtiquetaEstado" styleClass="texto-secundario"/>
+                            </children>
+                        </HBox>
+
+                        <Label fx:id="beyEtiquetaModalidad" styleClass="chip-modalidad"/>
+
+                        <TableView fx:id="beyTablaEjercicios" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="beyColumnaNombre" text="Ejercicio" prefWidth="260"/>
+                                <TableColumn fx:id="beyColumnaGrupo" text="Grupo muscular" prefWidth="140"/>
+                                <TableColumn fx:id="beyColumnaPrescripcion" text="Prescripción" prefWidth="100"/>
+                                <TableColumn fx:id="beyColumnaRir" text="RIR" prefWidth="80"/>
+                                <TableColumn fx:id="beyColumnaDescanso" text="Descanso" prefWidth="85"/>
+                                <TableColumn fx:id="beyColumnaMultimedia" text="Multimedia" prefWidth="120"/>
+                                <TableColumn fx:id="beyColumnaAcciones" text="Acciones" prefWidth="150"
+                                             sortable="false" resizable="false"/>
+                            </columns>
+                        </TableView>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+
+        <StackPane fx:id="beyModalBiblioteca" visible="false" managed="false" focusTraversable="true">
+            <children>
+                <Region styleClass="modal-scrim" onMouseClicked="#beyCerrarSugerencias"/>
+
+                <VBox styleClass="modal-biblioteca" spacing="14" maxWidth="960" maxHeight="680"
+                      StackPane.alignment="CENTER">
+                    <StackPane.margin>
+                        <Insets top="24" right="24" bottom="24" left="24"/>
+                    </StackPane.margin>
+                    <children>
+
+                        <HBox spacing="12" alignment="CENTER_LEFT">
+                            <children>
+                                <VBox spacing="3" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label text="Biblioteca de ejercicios" styleClass="titulo-seccion"/>
+                                        <Label fx:id="beyEtiquetaDescripcionNivel" styleClass="texto-secundario"
+                                               wrapText="true"/>
+                                    </children>
+                                </VBox>
+                                <ComboBox fx:id="beyComboNivelSugerencias" prefWidth="150"/>
+                                <HBox styleClass="segmento-contenedor" alignment="CENTER">
+                                    <children>
+                                        <ToggleButton fx:id="beyBotonModalGimnasio" text="Con equipo"
+                                                      styleClass="segmento-boton" onAction="#beyUsarModoGimnasio"/>
+                                        <ToggleButton fx:id="beyBotonModalCasa" text="Sin equipo"
+                                                      styleClass="segmento-boton" onAction="#beyUsarModoCasa"/>
+                                    </children>
+                                </HBox>
+                                <Button text="&#10005;" styleClass="boton-icono" onAction="#beyCerrarSugerencias"/>
+                            </children>
+                        </HBox>
+
+                        <ScrollPane fx:id="beyScrollSugerencias" fitToWidth="true" hbarPolicy="NEVER"
+                                    styleClass="scroll-fondo" VBox.vgrow="ALWAYS" prefHeight="440">
+                            <content>
+                                <GridPane fx:id="beyCuadriculaSugerencias" hgap="12" vgap="12">
+                                    <padding>
+                                        <Insets top="2" right="6" bottom="6" left="2"/>
+                                    </padding>
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                        <ColumnConstraints percentWidth="50" hgrow="ALWAYS"/>
+                                    </columnConstraints>
+                                </GridPane>
+                            </content>
+                        </ScrollPane>
+
+                        <HBox spacing="10" alignment="CENTER_LEFT">
+                            <children>
+                                <Label fx:id="beyEtiquetaSeleccion" styleClass="texto-secundario" HBox.hgrow="ALWAYS"/>
+                                <Button text="Cancelar" styleClass="boton-secundario" onAction="#beyCerrarSugerencias"/>
+                                <Button fx:id="beyBotonAgregarSugerencia"
+                                        text="Añadir ejercicios seleccionados a la rutina"
+                                        styleClass="boton-acento" onAction="#beyAgregarSugerencia"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </StackPane>
+    </children>
+</StackPane>
