@@ -43,10 +43,10 @@ import java.util.List;
 import java.util.Random;
 
 public final class beyAchievementVFX {
-    private static final Color ORO = Color.web("#F5B301");
+    private static final Color ORO = Color.web("#8A6D3B");
     private static final Color[] PALETA = {
-            Color.web("#0078D4"), Color.web("#22C55E"), Color.web("#F5B301"), Color.web("#EF4444"),
-            Color.web("#A855F7"), Color.web("#06B6D4"), Color.web("#FB923C"), Color.web("#F472B6")};
+            Color.web("#0F6CBD"), Color.web("#4A93D6"), Color.web("#475569"), Color.web("#94A3B8"),
+            Color.web("#B08D57"), Color.web("#6E7691"), Color.web("#4F8A74"), Color.web("#3F7FA6")};
 
     private static final String[] MOTIVACION = {
             "La constancia de hoy es el rendimiento de mañana.",
@@ -159,13 +159,13 @@ public final class beyAchievementVFX {
     private static Color beyColorAcento(Node nodo) {
         for (Parent p = nodo instanceof Parent padre ? padre : nodo.getParent(); p != null; p = p.getParent()) {
             if (p.getStyleClass().contains("tema-oscuro")) {
-                return Color.web("#3AA0FF");
+                return Color.web("#3D8AD0");
             }
         }
         if (nodo.getScene() != null && nodo.getScene().getRoot().getStyleClass().contains("tema-oscuro")) {
-            return Color.web("#3AA0FF");
+            return Color.web("#3D8AD0");
         }
-        return Color.web("#0078D4");
+        return Color.web("#0F6CBD");
     }
 
     public static void beyConfeti() {

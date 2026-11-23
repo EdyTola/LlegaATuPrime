@@ -73,8 +73,6 @@ public class beyMainController implements Initializable {
     @FXML
     private ToggleButton beyBotonTema;
     @FXML
-    private Label beyIconoTema;
-    @FXML
     private StackPane beyCapaCelebracion;
     @FXML
     private Pane beyCapaConfeti;
@@ -174,10 +172,7 @@ public class beyMainController implements Initializable {
     private void beySincronizarBotonTema() {
         boolean oscuro = beyGestorDatos.beyGetInstancia().beyGetTema() == beyTemaApp.OSCURO;
         beyBotonTema.setSelected(oscuro);
-        beyBotonTema.setText(oscuro ? "Modo claro" : "Modo oscuro");
-        if (beyIconoTema != null) {
-            beyIconoTema.setText(oscuro ? "\u2600" : "\u263D");
-        }
+        beyBotonTema.setText("Modo oscuro");
     }
 
     @FXML

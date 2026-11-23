@@ -50,38 +50,67 @@
                                       maxWidth="Infinity" selected="true" contentDisplay="LEFT"
                                       onAction="#beyMostrarInicio">
                             <graphic>
-                                <Label text="&#8962;" styleClass="nav-icono"/>
+                                <StackPane minWidth="22" prefWidth="22" maxWidth="22" minHeight="22" prefHeight="22" maxHeight="22">
+                                    <children>
+                                        <SVGPath styleClass="nav-icono-svg" scaleX="0.8" scaleY="0.8"
+                                                 content="M3 10.5L12 3l9 7.5 M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5 M9.5 21v-6.5h5V21"/>
+                                    </children>
+                                </StackPane>
                             </graphic>
                         </ToggleButton>
                         <ToggleButton fx:id="beyBotonEntrenamiento" styleClass="nav-boton" text="Entrenamiento"
                                       maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarEntrenamiento">
                             <graphic>
-                                <Label text="&#9635;" styleClass="nav-icono"/>
+                                <StackPane minWidth="22" prefWidth="22" maxWidth="22" minHeight="22" prefHeight="22" maxHeight="22">
+                                    <children>
+                                        <SVGPath styleClass="nav-icono-svg" scaleX="0.8" scaleY="0.8"
+                                                 content="M6.5 6.5v11 M17.5 6.5v11 M3.5 9v6 M20.5 9v6 M6.5 12h11"/>
+                                    </children>
+                                </StackPane>
                             </graphic>
                         </ToggleButton>
                         <ToggleButton fx:id="beyBotonNutricion" styleClass="nav-boton" text="Nutricion e hidratacion"
                                       maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarNutricion">
                             <graphic>
-                                <Label text="&#9680;" styleClass="nav-icono"/>
+                                <StackPane minWidth="22" prefWidth="22" maxWidth="22" minHeight="22" prefHeight="22" maxHeight="22">
+                                    <children>
+                                        <SVGPath styleClass="nav-icono-svg" scaleX="0.8" scaleY="0.8"
+                                                 content="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>
+                                    </children>
+                                </StackPane>
                             </graphic>
                         </ToggleButton>
                         <ToggleButton fx:id="beyBotonMusica" styleClass="nav-boton" text="Musica local"
                                       maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarMusica">
                             <graphic>
-                                <Label text="&#9834;" styleClass="nav-icono"/>
+                                <StackPane minWidth="22" prefWidth="22" maxWidth="22" minHeight="22" prefHeight="22" maxHeight="22">
+                                    <children>
+                                        <SVGPath styleClass="nav-icono-svg" scaleX="0.8" scaleY="0.8"
+                                                 content="M9 18V5l12-2v13 M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0z M21 16a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+                                    </children>
+                                </StackPane>
                             </graphic>
                         </ToggleButton>
                         <ToggleButton fx:id="beyBotonProgreso" styleClass="nav-boton" text="Progreso y analiticas"
                                       maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarProgreso">
                             <graphic>
-                                <Label text="&#9650;" styleClass="nav-icono"/>
+                                <StackPane minWidth="22" prefWidth="22" maxWidth="22" minHeight="22" prefHeight="22" maxHeight="22">
+                                    <children>
+                                        <SVGPath styleClass="nav-icono-svg" scaleX="0.8" scaleY="0.8"
+                                                 content="M3 3v18h18 M7 15l4-4 3 3 5-6"/>
+                                    </children>
+                                </StackPane>
                             </graphic>
                         </ToggleButton>
                         <ToggleButton fx:id="beyBotonPerfil" styleClass="nav-boton" text="Mi perfil"
                                       maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyMostrarPerfil">
                             <graphic>
-                                <SVGPath styleClass="nav-icono-svg"
-                                         content="M12,12 a4,4 0 1,0 0,-8 a4,4 0 1,0 0,8 Z M20,20 c0,-3.3 -3.6,-6 -8,-6 s-8,2.7 -8,6 Z"/>
+                                <StackPane minWidth="22" prefWidth="22" maxWidth="22" minHeight="22" prefHeight="22" maxHeight="22">
+                                    <children>
+                                        <SVGPath styleClass="nav-icono-svg" scaleX="0.8" scaleY="0.8"
+                                                 content="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2 M15.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0z"/>
+                                    </children>
+                                </StackPane>
                             </graphic>
                         </ToggleButton>
                     </children>
@@ -108,7 +137,11 @@
                         <ToggleButton fx:id="beyBotonTema" styleClass="nav-tema" text="Modo oscuro"
                                       maxWidth="Infinity" contentDisplay="LEFT" onAction="#beyAlternarTema">
                             <graphic>
-                                <Label fx:id="beyIconoTema" text="&#9789;" styleClass="nav-icono"/>
+                                <StackPane styleClass="interruptor">
+                                    <children>
+                                        <Region styleClass="interruptor-bola"/>
+                                    </children>
+                                </StackPane>
                             </graphic>
                         </ToggleButton>
                         <VBox spacing="3">

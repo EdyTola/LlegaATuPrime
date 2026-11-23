@@ -22,13 +22,13 @@ final class beyMunecoRenderer2D {
                   Color excentrica, Color secundario) {
         static beyPaleta de(boolean oscuro) {
             return oscuro
-                    ? new beyPaleta(Color.web("#161B22"), Color.web("#3B434F"), Color.web("#E9EEF6"),
+                    ? new beyPaleta(Color.web("#1C2026"), Color.web("#3B434F"), Color.web("#E9EEF6"),
                     Color.web("#B4BFD1"), Color.web("#7E8AA0"), Color.web("#566175"), Color.web("#3C485D"),
-                    Color.web("#19C8FF"), Color.web("#8791A3"), Color.web("#4E5869"), Color.web("#A9B3C3"),
-                    Color.web("#E6EAF0"), Color.web("#F2A93B"), Color.web("#7C8594"))
-                    : new beyPaleta(Color.web("#F4F7FB"), Color.web("#C5CCD7"), Color.web("#A9B7CD"),
+                    Color.web("#4C9AE0"), Color.web("#8791A3"), Color.web("#4E5869"), Color.web("#A9B3C3"),
+                    Color.web("#E6EAF0"), Color.web("#C9A66B"), Color.web("#7C8594"))
+                    : new beyPaleta(Color.web("#F8F9FA"), Color.web("#C5CCD7"), Color.web("#A9B7CD"),
                     Color.web("#6C7C97"), Color.web("#3E4B63"), Color.web("#A3AEC1"), Color.web("#283245"),
-                    Color.web("#0A84FF"), Color.web("#8791A3"), Color.web("#4B5567"), Color.web("#B7C0CE"),
+                    Color.web("#0F6CBD"), Color.web("#8791A3"), Color.web("#4B5567"), Color.web("#B7C0CE"),
                     Color.web("#1F2937"), Color.web("#C2710C"), Color.web("#98A2B3"));
         }
     }

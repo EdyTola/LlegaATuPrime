@@ -1,0 +1,3 @@
+LLEGA A TU PRIME - Instalacion
+1) Haz doble clic en LlegaATuPrime_Setup.exe y pulsa Siguiente > Instalar > Finalizar.
+2) Abre "Llega a tu Prime" desde el Escritorio o el menu Inicio. Tus datos se guardan en tu equipo.

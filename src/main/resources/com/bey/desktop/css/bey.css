@@ -1,82 +1,90 @@
 .root {
-    -color-fondo: #F3F3F3;
+    -color-fondo: #F5F6F8;
     -color-superficie: #FFFFFF;
-    -color-superficie-alt: #FAFAFA;
-    -color-superficie-hover: #F5F4F3;
-    -color-tabla-cabecera: #FAF9F8;
-    -color-tabla-fila-hover: #F7F7F7;
-    -color-borde: #E1DFDD;
-    -color-borde-fuerte: #D2D0CE;
-    -color-separador: #F0EFEE;
-    -color-texto: #242424;
-    -color-texto-secundario: #605E5C;
-    -color-texto-deshabilitado: #9A9A9A;
-    -color-acento: #0078D4;
-    -color-acento-hover: #106EBE;
-    -color-acento-suave: #EFF6FC;
-    -color-acento-suave-hover: #DCEBF8;
-    -color-acento-borde: #CFE4F5;
-    -color-verde: #107C10;
-    -color-naranja: #CA5010;
-    -color-morado: #8764B8;
-    -color-teal: #038387;
-    -color-gris: #8A8886;
-    -color-rojo: #C42B1C;
-    -color-cian: #0A6EBD;
-    -color-menta: #0E8F6E;
-    -color-peligro-borde: #E8BFB9;
-    -color-peligro-suave: #FDF3F2;
-    -color-pista: #EDEBE9;
-    -color-grafico-fondo: #FCFCFC;
-    -color-grid: #EDEBE9;
-    -color-deshabilitado: #C7C7C7;
-    -color-sombra: rgba(0, 0, 0, 0.06);
-    -color-oro: #B7791F;
-    -color-oro-suave: #FFF6DD;
-    -color-oro-borde: #F1D58A;
+    -color-superficie-alt: #F8F9FA;
+    -color-superficie-hover: #F1F3F5;
+    -color-tabla-cabecera: #F8F9FA;
+    -color-tabla-fila-hover: #F4F6F8;
+    -color-borde: #E2E5E9;
+    -color-borde-fuerte: #D0D7DE;
+    -color-separador: #EDEFF2;
+    -color-texto: #1F2328;
+    -color-texto-secundario: #57606A;
+    -color-texto-deshabilitado: #8C959F;
+    -color-acento: #0F6CBD;
+    -color-acento-hover: #0C5A9E;
+    -color-acento-suave: #EEF4FA;
+    -color-acento-suave-hover: #DEEAF6;
+    -color-acento-borde: #C5D9EC;
+    -color-verde: #4D7C5F;
+    -color-naranja: #8A6D3B;
+    -color-morado: #6E7691;
+    -color-teal: #4A7C85;
+    -color-gris: #6E7781;
+    -color-rojo: #B4443A;
+    -color-cian: #3F7FA6;
+    -color-menta: #4F8A74;
+    -color-peligro-borde: #E5C6C2;
+    -color-peligro-suave: #FBF3F2;
+    -color-pista: #E9ECEF;
+    -color-grafico-fondo: #FFFFFF;
+    -color-grid: #EBEEF1;
+    -color-deshabilitado: #C6CCD2;
+    -color-sombra: rgba(31, 35, 40, 0.06);
+    -color-oro: #8A6D3B;
+    -color-oro-suave: #F6F1E7;
+    -color-oro-borde: #E3D6BC;
+    -color-pizarra: #475569;
+    -color-pizarra-suave: #F1F5F9;
+    -color-pizarra-borde: #DDE3EA;
+    -color-pizarra-texto: #334155;
 
-    -fx-font-family: "Inter", "Segoe UI Variable Text", "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    -fx-font-family: "Segoe UI Variable Text", "Segoe UI", "Inter", "Helvetica Neue", "Arial", sans-serif;
     -fx-font-size: 13px;
     -fx-background-color: -color-fondo;
     -fx-text-fill: -color-texto;
 }
 
 .root.tema-oscuro {
-    -color-fondo: #0F0F0F;
-    -color-superficie: #181818;
-    -color-superficie-alt: #141414;
-    -color-superficie-hover: #232323;
-    -color-tabla-cabecera: #242424;
-    -color-tabla-fila-hover: #262626;
-    -color-borde: #333333;
-    -color-borde-fuerte: #3D3D3D;
-    -color-separador: #2A2A2A;
-    -color-texto: #F0F0F0;
-    -color-texto-secundario: #A8A8A8;
-    -color-texto-deshabilitado: #6E6E6E;
-    -color-acento: #0078D4;
-    -color-acento-hover: #2B88D8;
-    -color-acento-suave: #11293D;
-    -color-acento-suave-hover: #16354E;
-    -color-acento-borde: #1E4A6E;
-    -color-verde: #4CC265;
-    -color-naranja: #E8A33D;
-    -color-morado: #B79CE8;
-    -color-teal: #2AA0A4;
-    -color-gris: #9A9A9A;
-    -color-rojo: #F1707B;
-    -color-cian: #38BDF8;
-    -color-menta: #5EE2A6;
-    -color-peligro-borde: #5A2A2A;
-    -color-peligro-suave: #2A1616;
-    -color-pista: #2A2A2A;
-    -color-grafico-fondo: #191919;
-    -color-grid: #2A2A2A;
-    -color-deshabilitado: #4A4A4A;
-    -color-sombra: rgba(0, 0, 0, 0.5);
-    -color-oro: #F5B301;
-    -color-oro-suave: #2E2510;
-    -color-oro-borde: #5C4915;
+    -color-fondo: #14171A;
+    -color-superficie: #1C2026;
+    -color-superficie-alt: #181B1F;
+    -color-superficie-hover: #232830;
+    -color-tabla-cabecera: #20252B;
+    -color-tabla-fila-hover: #242A31;
+    -color-borde: #2D333B;
+    -color-borde-fuerte: #3A424C;
+    -color-separador: #262C33;
+    -color-texto: #E6EDF3;
+    -color-texto-secundario: #9BA3AF;
+    -color-texto-deshabilitado: #6B7280;
+    -color-acento: #3D8AD0;
+    -color-acento-hover: #5599DA;
+    -color-acento-suave: #1B2A3A;
+    -color-acento-suave-hover: #213448;
+    -color-acento-borde: #2B4660;
+    -color-verde: #7FB394;
+    -color-naranja: #C9A66B;
+    -color-morado: #A3A9C9;
+    -color-teal: #77AEB6;
+    -color-gris: #9BA3AF;
+    -color-rojo: #E07F78;
+    -color-cian: #6FA8D2;
+    -color-menta: #85B9A6;
+    -color-peligro-borde: #5A3431;
+    -color-peligro-suave: #2A1D1C;
+    -color-pista: #2A3037;
+    -color-grafico-fondo: #1C2026;
+    -color-grid: #2A3037;
+    -color-deshabilitado: #4A525C;
+    -color-sombra: rgba(0, 0, 0, 0.35);
+    -color-oro: #C9A66B;
+    -color-oro-suave: #2A2519;
+    -color-oro-borde: #4A412A;
+    -color-pizarra: #94A3B8;
+    -color-pizarra-suave: #222831;
+    -color-pizarra-borde: #343C47;
+    -color-pizarra-texto: #CBD5E1;
 }
 
 .label {
@@ -95,14 +103,14 @@
 
 .nav-marca-titulo {
     -fx-font-size: 19px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -color-acento;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-texto;
 }
 
 .nav-marca-acento {
     -fx-font-size: 19px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -color-menta;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-acento;
 }
 
 .nav-marca-subtitulo {
@@ -172,14 +180,9 @@
 }
 
 .nav-tema:selected {
-    -fx-background-color: -color-acento-suave;
-    -fx-border-color: -color-acento;
-    -fx-text-fill: -color-acento;
-    -fx-font-weight: bold;
-}
-
-.nav-tema:selected .nav-icono {
-    -fx-text-fill: -color-acento;
+    -fx-background-color: transparent;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-text-fill: -color-texto;
 }
 
 .area-contenido {
@@ -665,14 +668,14 @@
 }
 
 .chip-pose {
-    -fx-background-color: -color-acento-suave;
-    -fx-background-radius: 10px;
-    -fx-border-color: -color-acento-borde;
-    -fx-border-radius: 10px;
+    -fx-background-color: -color-pizarra-suave;
+    -fx-background-radius: 5px;
+    -fx-border-color: -color-pizarra-borde;
+    -fx-border-radius: 5px;
     -fx-border-width: 1px;
-    -fx-padding: 2 10 2 10;
+    -fx-padding: 2 8 2 8;
     -fx-font-size: 11px;
-    -fx-text-fill: -color-acento;
+    -fx-text-fill: -color-pizarra-texto;
 }
 
 .chart-legend-item {
@@ -1013,42 +1016,42 @@
 }
 
 .chip-grupo {
-    -fx-background-color: -color-acento-suave;
-    -fx-text-fill: -color-acento;
-    -fx-border-color: -color-acento-borde;
+    -fx-background-color: -color-pizarra-suave;
+    -fx-text-fill: -color-pizarra-texto;
+    -fx-border-color: -color-pizarra-borde;
     -fx-border-width: 1px;
-    -fx-background-radius: 9px;
-    -fx-border-radius: 9px;
-    -fx-padding: 1 8 1 8;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-padding: 1 7 1 7;
     -fx-font-size: 11px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
 }
 
 .chip-prescripcion {
     -fx-font-size: 11px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
     -fx-text-fill: -color-texto-secundario;
 }
 
 .dash-hero {
-    -fx-background-color: linear-gradient(to right, -color-acento-suave, transparent);
-    -fx-background-radius: 12px;
-    -fx-border-color: -color-acento-borde;
-    -fx-border-radius: 12px;
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 10px;
+    -fx-border-color: -color-borde;
+    -fx-border-radius: 10px;
     -fx-border-width: 1px;
     -fx-padding: 18 22 18 22;
 }
 
 .dash-hero-badge {
-    -fx-background-color: -color-superficie;
-    -fx-background-radius: 10px;
-    -fx-border-color: -color-acento-borde;
-    -fx-border-radius: 10px;
+    -fx-background-color: -color-pizarra-suave;
+    -fx-background-radius: 6px;
+    -fx-border-color: -color-pizarra-borde;
+    -fx-border-radius: 6px;
     -fx-border-width: 1px;
-    -fx-padding: 6 12 6 12;
+    -fx-padding: 5 12 5 12;
     -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -color-acento;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-pizarra-texto;
 }
 
 .tarjeta-consejo {
@@ -1119,27 +1122,36 @@
 }
 
 .icono-accion {
-    -fx-fill: -color-texto-secundario;
+    -fx-fill: transparent;
+    -fx-stroke: -color-texto-secundario;
+    -fx-stroke-width: 1.4;
+    -fx-stroke-line-join: round;
+    -fx-stroke-line-cap: round;
 }
 
 .boton-icono:hover .icono-accion {
-    -fx-fill: -color-acento;
+    -fx-stroke: -color-acento;
 }
 
 .boton-icono-peligro .icono-accion {
-    -fx-fill: -color-rojo;
+    -fx-stroke: -color-rojo;
 }
 
 .boton-icono-peligro:hover .icono-accion {
-    -fx-fill: -color-rojo;
+    -fx-stroke: -color-rojo;
 }
 
 .nav-icono-svg {
-    -fx-fill: -color-texto-secundario;
+    -fx-fill: transparent;
+    -fx-stroke: -color-texto-secundario;
+    -fx-stroke-width: 2;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
 }
 
 .nav-boton:selected .nav-icono-svg {
-    -fx-fill: -color-acento;
+    -fx-fill: transparent;
+    -fx-stroke: -color-acento;
 }
 
 .chip-hoy {
@@ -1167,7 +1179,7 @@
 }
 
 .avatar-perfil {
-    -fx-background-color: linear-gradient(to bottom right, -color-acento-suave, -color-superficie);
+    -fx-background-color: -color-acento-suave;
     -fx-background-radius: 999px;
     -fx-border-color: -color-acento-borde;
     -fx-border-radius: 999px;
@@ -1242,7 +1254,6 @@
     -fx-fill: -color-acento;
     -fx-stroke: -color-acento-hover;
     -fx-stroke-width: 1;
-    -fx-effect: dropshadow(gaussian, -color-acento, 8, 0.45, 0, 0);
 }
 
 .musculo-secundario {
@@ -1280,33 +1291,32 @@
     -fx-border-radius: 999px;
     -fx-border-width: 1px;
     -fx-padding: 1 4 1 4;
-    -fx-effect: dropshadow(gaussian, -color-verde, 6, 0.35, 0, 0);
 }
 
 .toast-logro {
-    -fx-background-color: rgba(32, 32, 32, 0.92);
-    -fx-background-radius: 12px;
-    -fx-border-color: rgba(58, 160, 255, 0.55);
-    -fx-border-radius: 12px;
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 8px;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 8px;
     -fx-border-width: 1px;
     -fx-padding: 10 16 10 14;
-    -fx-effect: dropshadow(gaussian, rgba(0, 120, 212, 0.55), 12, 0.15, 0, 2);
+    -fx-effect: dropshadow(gaussian, -color-sombra, 12, 0, 0, 3);
 }
 
 .toast-logro-simbolo {
-    -fx-font-size: 22px;
-    -fx-text-fill: #F5B301;
+    -fx-font-size: 20px;
+    -fx-text-fill: -color-acento;
 }
 
 .toast-logro-titulo {
     -fx-font-size: 13.5px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-texto;
 }
 
 .toast-logro-detalle {
     -fx-font-size: 11.5px;
-    -fx-text-fill: #C8CDD6;
+    -fx-text-fill: -color-texto-secundario;
 }
 
 .reproductor-tarjeta {
@@ -1324,7 +1334,7 @@
 }
 
 .espectro-barra {
-    -fx-fill: linear-gradient(to top, -color-acento, -color-cian);
+    -fx-fill: -color-acento;
 }
 
 .portada-reproductor {
@@ -1372,7 +1382,6 @@
     -fx-background-color: -color-acento-suave;
     -fx-border-color: -color-acento;
     -fx-border-width: 2px;
-    -fx-effect: dropshadow(gaussian, -color-acento, 10, 0.35, 0, 0);
 }
 
 .etiqueta-modo {
@@ -1407,7 +1416,6 @@
     -fx-pref-height: 56px;
     -fx-padding: 0;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, -color-acento, 14, 0.40, 0, 3);
 }
 
 .boton-media-principal:hover {
@@ -1548,7 +1556,6 @@
     -fx-pref-height: 40px;
     -fx-padding: 0;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, -color-acento, 12, 0.35, 0, 3);
 }
 
 .boton-media-mini-principal:hover {
@@ -1568,7 +1575,7 @@
 }
 
 .barra-xp > .bar {
-    -fx-background-color: linear-gradient(to right, -color-oro, #FFD866);
+    -fx-background-color: -color-acento;
     -fx-background-radius: 5px;
     -fx-background-insets: 0;
     -fx-padding: 4px;
@@ -1586,9 +1593,9 @@
 }
 
 .nav-nivel {
-    -fx-background-color: -color-oro-suave;
+    -fx-background-color: -color-pizarra-suave;
     -fx-background-radius: 8px;
-    -fx-border-color: -color-oro-borde;
+    -fx-border-color: -color-pizarra-borde;
     -fx-border-radius: 8px;
     -fx-border-width: 1px;
     -fx-padding: 10px;
@@ -1596,49 +1603,47 @@
 }
 
 .nav-nivel-insignia {
-    -fx-background-color: -color-oro;
-    -fx-text-fill: #1B1B1B;
+    -fx-background-color: -color-pizarra;
+    -fx-text-fill: white;
     -fx-font-size: 11px;
-    -fx-font-weight: bold;
-    -fx-background-radius: 9px;
-    -fx-padding: 2 8 2 8;
+    -fx-font-weight: 600;
+    -fx-background-radius: 5px;
+    -fx-padding: 2 7 2 7;
 }
 
 .nav-nivel-titulo {
     -fx-font-size: 12px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
     -fx-text-fill: -color-texto;
 }
 
 .rpg-panel {
     -fx-background-color: -color-superficie;
     -fx-background-radius: 10px;
-    -fx-border-color: -color-oro-borde;
+    -fx-border-color: -color-borde;
     -fx-border-radius: 10px;
     -fx-border-width: 1px;
     -fx-padding: 18px;
-    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
 }
 
 .rpg-medalla {
-    -fx-background-color: radial-gradient(center 50% 35%, radius 80%, #FFE08A, -color-oro);
+    -fx-background-color: -color-pizarra-suave;
     -fx-background-radius: 40px;
-    -fx-border-color: #FFF1C2;
+    -fx-border-color: -color-pizarra;
     -fx-border-radius: 40px;
-    -fx-border-width: 3px;
-    -fx-effect: dropshadow(gaussian, rgba(245, 179, 1, 0.55), 14, 0.2, 0, 0);
+    -fx-border-width: 2px;
 }
 
 .rpg-medalla-numero {
     -fx-font-size: 30px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #3A2A00;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-pizarra-texto;
 }
 
 .rpg-titulo {
     -fx-font-size: 18px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -color-oro;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-pizarra-texto;
 }
 
 .rpg-subtitulo-meta {
@@ -1672,15 +1677,15 @@
 }
 
 .chip-xp {
-    -fx-background-color: -color-oro-suave;
-    -fx-text-fill: -color-oro;
-    -fx-border-color: -color-oro-borde;
+    -fx-background-color: -color-pizarra-suave;
+    -fx-text-fill: -color-pizarra-texto;
+    -fx-border-color: -color-pizarra-borde;
     -fx-border-width: 1px;
-    -fx-background-radius: 9px;
-    -fx-border-radius: 9px;
-    -fx-padding: 1 8 1 8;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-padding: 1 7 1 7;
     -fx-font-size: 11px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
 }
 
 .chip-xp-hecho {
@@ -1694,22 +1699,23 @@
     -fx-border-radius: 10px;
     -fx-border-width: 1px;
     -fx-padding: 16px;
-    -fx-effect: dropshadow(gaussian, -color-sombra, 8, 0, 0, 2);
 }
 
 .tarjeta-reto-flash {
-    -fx-border-color: -color-naranja;
+    -fx-border-color: -color-borde-fuerte;
 }
 
 .tarjeta-reto-recuperacion {
-    -fx-border-color: -color-menta;
+    -fx-border-color: -color-borde;
 }
 
 .boton-reto-completar {
-    -fx-background-color: -color-acento-suave;
-    -fx-border-color: -color-acento;
+    -fx-background-color: -color-superficie;
+    -fx-border-color: -color-borde-fuerte;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
     -fx-text-fill: -color-acento;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
     -fx-font-size: 12px;
     -fx-padding: 6 14 6 14;
 }
@@ -1719,23 +1725,23 @@
 }
 
 .tarjeta-reto-completo {
-    -fx-background-color: -color-acento-suave;
-    -fx-border-color: -color-verde;
+    -fx-background-color: -color-superficie-alt;
+    -fx-border-color: -color-acento-borde;
 }
 
 .reto-tipo {
     -fx-font-size: 10.5px;
-    -fx-font-weight: bold;
-    -fx-text-fill: -color-acento;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-pizarra;
 }
 
 .reto-tipo-flash {
-    -fx-text-fill: -color-naranja;
+    -fx-text-fill: -color-pizarra;
 }
 
 .reto-titulo {
     -fx-font-size: 14px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
     -fx-text-fill: -color-texto;
 }
 
@@ -1799,7 +1805,6 @@
     -fx-border-radius: 16px;
     -fx-border-width: 2px;
     -fx-padding: 26px 30px 26px 30px;
-    -fx-effect: dropshadow(gaussian, rgba(245, 179, 1, 0.45), 40, 0.15, 0, 0);
 }
 
 .levelup-etiqueta {
@@ -1809,17 +1814,17 @@
 }
 
 .levelup-medalla {
-    -fx-background-color: radial-gradient(center 50% 35%, radius 80%, #FFE08A, #E0A000);
-    -fx-background-radius: 66px;
-    -fx-border-color: #FFF1C2;
-    -fx-border-radius: 66px;
-    -fx-border-width: 4px;
+    -fx-background-color: -color-superficie;
+    -fx-background-radius: 60px;
+    -fx-border-color: -color-acento;
+    -fx-border-radius: 60px;
+    -fx-border-width: 3px;
 }
 
 .levelup-numero {
-    -fx-font-size: 58px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #3A2A00;
+    -fx-font-size: 44px;
+    -fx-font-weight: 600;
+    -fx-text-fill: -color-texto;
 }
 
 .levelup-titulo {
@@ -1906,12 +1911,12 @@
 }
 
 .tarjeta-frase {
-    -fx-background-color: linear-gradient(to right, -color-acento-suave, -color-superficie);
+    -fx-background-color: -color-superficie;
     -fx-background-radius: 10px;
-    -fx-border-color: -color-acento-borde;
+    -fx-border-color: -color-borde;
     -fx-border-radius: 10px;
     -fx-border-width: 1px;
-    -fx-padding: 14 18 14 18;
+    -fx-padding: 16 20 16 20;
 }
 
 .frase-comillas {
@@ -1941,22 +1946,14 @@
 }
 
 .vfx-texto-flotante {
-    -fx-background-color: -color-superficie;
+    -fx-font-size: 22px;
+    -fx-font-weight: 600;
     -fx-text-fill: -color-acento;
-    -fx-font-size: 17px;
-    -fx-font-weight: bold;
-    -fx-padding: 4 12 4 12;
-    -fx-background-radius: 14px;
-    -fx-border-color: -color-acento;
-    -fx-border-radius: 14px;
-    -fx-border-width: 1px;
-    -fx-effect: dropshadow(gaussian, -color-acento, 14, 0.25, 0, 0);
 }
 
 .levelup-escudo {
-    -fx-fill: linear-gradient(to bottom, #FFE08A, #E0A000);
-    -fx-stroke: #FFF1C2;
-    -fx-stroke-width: 3px;
+    -fx-fill: -color-acento;
+    -fx-stroke: transparent;
 }
 
 .levelup-xp {
@@ -1966,16 +1963,18 @@
 }
 
 .levelup-boton {
-    -fx-font-size: 14px;
-    -fx-padding: 9 28 9 28;
-    -fx-background-color: linear-gradient(to bottom, #FFD866, #F5B301);
-    -fx-text-fill: #3A2A00;
-    -fx-border-color: #FFF1C2;
-    -fx-effect: dropshadow(gaussian, rgba(245, 179, 1, 0.6), 18, 0.2, 0, 0);
+    -fx-background-color: -color-acento;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
+    -fx-font-weight: 600;
+    -fx-padding: 9 22 9 22;
+    -fx-cursor: hand;
 }
 
 .levelup-boton:hover {
-    -fx-background-color: linear-gradient(to bottom, #FFE08A, #FFB800);
+    -fx-background-color: -color-acento-hover;
 }
 
 .table-row-cell:empty {
@@ -1994,21 +1993,20 @@
 }
 
 .boton-iniciar {
-    -fx-background-color: linear-gradient(to bottom, -color-acento, -color-acento-hover);
+    -fx-background-color: -color-acento;
     -fx-border-color: transparent;
-    -fx-background-radius: 7px;
-    -fx-border-radius: 7px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
     -fx-text-fill: white;
     -fx-font-size: 13.5px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
     -fx-padding: 10 22 10 18;
     -fx-graphic-text-gap: 8px;
-    -fx-effect: dropshadow(gaussian, -color-acento, 16, 0.38, 0, 3);
     -fx-cursor: hand;
 }
 
 .boton-iniciar:hover {
-    -fx-background-color: linear-gradient(to bottom, -color-acento-hover, -color-acento-hover);
+    -fx-background-color: -color-acento-hover;
 }
 
 .boton-iniciar:disabled {
@@ -2041,7 +2039,7 @@
 }
 
 .boton-icono-borde:hover .icono-accion {
-    -fx-fill: -color-acento;
+    -fx-stroke: -color-acento;
 }
 
 .boton-icono-borde-peligro:hover {
@@ -2050,7 +2048,7 @@
 }
 
 .boton-icono-borde-peligro .icono-accion {
-    -fx-fill: -color-rojo;
+    -fx-stroke: -color-rojo;
 }
 
 .lista-rutinas {
@@ -2126,29 +2124,29 @@
 
 .chip-rir {
     -fx-border-width: 1px;
-    -fx-background-radius: 9px;
-    -fx-border-radius: 9px;
-    -fx-padding: 1 8 1 8;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-padding: 1 7 1 7;
     -fx-font-size: 11px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
 }
 
 .chip-rir-duro {
-    -fx-background-color: -color-peligro-suave;
-    -fx-text-fill: -color-naranja;
-    -fx-border-color: -color-naranja;
+    -fx-background-color: -color-oro-suave;
+    -fx-text-fill: -color-oro;
+    -fx-border-color: -color-oro-borde;
 }
 
 .chip-rir-medio {
-    -fx-background-color: -color-acento-suave;
-    -fx-text-fill: -color-acento;
-    -fx-border-color: -color-acento-borde;
+    -fx-background-color: -color-pizarra-suave;
+    -fx-text-fill: -color-pizarra-texto;
+    -fx-border-color: -color-pizarra-borde;
 }
 
 .chip-rir-suave {
-    -fx-background-color: -color-acento-suave;
-    -fx-text-fill: -color-verde;
-    -fx-border-color: -color-acento-borde;
+    -fx-background-color: -color-pizarra-suave;
+    -fx-text-fill: -color-texto-secundario;
+    -fx-border-color: -color-pizarra-borde;
 }
 
 .icono-media-ok {
@@ -2174,9 +2172,9 @@
 }
 
 .splash-panel {
-    -fx-background-color: linear-gradient(to bottom, #10141C, #0A0D14);
+    -fx-background-color: #1C2026;
     -fx-background-radius: 20px;
-    -fx-border-color: rgba(42, 169, 240, 0.35);
+    -fx-border-color: #2D333B;
     -fx-border-radius: 20px;
     -fx-border-width: 1px;
     -fx-padding: 46 56 40 56;
@@ -2192,7 +2190,7 @@
 .splash-titulo-acento {
     -fx-font-size: 34px;
     -fx-font-weight: bold;
-    -fx-text-fill: #2AA9F0;
+    -fx-text-fill: #4A93D6;
 }
 
 .splash-lema {
@@ -2212,7 +2210,7 @@
 }
 
 .splash-progreso > .bar {
-    -fx-background-color: linear-gradient(to right, #2AA9F0, #0078D4);
+    -fx-background-color: #3D8AD0;
     -fx-background-radius: 3px;
     -fx-background-insets: 0;
     -fx-padding: 3px;
@@ -2221,4 +2219,33 @@
 .splash-carga {
     -fx-font-size: 12px;
     -fx-text-fill: #9AA7B8;
+}
+
+.interruptor {
+    -fx-background-color: -color-borde-fuerte;
+    -fx-background-radius: 10px;
+    -fx-min-width: 34px;
+    -fx-pref-width: 34px;
+    -fx-max-width: 34px;
+    -fx-min-height: 18px;
+    -fx-pref-height: 18px;
+    -fx-max-height: 18px;
+    -fx-padding: 0 2 0 2;
+    -fx-alignment: center-left;
+}
+
+.interruptor-bola {
+    -fx-background-color: white;
+    -fx-background-radius: 999px;
+    -fx-min-width: 14px;
+    -fx-pref-width: 14px;
+    -fx-max-width: 14px;
+    -fx-min-height: 14px;
+    -fx-pref-height: 14px;
+    -fx-max-height: 14px;
+}
+
+.nav-tema:selected .interruptor {
+    -fx-background-color: -color-acento;
+    -fx-alignment: center-right;
 }
